@@ -15,7 +15,6 @@ setup(
     packages=["codenerix_storages"],
     include_package_data=True,
     zip_safe=False,
-    install_requires=['django-codenerix', ],
     license='Apache License Version 2.0',
     description='Codenerix Storages is a module that enables CODENERIX to set storages on serveral platforms in a general manner.',
     long_description=README,
