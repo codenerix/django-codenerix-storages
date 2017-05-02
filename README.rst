@@ -32,8 +32,8 @@ Quickstart
     ]
 
 3. Add in settings the params::
-	# path for codenerix_storages
-	CDNX_STORAGES = "storages"
+    # path for codenerix_storages
+    CDNX_STORAGES = "storages"
 
 4. Since Codenerix Storages is a library, you only need to import its parts into your project and use them.
 
