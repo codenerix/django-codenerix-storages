@@ -32,6 +32,7 @@ Quickstart
     ]
 
 3. Add in settings the params::
+
     # path for codenerix_storages
     CDNX_STORAGES = "storages"
 
