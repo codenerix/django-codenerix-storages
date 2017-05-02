@@ -1,0 +1,124 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-28 14:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: codenerix_storages/forms.py:24 codenerix_storages/forms.py:34
+#: codenerix_storages/forms.py:58 codenerix_storages/forms.py:67
+#: codenerix_storages/forms.py:81 codenerix_storages/forms.py:91
+#: codenerix_storages/forms.py:106 codenerix_storages/forms.py:115
+#: codenerix_storages/forms.py:130 codenerix_storages/forms.py:140
+#: codenerix_storages/forms.py:155 codenerix_storages/forms.py:164
+msgid "Details"
+msgstr ""
+
+#: codenerix_storages/models.py:11 codenerix_storages/models.py:73
+#: codenerix_storages/models.py:93 codenerix_storages/models.py:99
+#: codenerix_storages/models.py:125 codenerix_storages/views.py:29
+#: codenerix_storages/views.py:98
+msgid "Storage"
+msgstr ""
+
+#: codenerix_storages/models.py:18 codenerix_storages/models.py:31
+msgid "---"
+msgstr ""
+
+#: codenerix_storages/models.py:24
+msgid "Contact persons of storage"
+msgstr ""
+
+#: codenerix_storages/models.py:41 codenerix_storages/models.py:47
+msgid "Alias"
+msgstr ""
+
+#: codenerix_storages/models.py:61
+msgid ""
+"Cannot delete storage model, relationship between storage model and contacts"
+msgstr ""
+
+#: codenerix_storages/models.py:63
+msgid ""
+"Cannot delete storage model, relationship between storage model and zones"
+msgstr ""
+
+#: codenerix_storages/models.py:85
+msgid "Storages"
+msgstr ""
+
+#: codenerix_storages/models.py:94 codenerix_storages/models.py:98
+#: codenerix_storages/models.py:114 codenerix_storages/models.py:124
+msgid "Zone"
+msgstr ""
+
+#: codenerix_storages/models.py:107
+msgid ""
+"Cannot delete storage zone model, relationship between storage zone model "
+"and bacth"
+msgstr ""
+
+#: codenerix_storages/models.py:115 codenerix_storages/models.py:123
+msgid "Reference"
+msgstr ""
+
+#: codenerix_storages/models.py:118
+msgid "Storage's Batch"
+msgstr ""
+
+#: codenerix_storages/models.py:119
+msgid "Storage's Batchs"
+msgstr ""
+
+#: codenerix_storages/views.py:29 codenerix_storages/views.py:98
+#: codenerix_storages/views.py:116 codenerix_storages/views.py:197
+msgid "People"
+msgstr ""
+
+#: codenerix_storages/views.py:43
+msgid "The selected entry is already a storage, select another entry!"
+msgstr ""
+
+#: codenerix_storages/views.py:44 codenerix_storages/views.py:69
+msgid "The selected entry is not available anymore, please, try again!"
+msgstr ""
+
+#: codenerix_storages/views.py:87
+msgid "Zones"
+msgstr ""
+
+#: codenerix_storages/views.py:88 codenerix_storages/views.py:179
+msgid "Bacthes"
+msgstr ""
+
+#: codenerix_storages/views.py:89
+msgid "Contacts"
+msgstr ""
+
+#: codenerix_storages/views.py:116
+msgid "StorageZone"
+msgstr ""
+
+#: codenerix_storages/views.py:197
+msgid "StorageBatch"
+msgstr ""
+
+#: codenerix_storages/views.py:256
+msgid "ref"
+msgstr ""
+
+#: codenerix_storages/views.py:320
+msgid "Storage not seleted!"
+msgstr ""
