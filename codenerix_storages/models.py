@@ -22,6 +22,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from codenerix.models import GenInterface, CodenerixModel
+from codenerix.models_people import GenRole
+
 from codenerix_extensions.helpers import get_external_method
 
 
@@ -52,9 +54,14 @@ class GenStorageContact(GenInterface):
 
 
 # almacen
-class Storage(CodenerixModel):
+class Storage(GenRole, CodenerixModel):
     class CodenerixMeta:
         abstract = GenStorage
+        rol_groups = {}
+        rol_permissions = []
+        force_methods = {
+            'foreignkey_storage': ('CDNX_get_fk_info_storage_contacts', _('---')),
+        }
 
     alias = models.CharField(_("Alias"), max_length=80, null=False, blank=False)
 
