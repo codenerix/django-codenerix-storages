@@ -143,7 +143,7 @@ class StorageBatch(CodenerixModel):
     zone = models.ForeignKey(StorageZone, related_name='storage_zones', verbose_name=_("Zone"), null=False, blank=False)
     ref = models.CharField(_("Reference"), max_length=80, null=False, blank=False)
 
-    class Meta:
+    class Meta(CodenerixModel.Meta):
         verbose_name = _("Storage's Batch")
         verbose_name_plural = _("Storage's Batchs")
 
