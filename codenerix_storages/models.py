@@ -95,7 +95,7 @@ class StorageContact(CodenerixModel):
     class CodenerixMeta:
         abstract = GenStorageContact
 
-    storage = models.ManyToManyField(Storage, related_name='storage_contacts', verbose_name=_("Storage"), null=False, blank=False)
+    storage = models.ManyToManyField(Storage, related_name='storage_contacts', verbose_name=_("Storage"), blank=False)
 
     def __unicode__(self):
         return u"{}".format("self.storage")
