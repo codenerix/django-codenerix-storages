@@ -116,7 +116,7 @@ class StorageContact(CodenerixModel):
 
 # zonas del almacen
 class StorageZone(CodenerixModel):
-    storage = models.ForeignKey(Storage, related_name='storage_zones', verbose_name=_("Storage"), null=False, blank=False)
+    storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name='storage_zones', verbose_name=_("Storage"), null=False, blank=False)
     name = models.CharField(_("Zone"), max_length=80, null=False, blank=False)
 
     def __fields__(self, info):
@@ -140,7 +140,7 @@ class StorageZone(CodenerixModel):
 
 # Lotes
 class StorageBatch(CodenerixModel):
-    zone = models.ForeignKey(StorageZone, related_name='storage_zones', verbose_name=_("Zone"), null=False, blank=False)
+    zone = models.ForeignKey(StorageZone, on_delete=models.CASCADE, related_name='storage_zones', verbose_name=_("Zone"), null=False, blank=False)
     ref = models.CharField(_("Reference"), max_length=80, null=False, blank=False)
 
     class Meta(CodenerixModel.Meta):
