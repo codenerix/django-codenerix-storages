@@ -18,37 +18,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django import forms
 from django.utils.translation import ugettext_lazy as _
 from codenerix.forms import GenModelForm
-from codenerix_extensions.helpers import get_external_model
-from codenerix_storages.models import Storage, StorageZone  # , StorageContact
-# from codenerix_storages.models import StorageHall, StorageRack, StorageShelf, 
-from codenerix_storages.models import StorageBox
+from codenerix_storages.models import Storage, StorageZone
+from codenerix_storages.models import StorageBox, StorageBoxStructure, StorageBoxKind
 
 
 class StorageForm(GenModelForm):
-    """
-    codenerix_external_field = forms.ModelChoiceField(
-        label=Storage.foreignkey_external()['label'],
-        queryset=get_external_model(Storage).objects.all()
-    )
-    """
 
     class Meta:
         model = Storage
         exclude = []
-        """
-        autofill = {
-            'codenerix_external_field': ['select', 3, Storage.foreignkey_external()['related']],
-        }
-        """
 
     def __groups__(self):
         g = [
-           (_('Details'), 12,
-                # ['codenerix_external_field', 6],
-                ['alias', 6],
+            (
+                _('Details'), 12,
+                ['name', 6],
             )
         ]
         return g
@@ -56,46 +42,14 @@ class StorageForm(GenModelForm):
     @staticmethod
     def __groups_details__():
         g = [
-           (_('Details'), 12,
-                ['company', 6],
-                ['alias', 6],
+            (
+                _('Details'), 12,
+                ['name', 6],
             )
         ]
         return g
 
 
-"""
-class StorageContactForm(GenModelForm):
-    codenerix_external_field = forms.ModelChoiceField(
-        label=StorageContact.foreignkey_external()['label'],
-        queryset=get_external_model(StorageContact).objects.all()
-    )
-
-    class Meta:
-        model = StorageContact
-        exclude = ['storage']
-        autofill = {
-            'codenerix_external_field': ['select', 3, StorageContact.foreignkey_external()['related']],
-        }
-
-    def __groups__(self):
-        g = [
-           (_('Details'), 12,
-                ['codenerix_external_field', 6],
-            )
-        ]
-        return g
-
-    @staticmethod
-    def __groups_details__():
-        g = [
-           (_('Details'), 12,
-                ['external_contact', 6],
-            )
-        ]
-        return g
-
-"""
 class StorageZoneForm(GenModelForm):
     class Meta:
         model = StorageZone
@@ -103,9 +57,11 @@ class StorageZoneForm(GenModelForm):
 
     def __groups__(self):
         g = [
-           (_('Details'), 12,
+            (
+                _('Details'), 12,
                 ['storage', 6],
                 ['name', 6],
+                ['salable', 6],
             )
         ]
         return g
@@ -113,9 +69,11 @@ class StorageZoneForm(GenModelForm):
     @staticmethod
     def __groups_details__():
         g = [
-           (_('Details'), 12,
+            (
+                _('Details'), 12,
                 ['storage', 6],
                 ['name', 6],
+                ['salable', 6],
             )
         ]
         return g
@@ -128,8 +86,10 @@ class StorageZoneOwnForm(GenModelForm):
 
     def __groups__(self):
         g = [
-           (_('Details'), 12,
+            (
+                _('Details'), 12,
                 ['name', 6],
+                ['salable', 6],
             )
         ]
         return g
@@ -137,144 +97,14 @@ class StorageZoneOwnForm(GenModelForm):
     @staticmethod
     def __groups_details__():
         g = [
-           (_('Details'), 12,
+            (
+                _('Details'), 12,
                 ['storage', 6],
                 ['name', 6],
+                ['salable', 6],
             )
         ]
         return g
-
-"""
-class StorageBatchForm(GenModelForm):
-    class Meta:
-        model = StorageBatch
-        exclude = []
-
-    def __groups__(self):
-        g = [
-           (_('Details'), 12,
-                ['zone', 6],
-                ['ref', 6],
-            )
-        ]
-        return g
-
-    @staticmethod
-    def __groups_details__():
-        g = [
-           (_('Details'), 12,
-                ['zone', 6],
-                ['ref', 6],
-            )
-        ]
-        return g
-
-
-class StorageBatchOwnForm(GenModelForm):
-    class Meta:
-        model = StorageBatch
-        exclude = ['zone']
-
-    def __groups__(self):
-        g = [
-           (_('Details'), 12,
-                ['ref', 6],
-            )
-        ]
-        return g
-
-    @staticmethod
-    def __groups_details__():
-        g = [
-           (_('Details'), 12,
-                ['zone', 6],
-                ['ref', 6],
-            )
-        ]
-        return g
-"""
-
-"""
-class StorageHallForm(GenModelForm):
-    class Meta:
-        model = StorageHall
-        exclude = []
-
-    def __groups__(self):
-        g = [
-            (
-                _('Details'), 12,
-                ['zone', 6],
-                ['alias', 6],
-            )
-        ]
-        return g
-
-    @staticmethod
-    def __groups_details__():
-        g = [
-            (
-                _('Details'), 12,
-                ['zone', 6],
-                ['alias', 6],
-            )
-        ]
-        return g
-
-
-class StorageRackForm(GenModelForm):
-    class Meta:
-        model = StorageRack
-        exclude = []
-
-    def __groups__(self):
-        g = [
-            (
-                _('Details'), 12,
-                ['hall', 6],
-                ['alias', 6],
-            )
-        ]
-        return g
-
-    @staticmethod
-    def __groups_details__():
-        g = [
-            (
-                _('Details'), 12,
-                ['hall', 6],
-                ['alias', 6],
-            )
-        ]
-        return g
-
-
-class StorageShelfForm(GenModelForm):
-    class Meta:
-        model = StorageShelf
-        exclude = []
-
-    def __groups__(self):
-        g = [
-            (
-                _('Details'), 12,
-                ['rack', 6],
-                ['alias', 6],
-            )
-        ]
-        return g
-
-    @staticmethod
-    def __groups_details__():
-        g = [
-            (
-                _('Details'), 12,
-                ['rack', 6],
-                ['alias', 6],
-            )
-        ]
-        return g
-"""
 
 
 class StorageBoxForm(GenModelForm):
@@ -312,3 +142,72 @@ class StorageBoxForm(GenModelForm):
         return g
 
 
+class StorageBoxStructureForm(GenModelForm):
+    class Meta:
+        model = StorageBoxStructure
+        exclude = []
+    
+    def __groups__(self):
+        return [
+            (
+                _('Details', 12),
+                ['zone', 6],
+                ['box_structure', 6],
+                ['length', 6],
+                ['width', 6],
+                ['heigth', 6],
+                ['weight', 6],
+                ['max_weight', 6],
+                ['name', 6],
+            )
+        ]
+
+    @staticmethod
+    def __groups_details__():
+        g = [
+            (
+                _('Details'), 12,
+                ['zone', 6],
+                ['box_structure', 6],
+                ['length', 6],
+                ['width', 6],
+                ['heigth', 6],
+                ['weight', 6],
+                ['max_weight', 6],
+                ['name', 6],
+            )
+        ]
+        return g
+
+
+class StorageBoxKindForm(GenModelForm):
+    class Meta:
+        model = StorageBoxKind
+        exclude = []
+
+    def __groups__(self):
+        return [
+            (
+                _('Details', 12),
+                ['length', 6],
+                ['width', 6],
+                ['heigth', 6],
+                ['weight', 6],
+                ['max_weight', 6],
+                ['name', 6],
+            )
+        ]
+        
+    @staticmethod
+    def __groups_details__():
+        return [
+            (
+                _('Details', 12),
+                ['length', 6],
+                ['width', 6],
+                ['heigth', 6],
+                ['weight', 6],
+                ['max_weight', 6],
+                ['name', 6],
+            )
+        ]

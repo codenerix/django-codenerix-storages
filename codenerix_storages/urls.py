@@ -21,13 +21,10 @@
 from django.conf.urls import url
 from codenerix_storages.views import StorageList, StorageCreate, StorageCreateModal, StorageUpdate, StorageUpdateModal, StorageDelete, StorageDetails
 from codenerix_storages.views import StorageZoneList, StorageZoneCreate, StorageZoneCreateModal, StorageZoneUpdate, StorageZoneUpdateModal, StorageZoneDelete, StorageZoneSubList, StorageZoneDetail, StorageZoneDetailModal, OwnStorageZoneCreateModal, OwnStorageZoneUpdateModal
-# from codenerix_storages.views import StorageContactCreateModal, StorageContactDelete, StorageContactSubList, StorageContactDetailModal
-# from codenerix_storages.views import StorageContactUpdateModal
-# StorageBatchList, StorageBatchCreate, StorageBatchCreateModal, StorageBatchOwnCreateModal, StorageBatchUpdate, StorageBatchUpdateModal, StorageBatchOwnUpdateModal, StorageBatchDelete, StorageBatchDetail, StorageBatchSubList, StorageBatchDetailModal, StorageBatchOwnSubList
-# from codenerix_storages.views import StorageHallList, StorageHallCreate, StorageHallCreateModal, StorageHallDetail, StorageHallUpdate, StorageHallUpdateModal, StorageHallDelete, StorageHallSubList, StorageHallDetailModal
-# from codenerix_storages.views import StorageRackList, StorageRackCreate, StorageRackCreateModal, StorageRackDetail, StorageRackUpdate, StorageRackUpdateModal, StorageRackDelete, StorageRackSubList, StorageRackDetailModal
-# from codenerix_storages.views import StorageShelfList, StorageShelfCreate, StorageShelfCreateModal, StorageShelfDetail, StorageShelfUpdate, StorageShelfUpdateModal, StorageShelfDelete, StorageShelfSubList, StorageShelfDetailModal
 from codenerix_storages.views import StorageBoxList, StorageBoxCreate, StorageBoxCreateModal, StorageBoxDetail, StorageBoxUpdate, StorageBoxUpdateModal, StorageBoxDelete, StorageBoxSubList, StorageBoxDetailModal
+from codenerix_storages.views import StorageBoxStructureList, StorageBoxStructureCreate, StorageBoxStructureCreateModal, StorageBoxStructureUpdate, StorageBoxStructureUpdateModal, StorageBoxStructureDelete, StorageBoxStructureSubList, StorageBoxStructureDetails, StorageBoxStructureDetailModal
+from codenerix_storages.views import StorageBoxKindList, StorageBoxKindCreate, StorageBoxKindCreateModal, StorageBoxKindUpdate, StorageBoxKindUpdateModal, StorageBoxKindDelete, StorageBoxKindSubList, StorageBoxKindDetails, StorageBoxKindDetailModal
+
 
 urlpatterns = [
     url(r'^storages$', StorageList.as_view(), name='CDNX_storages_storages_list'),
@@ -70,89 +67,37 @@ urlpatterns = [
     url(r'^storageboxs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', StorageBoxUpdateModal.as_view(), name='CDNX_storages_storageboxs_sublist_edit'),
     url(r'^storageboxs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', StorageBoxUpdateModal.as_view(), name='CDNX_storages_storageboxs_sublist_editmodal'),
     url(r'^storageboxs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', StorageBoxDelete.as_view(), name='CDNX_storages_storageboxs_sublist_delete'),
-]
-"""
-    # StorageBatch
-    url(r'^storagebatchs$', StorageBatchList.as_view(), name='CDNX_storages_storagebatchs_list'),
-    url(r'^storagebatchs/add$', StorageBatchCreate.as_view(), name='CDNX_storages_storagebatchs_add'),
-    url(r'^storagebatchs/addmodal$', StorageBatchCreateModal.as_view(), name='CDNX_storages_storagebatchs_addmodal'),
-    url(r'^storagebatchs/(?P<pk>\w+)$', StorageBatchDetail.as_view(), name='CDNX_storages_storagezones_detail'),
-    url(r'^storagebatchs/(?P<pk>\w+)/edit$', StorageBatchUpdate.as_view(), name='CDNX_storages_storagebatchs_edit'),
-    url(r'^storagebatchs/(?P<pk>\w+)/editmodal$', StorageBatchUpdateModal.as_view(), name='CDNX_storages_storagebatchs_editmodal'),
-    url(r'^storagebatchs/(?P<pk>\w+)/delete$', StorageBatchDelete.as_view(), name='CDNX_storages_storagebatchs_delete'),
-
-    url(r'^storagebatchs/(?P<pk>\w+)/sublist$', StorageBatchSubList.as_view(), name='CDNX_storages_storagebatchs_sublist'),
-    url(r'^storagebatchs/(?P<pk>\w+)/sublist/add$', StorageBatchCreateModal.as_view(), name='CDNX_storages_storagebatchs_sublist_add'),
-    url(r'^storagebatchs/(?P<pk>\w+)/sublist/addmodal$', StorageBatchCreateModal.as_view(), name='CDNX_storages_storagebatchs_sublist_addmodal'),
-    url(r'^storagebatchs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', StorageBatchDetailModal.as_view(), name='CDNX_storages_storagebatchs_sublist_details'),
-    url(r'^storagebatchs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', StorageBatchUpdateModal.as_view(), name='CDNX_storages_storagebatchs_sublist_edit'),
-    url(r'^storagebatchs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', StorageBatchUpdateModal.as_view(), name='CDNX_storages_storagebatchs_sublist_editmodal'),
-    url(r'^storagebatchs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', StorageBatchDelete.as_view(), name='CDNX_storages_storagebatchs_sublist_delete'),
-
-    url(r'^storagebatchs/(?P<pk>\w+)/own/sublist$', StorageBatchOwnSubList.as_view(), name='CDNX_storages_own_storagebatchs_sublist'),
-    url(r'^storagebatchs/(?P<pk>\w+)/own/sublist/add$', StorageBatchOwnCreateModal.as_view(), name='CDNX_storages_own_storagebatchs_sublist_add'),
-    url(r'^storagebatchs/(?P<pk>\w+)/own/sublist/addmodal$', StorageBatchOwnCreateModal.as_view(), name='CDNX_storages_own_storagebatchs_sublist_addmodal'),
-    url(r'^storagebatchs/(?P<cpk>\w+)/own/sublist/(?P<pk>\w+)/editmodal$', StorageBatchOwnUpdateModal.as_view(), name='CDNX_storages_own_storagebatchs_sublist_editmodal'),
-    url(r'^storagebatchs/(?P<cpk>\w+)/own/sublist/(?P<pk>\w+)/delete$', StorageBatchDelete.as_view(), name='CDNX_storages_own_storagebatchs_sublist_delete'),
-
-
-    # StorageContact
-    url(r'^storagecontacts/(?P<pk>\w+)/sublist$', StorageContactSubList.as_view(), name='CDNX_storages_storagecontacts_sublist'),
-    url(r'^storagecontacts/(?P<pk>\w+)/sublist/add$', StorageContactCreateModal.as_view(), name='CDNX_storages_storagecontacts_sublist_add'),
-    url(r'^storagecontacts/(?P<pk>\w+)/sublist/addmodal$', StorageContactCreateModal.as_view(), name='CDNX_storages_storagecontacts_sublist_addmodal'),
-    url(r'^storagecontacts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', StorageContactDetailModal.as_view(), name='CDNX_storages_storagecontacts_sublist_details'),
-    url(r'^storagecontacts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', StorageContactUpdateModal.as_view(), name='CDNX_storages_storagecontacts_sublist_editmodal'),
-    url(r'^storagecontacts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', StorageContactDelete.as_view(), name='CDNX_storages_storagecontacts_sublist_delete'),
-
-    # StorageHall
-    url(r'^storagehalls$', StorageHallList.as_view(), name='CDNX_storages_storagehalls_list'),
-    url(r'^storagehalls/add$', StorageHallCreate.as_view(), name='CDNX_storages_storagehalls_add'),
-    url(r'^storagehalls/addmodal$', StorageHallCreateModal.as_view(), name='CDNX_storages_storagehalls_addmodal'),
-    url(r'^storagehalls/(?P<pk>\w+)$', StorageHallDetail.as_view(), name='CDNX_storages_storagezones_detail'),
-    url(r'^storagehalls/(?P<pk>\w+)/edit$', StorageHallUpdate.as_view(), name='CDNX_storages_storagehalls_edit'),
-    url(r'^storagehalls/(?P<pk>\w+)/editmodal$', StorageHallUpdateModal.as_view(), name='CDNX_storages_storagehalls_editmodal'),
-    url(r'^storagehalls/(?P<pk>\w+)/delete$', StorageHallDelete.as_view(), name='CDNX_storages_storagehalls_delete'),
-
-    url(r'^storagehalls/(?P<pk>\w+)/sublist$', StorageHallSubList.as_view(), name='CDNX_storages_storagehalls_sublist'),
-    url(r'^storagehalls/(?P<pk>\w+)/sublist/add$', StorageHallCreateModal.as_view(), name='CDNX_storages_storagehalls_sublist_add'),
-    url(r'^storagehalls/(?P<pk>\w+)/sublist/addmodal$', StorageHallCreateModal.as_view(), name='CDNX_storages_storagehalls_sublist_addmodal'),
-    url(r'^storagehalls/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', StorageHallDetailModal.as_view(), name='CDNX_storages_storagehalls_sublist_details'),
-    url(r'^storagehalls/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', StorageHallUpdateModal.as_view(), name='CDNX_storages_storagehalls_sublist_edit'),
-    url(r'^storagehalls/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', StorageHallUpdateModal.as_view(), name='CDNX_storages_storagehalls_sublist_editmodal'),
-    url(r'^storagehalls/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', StorageHallDelete.as_view(), name='CDNX_storages_storagehalls_sublist_delete'),
-
-    # StorageRack
-    url(r'^storageracks$', StorageRackList.as_view(), name='CDNX_storages_storageracks_list'),
-    url(r'^storageracks/add$', StorageRackCreate.as_view(), name='CDNX_storages_storageracks_add'),
-    url(r'^storageracks/addmodal$', StorageRackCreateModal.as_view(), name='CDNX_storages_storageracks_addmodal'),
-    url(r'^storageracks/(?P<pk>\w+)$', StorageRackDetail.as_view(), name='CDNX_storages_storagezones_detail'),
-    url(r'^storageracks/(?P<pk>\w+)/edit$', StorageRackUpdate.as_view(), name='CDNX_storages_storageracks_edit'),
-    url(r'^storageracks/(?P<pk>\w+)/editmodal$', StorageRackUpdateModal.as_view(), name='CDNX_storages_storageracks_editmodal'),
-    url(r'^storageracks/(?P<pk>\w+)/delete$', StorageRackDelete.as_view(), name='CDNX_storages_storageracks_delete'),
-
-    url(r'^storageracks/(?P<pk>\w+)/sublist$', StorageRackSubList.as_view(), name='CDNX_storages_storageracks_sublist'),
-    url(r'^storageracks/(?P<pk>\w+)/sublist/add$', StorageRackCreateModal.as_view(), name='CDNX_storages_storageracks_sublist_add'),
-    url(r'^storageracks/(?P<pk>\w+)/sublist/addmodal$', StorageRackCreateModal.as_view(), name='CDNX_storages_storageracks_sublist_addmodal'),
-    url(r'^storageracks/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', StorageRackDetailModal.as_view(), name='CDNX_storages_storageracks_sublist_details'),
-    url(r'^storageracks/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', StorageRackUpdateModal.as_view(), name='CDNX_storages_storageracks_sublist_edit'),
-    url(r'^storageracks/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', StorageRackUpdateModal.as_view(), name='CDNX_storages_storageracks_sublist_editmodal'),
-    url(r'^storageracks/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', StorageRackDelete.as_view(), name='CDNX_storages_storageracks_sublist_delete'),
-
-    # StorageShelf
-    url(r'^storageshelfs$', StorageShelfList.as_view(), name='CDNX_storages_storageshelfs_list'),
-    url(r'^storageshelfs/add$', StorageShelfCreate.as_view(), name='CDNX_storages_storageshelfs_add'),
-    url(r'^storageshelfs/addmodal$', StorageShelfCreateModal.as_view(), name='CDNX_storages_storageshelfs_addmodal'),
-    url(r'^storageshelfs/(?P<pk>\w+)$', StorageShelfDetail.as_view(), name='CDNX_storages_storagezones_detail'),
-    url(r'^storageshelfs/(?P<pk>\w+)/edit$', StorageShelfUpdate.as_view(), name='CDNX_storages_storageshelfs_edit'),
-    url(r'^storageshelfs/(?P<pk>\w+)/editmodal$', StorageShelfUpdateModal.as_view(), name='CDNX_storages_storageshelfs_editmodal'),
-    url(r'^storageshelfs/(?P<pk>\w+)/delete$', StorageShelfDelete.as_view(), name='CDNX_storages_storageshelfs_delete'),
-
-    url(r'^storageshelfs/(?P<pk>\w+)/sublist$', StorageShelfSubList.as_view(), name='CDNX_storages_storageshelfs_sublist'),
-    url(r'^storageshelfs/(?P<pk>\w+)/sublist/add$', StorageShelfCreateModal.as_view(), name='CDNX_storages_storageshelfs_sublist_add'),
-    url(r'^storageshelfs/(?P<pk>\w+)/sublist/addmodal$', StorageShelfCreateModal.as_view(), name='CDNX_storages_storageshelfs_sublist_addmodal'),
-    url(r'^storageshelfs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', StorageShelfDetailModal.as_view(), name='CDNX_storages_storageshelfs_sublist_details'),
-    url(r'^storageshelfs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', StorageShelfUpdateModal.as_view(), name='CDNX_storages_storageshelfs_sublist_edit'),
-    url(r'^storageshelfs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', StorageShelfUpdateModal.as_view(), name='CDNX_storages_storageshelfs_sublist_editmodal'),
-    url(r'^storageshelfs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', StorageShelfDelete.as_view(), name='CDNX_storages_storageshelfs_sublist_delete'),
     
-"""
+    # StorageBoxStructure
+    url(r'^storageboxstructures$', StorageBoxStructureList.as_view(), name='storageboxstructures_list'),
+    url(r'^storageboxstructures/add$', StorageBoxStructureCreate.as_view(), name='storageboxstructures_add'),
+    url(r'^storageboxstructures/addmodal$', StorageBoxStructureCreateModal.as_view(), name='storageboxstructures_addmodal'),
+    url(r'^storageboxstructures/(?P<pk>\w+)$', StorageBoxStructureDetails.as_view(), name='storageboxstructures_details'),
+    url(r'^storageboxstructures/(?P<pk>\w+)/edit$', StorageBoxStructureUpdate.as_view(), name='storageboxstructures_edit'),
+    url(r'^storageboxstructures/(?P<pk>\w+)/editmodal$', StorageBoxStructureUpdateModal.as_view(), name='storageboxstructures_editmodal'),
+    url(r'^storageboxstructures/(?P<pk>\w+)/delete$', StorageBoxStructureDelete.as_view(), name='storageboxstructures_delete'),
+    url(r'^storageboxstructures/(?P<pk>\w+)/sublist$', StorageBoxStructureSubList.as_view(), name='storageboxstructures_sublist'),
+    url(r'^storageboxstructures/(?P<pk>\w+)/sublist/add$', StorageBoxStructureCreateModal.as_view(), name='storageboxstructures_sublist_add'),
+    url(r'^storageboxstructures/(?P<pk>\w+)/sublist/addmodal$', StorageBoxStructureCreateModal.as_view(), name='storageboxstructures_sublist_addmodal'),
+    url(r'^storageboxstructures/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', StorageBoxStructureDetailModal.as_view(), name='storageboxstructures_sublist_details'),
+    url(r'^storageboxstructures/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', StorageBoxStructureUpdateModal.as_view(), name='storageboxstructures_sublist_edit'),
+    url(r'^storageboxstructures/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', StorageBoxStructureUpdateModal.as_view(), name='storageboxstructures_sublist_editmodal'),
+    url(r'^storageboxstructures/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', StorageBoxStructureDelete.as_view(), name='storageboxstructures_sublist_delete'),
+
+    # StorageBoxKind
+    url(r'^storageboxkinds$', StorageBoxKindList.as_view(), name='storageboxkinds_list'),
+    url(r'^storageboxkinds/add$', StorageBoxKindCreate.as_view(), name='storageboxkinds_add'),
+    url(r'^storageboxkinds/addmodal$', StorageBoxKindCreateModal.as_view(), name='storageboxkinds_addmodal'),
+    url(r'^storageboxkinds/(?P<pk>\w+)$', StorageBoxKindDetails.as_view(), name='storageboxkinds_details'),
+    url(r'^storageboxkinds/(?P<pk>\w+)/edit$', StorageBoxKindUpdate.as_view(), name='storageboxkinds_edit'),
+    url(r'^storageboxkinds/(?P<pk>\w+)/editmodal$', StorageBoxKindUpdateModal.as_view(), name='storageboxkinds_editmodal'),
+    url(r'^storageboxkinds/(?P<pk>\w+)/delete$', StorageBoxKindDelete.as_view(), name='storageboxkinds_delete'),
+    url(r'^storageboxkinds/(?P<pk>\w+)/sublist$', StorageBoxKindSubList.as_view(), name='storageboxkinds_sublist'),
+    url(r'^storageboxkinds/(?P<pk>\w+)/sublist/add$', StorageBoxKindCreateModal.as_view(), name='storageboxkinds_sublist_add'),
+    url(r'^storageboxkinds/(?P<pk>\w+)/sublist/addmodal$', StorageBoxKindCreateModal.as_view(), name='storageboxkinds_sublist_addmodal'),
+    url(r'^storageboxkinds/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', StorageBoxKindDetailModal.as_view(), name='storageboxkinds_sublist_details'),
+    url(r'^storageboxkinds/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', StorageBoxKindUpdateModal.as_view(), name='storageboxkinds_sublist_edit'),
+    url(r'^storageboxkinds/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', StorageBoxKindUpdateModal.as_view(), name='storageboxkinds_sublist_editmodal'),
+    url(r'^storageboxkinds/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', StorageBoxKindDelete.as_view(), name='storageboxkinds_sublist_delete'),
+
+]
