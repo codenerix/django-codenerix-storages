@@ -22,26 +22,32 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 from codenerix.forms import GenModelForm
 from codenerix_extensions.helpers import get_external_model
-from codenerix_storages.models import Storage, StorageZone, StorageBatch, StorageContact
+from codenerix_storages.models import Storage, StorageZone  # , StorageContact
+# from codenerix_storages.models import StorageHall, StorageRack, StorageShelf, 
+from codenerix_storages.models import StorageBox
 
 
 class StorageForm(GenModelForm):
+    """
     codenerix_external_field = forms.ModelChoiceField(
         label=Storage.foreignkey_external()['label'],
         queryset=get_external_model(Storage).objects.all()
     )
+    """
 
     class Meta:
         model = Storage
         exclude = []
+        """
         autofill = {
             'codenerix_external_field': ['select', 3, Storage.foreignkey_external()['related']],
         }
+        """
 
     def __groups__(self):
         g = [
            (_('Details'), 12,
-                ['codenerix_external_field', 6],
+                # ['codenerix_external_field', 6],
                 ['alias', 6],
             )
         ]
@@ -58,6 +64,7 @@ class StorageForm(GenModelForm):
         return g
 
 
+"""
 class StorageContactForm(GenModelForm):
     codenerix_external_field = forms.ModelChoiceField(
         label=StorageContact.foreignkey_external()['label'],
@@ -88,7 +95,7 @@ class StorageContactForm(GenModelForm):
         ]
         return g
 
-
+"""
 class StorageZoneForm(GenModelForm):
     class Meta:
         model = StorageZone
@@ -137,7 +144,7 @@ class StorageZoneOwnForm(GenModelForm):
         ]
         return g
 
-
+"""
 class StorageBatchForm(GenModelForm):
     class Meta:
         model = StorageBatch
@@ -185,3 +192,123 @@ class StorageBatchOwnForm(GenModelForm):
             )
         ]
         return g
+"""
+
+"""
+class StorageHallForm(GenModelForm):
+    class Meta:
+        model = StorageHall
+        exclude = []
+
+    def __groups__(self):
+        g = [
+            (
+                _('Details'), 12,
+                ['zone', 6],
+                ['alias', 6],
+            )
+        ]
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = [
+            (
+                _('Details'), 12,
+                ['zone', 6],
+                ['alias', 6],
+            )
+        ]
+        return g
+
+
+class StorageRackForm(GenModelForm):
+    class Meta:
+        model = StorageRack
+        exclude = []
+
+    def __groups__(self):
+        g = [
+            (
+                _('Details'), 12,
+                ['hall', 6],
+                ['alias', 6],
+            )
+        ]
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = [
+            (
+                _('Details'), 12,
+                ['hall', 6],
+                ['alias', 6],
+            )
+        ]
+        return g
+
+
+class StorageShelfForm(GenModelForm):
+    class Meta:
+        model = StorageShelf
+        exclude = []
+
+    def __groups__(self):
+        g = [
+            (
+                _('Details'), 12,
+                ['rack', 6],
+                ['alias', 6],
+            )
+        ]
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = [
+            (
+                _('Details'), 12,
+                ['rack', 6],
+                ['alias', 6],
+            )
+        ]
+        return g
+"""
+
+
+class StorageBoxForm(GenModelForm):
+    class Meta:
+        model = StorageBox
+        exclude = []
+
+    def __groups__(self):
+        g = [
+            (
+                _('Details'), 12,
+                ['shelf', 6],
+                ['length', 6],
+                ['width', 6],
+                ['heigth', 6],
+                ['weight', 6],
+                ['alias', 6],
+            )
+        ]
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = [
+            (
+                _('Details'), 12,
+                ['shelf', 6],
+                ['length', 6],
+                ['width', 6],
+                ['heigth', 6],
+                ['weight', 6],
+                ['alias', 6],
+            )
+        ]
+        return g
+
+

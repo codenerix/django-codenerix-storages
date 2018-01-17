@@ -35,6 +35,10 @@ Quickstart
 
     # path for codenerix_storages
     CDNX_STORAGES = "storages"
+    # Format code for stock movement documents
+    CDNX_STORAGE_CODE_REQUEST_STOCK = 'RS{year}{day}{month}-{hour}{minute}--{number}'
+    CDNX_STORAGE_CODE_OUTGOING_ALBARAN = 'OA{year}{day}{month}-{hour}{minute}--{number}'
+    CDNX_STORAGE_CODE_INGOING_ALBARAN = 'IA{year}{day}{month}-{hour}{minute}--{number}'
 
 4. Since Codenerix Storages is a library, you only need to import its parts into your project and use them.
 

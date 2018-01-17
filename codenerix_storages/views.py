@@ -30,10 +30,15 @@ from django.conf import settings
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
 
-from codenerix_storages.models import Storage, StorageZone, StorageBatch, StorageContact
-from codenerix_storages.forms import StorageForm, StorageContactForm, \
-    StorageZoneForm, StorageZoneOwnForm, \
-    StorageBatchForm, StorageBatchOwnForm
+from codenerix_storages.models import Storage, StorageZone  # , StorageContact
+# from codenerix_storages.models import StorageHall, StorageRack, StorageShelf, 
+from codenerix_storages.models import StorageBox
+# StorageBatch
+from codenerix_storages.forms import StorageForm  # , StorageContactForm
+from codenerix_storages.forms import StorageZoneForm, StorageZoneOwnForm
+from codenerix_storages.forms import StorageBoxForm
+# from codenerix_storages.forms import StorageHallForm, StorageRackForm, StorageShelfForm, StorageBoxForm
+# StorageBatchForm, StorageBatchOwnForm
 
 
 # ###########################################
@@ -102,8 +107,8 @@ class StorageDetails(GenStorageUrl, GenDetail):
     template_model = "storages/storage_details.html"
     tabs = [
         {'id': 'Zone', 'name': _('Zones'), 'ws': 'CDNX_storages_storagezones_sublist', 'rows': 'base'},
-        {'id': 'Batch', 'name': _('Batches'), 'ws': 'CDNX_storages_storagebatchs_sublist', 'rows': 'base'},
-        {'id': 'Contacts', 'name': _('Contacts'), 'ws': 'CDNX_storages_storagecontacts_sublist', 'rows': 'base'},
+        # {'id': 'Batch', 'name': _('Batches'), 'ws': 'CDNX_storages_storagebatchs_sublist', 'rows': 'base'},
+        # {'id': 'Contacts', 'name': _('Contacts'), 'ws': 'CDNX_storages_storagecontacts_sublist', 'rows': 'base'},
     ]
 
 
@@ -194,7 +199,7 @@ class StorageZoneDetail(GenStorageZoneUrl, GenDetail):
     groups = StorageZoneForm.__groups_details__()
     template_model = "storages/storagezone_details.html"
     tabs = [
-        {'id': 'Batch', 'name': _('Bacthes'), 'ws': 'CDNX_storages_own_storagebatchs_sublist', 'rows': 'base'},
+        # {'id': 'Batch', 'name': _('Bacthes'), 'ws': 'CDNX_storages_own_storagebatchs_sublist', 'rows': 'base'},
     ]
     exclude_fields = []
 
@@ -202,7 +207,7 @@ class StorageZoneDetail(GenStorageZoneUrl, GenDetail):
 class StorageZoneDetailModal(GenDetailModal, StorageZoneDetail):
     pass
 
-
+"""
 # ###########################################
 class GenStorageBatchUrl(object):
     ws_entry_point = '{}/storagebatchs'.format(settings.CDNX_STORAGES)
@@ -301,8 +306,8 @@ class StorageBatchDetailModal(GenStorageBatchUrl, GenDetailModal):
     model = StorageBatch
     groups = StorageBatchForm.__groups_details__()
     exclude_fields = []
-
-
+"""
+"""
 # ###########################################
 class GenStorageContactUrl(object):
     ws_entry_point = '{}/storagecontacts'.format(settings.CDNX_STORAGES)
@@ -365,3 +370,247 @@ class StorageContactDetailModal(GenStorageContactUrl, GenDetailModal):
     groups = StorageContactForm.__groups_details__()
     template_model = "storages/storagecontact_details.html"
     exclude_fields = ['storage', ]
+
+
+# ###########################################
+class GenStorageHallUrl(object):
+    ws_entry_point = '{}/storagezones'.format(settings.CDNX_STORAGES)
+
+
+# StorageHall
+class StorageHallList(GenStorageHallUrl, GenList):
+    model = StorageHall
+    show_details = True
+    extra_context = {'menu': ['StorageHall', 'people'], 'bread': [_('StorageHall'), _('People')]}
+
+
+class StorageHallCreate(GenStorageHallUrl, GenCreate):
+    model = StorageHall
+    form_class = StorageHallForm
+
+
+class StorageHallCreateModal(GenCreateModal, StorageHallCreate):
+    pass
+
+
+class StorageHallUpdate(GenStorageHallUrl, GenUpdate):
+    model = StorageHall
+    show_details = True
+    form_class = StorageHallForm
+
+
+class StorageHallUpdateModal(GenUpdateModal, StorageHallUpdate):
+    pass
+
+
+class StorageHallDelete(GenStorageHallUrl, GenDelete):
+    model = StorageHall
+
+
+class StorageHallSubList(GenStorageHallUrl, GenList):
+    model = StorageHall
+    # field_check = True
+    field_delete = True
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['file_link'] = Q(storage__pk=pk)
+        return limit
+
+
+class StorageHallDetail(GenStorageHallUrl, GenDetail):
+    model = StorageHall
+    groups = StorageHallForm.__groups_details__()
+    template_model = "storages/storagezone_details.html"
+    tabs = [
+        # {'id': 'Batch', 'name': _('Bacthes'), 'ws': 'CDNX_storages_own_storagebatchs_sublist', 'rows': 'base'},
+    ]
+    exclude_fields = []
+
+
+class StorageHallDetailModal(GenDetailModal, StorageHallDetail):
+    pass
+
+
+# ###########################################
+class GenStorageRackUrl(object):
+    ws_entry_point = '{}/storagezones'.format(settings.CDNX_STORAGES)
+
+
+# StorageRack
+class StorageRackList(GenStorageRackUrl, GenList):
+    model = StorageRack
+    show_details = True
+    extra_context = {'menu': ['StorageRack', 'people'], 'bread': [_('StorageRack'), _('People')]}
+
+
+class StorageRackCreate(GenStorageRackUrl, GenCreate):
+    model = StorageRack
+    form_class = StorageRackForm
+
+
+class StorageRackCreateModal(GenCreateModal, StorageRackCreate):
+    pass
+
+
+class StorageRackUpdate(GenStorageRackUrl, GenUpdate):
+    model = StorageRack
+    show_details = True
+    form_class = StorageRackForm
+
+
+class StorageRackUpdateModal(GenUpdateModal, StorageRackUpdate):
+    pass
+
+
+class StorageRackDelete(GenStorageRackUrl, GenDelete):
+    model = StorageRack
+
+
+class StorageRackSubList(GenStorageRackUrl, GenList):
+    model = StorageRack
+    # field_check = True
+    field_delete = True
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['file_link'] = Q(storage__pk=pk)
+        return limit
+
+
+class StorageRackDetail(GenStorageRackUrl, GenDetail):
+    model = StorageRack
+    groups = StorageRackForm.__groups_details__()
+    template_model = "storages/storagezone_details.html"
+    tabs = [
+        # {'id': 'Batch', 'name': _('Bacthes'), 'ws': 'CDNX_storages_own_storagebatchs_sublist', 'rows': 'base'},
+    ]
+    exclude_fields = []
+
+
+class StorageRackDetailModal(GenDetailModal, StorageRackDetail):
+    pass
+
+
+# ###########################################
+class GenStorageShelfUrl(object):
+    ws_entry_point = '{}/storagezones'.format(settings.CDNX_STORAGES)
+
+
+# StorageShelf
+class StorageShelfList(GenStorageShelfUrl, GenList):
+    model = StorageShelf
+    show_details = True
+    extra_context = {'menu': ['StorageShelf', 'people'], 'bread': [_('StorageShelf'), _('People')]}
+
+
+class StorageShelfCreate(GenStorageShelfUrl, GenCreate):
+    model = StorageShelf
+    form_class = StorageShelfForm
+
+
+class StorageShelfCreateModal(GenCreateModal, StorageShelfCreate):
+    pass
+
+
+class StorageShelfUpdate(GenStorageShelfUrl, GenUpdate):
+    model = StorageShelf
+    show_details = True
+    form_class = StorageShelfForm
+
+
+class StorageShelfUpdateModal(GenUpdateModal, StorageShelfUpdate):
+    pass
+
+
+class StorageShelfDelete(GenStorageShelfUrl, GenDelete):
+    model = StorageShelf
+
+
+class StorageShelfSubList(GenStorageShelfUrl, GenList):
+    model = StorageShelf
+    # field_check = True
+    field_delete = True
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['file_link'] = Q(storage__pk=pk)
+        return limit
+
+
+class StorageShelfDetail(GenStorageShelfUrl, GenDetail):
+    model = StorageShelf
+    groups = StorageShelfForm.__groups_details__()
+    template_model = "storages/storagezone_details.html"
+    tabs = [
+        # {'id': 'Batch', 'name': _('Bacthes'), 'ws': 'CDNX_storages_own_storagebatchs_sublist', 'rows': 'base'},
+    ]
+    exclude_fields = []
+
+
+class StorageShelfDetailModal(GenDetailModal, StorageShelfDetail):
+    pass
+"""
+
+# ###########################################
+class GenStorageBoxUrl(object):
+    ws_entry_point = '{}/storagezones'.format(settings.CDNX_STORAGES)
+
+
+# StorageBox
+class StorageBoxList(GenStorageBoxUrl, GenList):
+    model = StorageBox
+    show_details = True
+    extra_context = {'menu': ['StorageBox', 'people'], 'bread': [_('StorageBox'), _('People')]}
+
+
+class StorageBoxCreate(GenStorageBoxUrl, GenCreate):
+    model = StorageBox
+    form_class = StorageBoxForm
+
+
+class StorageBoxCreateModal(GenCreateModal, StorageBoxCreate):
+    pass
+
+
+class StorageBoxUpdate(GenStorageBoxUrl, GenUpdate):
+    model = StorageBox
+    show_details = True
+    form_class = StorageBoxForm
+
+
+class StorageBoxUpdateModal(GenUpdateModal, StorageBoxUpdate):
+    pass
+
+
+class StorageBoxDelete(GenStorageBoxUrl, GenDelete):
+    model = StorageBox
+
+
+class StorageBoxSubList(GenStorageBoxUrl, GenList):
+    model = StorageBox
+    # field_check = True
+    field_delete = True
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['file_link'] = Q(storage__pk=pk)
+        return limit
+
+
+class StorageBoxDetail(GenStorageBoxUrl, GenDetail):
+    model = StorageBox
+    groups = StorageBoxForm.__groups_details__()
+    template_model = "storages/storagezone_details.html"
+    tabs = [
+        # {'id': 'Batch', 'name': _('Bacthes'), 'ws': 'CDNX_storages_own_storagebatchs_sublist', 'rows': 'base'},
+    ]
+    exclude_fields = []
+
+
+class StorageBoxDetailModal(GenDetailModal, StorageBoxDetail):
+    pass

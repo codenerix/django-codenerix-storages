@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-28 14:33+0000\n"
+"POT-Creation-Date: 2018-01-12 11:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,108 +17,136 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: codenerix_storages/forms.py:24 codenerix_storages/forms.py:34
-#: codenerix_storages/forms.py:58 codenerix_storages/forms.py:67
-#: codenerix_storages/forms.py:81 codenerix_storages/forms.py:91
-#: codenerix_storages/forms.py:106 codenerix_storages/forms.py:115
-#: codenerix_storages/forms.py:130 codenerix_storages/forms.py:140
-#: codenerix_storages/forms.py:155 codenerix_storages/forms.py:164
+#: codenerix_storages/forms.py:44 codenerix_storages/forms.py:54
+#: codenerix_storages/forms.py:77 codenerix_storages/forms.py:86
+#: codenerix_storages/forms.py:100 codenerix_storages/forms.py:110
+#: codenerix_storages/forms.py:125 codenerix_storages/forms.py:134
+#: codenerix_storages/forms.py:200 codenerix_storages/forms.py:211
+#: codenerix_storages/forms.py:227 codenerix_storages/forms.py:238
+#: codenerix_storages/forms.py:254 codenerix_storages/forms.py:265
+#: codenerix_storages/forms.py:281 codenerix_storages/forms.py:296
 msgid "Details"
 msgstr ""
 
-#: codenerix_storages/models.py:11 codenerix_storages/models.py:73
-#: codenerix_storages/models.py:93 codenerix_storages/models.py:99
-#: codenerix_storages/models.py:125 codenerix_storages/views.py:29
-#: codenerix_storages/views.py:98
+#: codenerix_storages/models.py:32 codenerix_storages/models.py:98
+#: codenerix_storages/models.py:119 codenerix_storages/models.py:125
+#: codenerix_storages/views.py:51 codenerix_storages/views.py:118
 msgid "Storage"
 msgstr ""
 
-#: codenerix_storages/models.py:18 codenerix_storages/models.py:31
+#: codenerix_storages/models.py:39 codenerix_storages/models.py:52
+#: codenerix_storages/models.py:63
 msgid "---"
 msgstr ""
 
-#: codenerix_storages/models.py:24
+#: codenerix_storages/models.py:45
 msgid "Contact persons of storage"
 msgstr ""
 
-#: codenerix_storages/models.py:41 codenerix_storages/models.py:47
+#: codenerix_storages/models.py:66 codenerix_storages/models.py:70
+#: codenerix_storages/models.py:174 codenerix_storages/models.py:185
+#: codenerix_storages/models.py:192 codenerix_storages/models.py:203
+#: codenerix_storages/models.py:210 codenerix_storages/models.py:221
+#: codenerix_storages/models.py:231 codenerix_storages/models.py:246
 msgid "Alias"
 msgstr ""
 
-#: codenerix_storages/models.py:61
+#: codenerix_storages/models.py:86
 msgid ""
 "Cannot delete storage model, relationship between storage model and contacts"
 msgstr ""
 
-#: codenerix_storages/models.py:63
+#: codenerix_storages/models.py:88
 msgid ""
 "Cannot delete storage model, relationship between storage model and zones"
 msgstr ""
 
-#: codenerix_storages/models.py:85
+#: codenerix_storages/models.py:112
 msgid "Storages"
 msgstr ""
 
-#: codenerix_storages/models.py:94 codenerix_storages/models.py:98
-#: codenerix_storages/models.py:114 codenerix_storages/models.py:124
+#: codenerix_storages/models.py:120 codenerix_storages/models.py:124
+#: codenerix_storages/models.py:173 codenerix_storages/models.py:184
 msgid "Zone"
 msgstr ""
 
-#: codenerix_storages/models.py:107
+#: codenerix_storages/models.py:136
 msgid ""
 "Cannot delete storage zone model, relationship between storage zone model "
 "and bacth"
 msgstr ""
 
-#: codenerix_storages/models.py:115 codenerix_storages/models.py:123
-msgid "Reference"
+#: codenerix_storages/models.py:191 codenerix_storages/models.py:202
+msgid "Hall"
 msgstr ""
 
-#: codenerix_storages/models.py:118
-msgid "Storage's Batch"
+#: codenerix_storages/models.py:209 codenerix_storages/models.py:220
+msgid "Rack"
 msgstr ""
 
-#: codenerix_storages/models.py:119
-msgid "Storage's Batchs"
+#: codenerix_storages/models.py:226 codenerix_storages/models.py:241
+msgid "Shelf"
 msgstr ""
 
-#: codenerix_storages/views.py:29 codenerix_storages/views.py:98
-#: codenerix_storages/views.py:116 codenerix_storages/views.py:197
+#: codenerix_storages/models.py:227 codenerix_storages/models.py:242
+msgid "Length"
+msgstr ""
+
+#: codenerix_storages/models.py:228 codenerix_storages/models.py:243
+msgid "Width"
+msgstr ""
+
+#: codenerix_storages/models.py:229 codenerix_storages/models.py:244
+msgid "Heigth"
+msgstr ""
+
+#: codenerix_storages/models.py:230 codenerix_storages/models.py:245
+msgid "Weight"
+msgstr ""
+
+#: codenerix_storages/views.py:51 codenerix_storages/views.py:118
+#: codenerix_storages/views.py:136 codenerix_storages/views.py:382
+#: codenerix_storages/views.py:443 codenerix_storages/views.py:504
+#: codenerix_storages/views.py:565
 msgid "People"
 msgstr ""
 
-#: codenerix_storages/views.py:43
+#: codenerix_storages/views.py:63
 msgid "The selected entry is already a storage, select another entry!"
 msgstr ""
 
-#: codenerix_storages/views.py:44 codenerix_storages/views.py:69
+#: codenerix_storages/views.py:64 codenerix_storages/views.py:89
 msgid "The selected entry is not available anymore, please, try again!"
 msgstr ""
 
-#: codenerix_storages/views.py:87
+#: codenerix_storages/views.py:107
 msgid "Zones"
 msgstr ""
 
-#: codenerix_storages/views.py:88 codenerix_storages/views.py:179
-msgid "Bacthes"
-msgstr ""
-
-#: codenerix_storages/views.py:89
+#: codenerix_storages/views.py:109
 msgid "Contacts"
 msgstr ""
 
-#: codenerix_storages/views.py:116
+#: codenerix_storages/views.py:136
 msgid "StorageZone"
 msgstr ""
 
-#: codenerix_storages/views.py:197
-msgid "StorageBatch"
-msgstr ""
-
-#: codenerix_storages/views.py:256
-msgid "ref"
-msgstr ""
-
-#: codenerix_storages/views.py:320
+#: codenerix_storages/views.py:341
 msgid "Storage not seleted!"
+msgstr ""
+
+#: codenerix_storages/views.py:382
+msgid "StorageHall"
+msgstr ""
+
+#: codenerix_storages/views.py:443
+msgid "StorageRack"
+msgstr ""
+
+#: codenerix_storages/views.py:504
+msgid "StorageShelf"
+msgstr ""
+
+#: codenerix_storages/views.py:565
+msgid "StorageBox"
 msgstr ""

@@ -19,9 +19,11 @@
 # limitations under the License.
 
 from django.contrib import admin
-from codenerix_storages.models import Storage, StorageZone, StorageBatch, StorageContact
+from codenerix_storages.models import Storage, StorageZone, StorageBoxStructure, StorageBoxKind, StorageBox, StorageOperator
 
 admin.site.register(Storage)
 admin.site.register(StorageZone)
-admin.site.register(StorageBatch)
-admin.site.register(StorageContact)
+admin.site.register(StorageBoxStructure)
+admin.site.register(StorageBoxKind)
+admin.site.register(StorageBox)
+admin.site.register(StorageOperator)

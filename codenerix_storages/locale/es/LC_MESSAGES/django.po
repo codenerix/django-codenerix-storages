@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-23 10:14+0100\n"
+"POT-Creation-Date: 2018-01-12 11:06+0100\n"
 "PO-Revision-Date: 2017-11-22 16:59-0015\n"
 "Last-Translator: b'nombe apellidos <jsoler@centrologic.com>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,19 +18,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Translated-Using: django-rosetta 0.7.13\n"
 
-#: codenerix_storages/forms.py:43 codenerix_storages/forms.py:53
-#: codenerix_storages/forms.py:76 codenerix_storages/forms.py:85
-#: codenerix_storages/forms.py:99 codenerix_storages/forms.py:109
-#: codenerix_storages/forms.py:124 codenerix_storages/forms.py:133
-#: codenerix_storages/forms.py:148 codenerix_storages/forms.py:158
-#: codenerix_storages/forms.py:173 codenerix_storages/forms.py:182
+#: codenerix_storages/forms.py:44 codenerix_storages/forms.py:54
+#: codenerix_storages/forms.py:77 codenerix_storages/forms.py:86
+#: codenerix_storages/forms.py:100 codenerix_storages/forms.py:110
+#: codenerix_storages/forms.py:125 codenerix_storages/forms.py:134
+#: codenerix_storages/forms.py:200 codenerix_storages/forms.py:211
+#: codenerix_storages/forms.py:227 codenerix_storages/forms.py:238
+#: codenerix_storages/forms.py:254 codenerix_storages/forms.py:265
+#: codenerix_storages/forms.py:281 codenerix_storages/forms.py:296
 msgid "Details"
 msgstr "Detalles"
 
 #: codenerix_storages/models.py:32 codenerix_storages/models.py:98
 #: codenerix_storages/models.py:119 codenerix_storages/models.py:125
-#: codenerix_storages/models.py:154 codenerix_storages/views.py:48
-#: codenerix_storages/views.py:115
+#: codenerix_storages/views.py:51 codenerix_storages/views.py:118
 msgid "Storage"
 msgstr "Almacén"
 
@@ -44,6 +45,10 @@ msgid "Contact persons of storage"
 msgstr "Persona de contacto del almacén"
 
 #: codenerix_storages/models.py:66 codenerix_storages/models.py:70
+#: codenerix_storages/models.py:174 codenerix_storages/models.py:185
+#: codenerix_storages/models.py:192 codenerix_storages/models.py:203
+#: codenerix_storages/models.py:210 codenerix_storages/models.py:221
+#: codenerix_storages/models.py:231 codenerix_storages/models.py:246
 msgid "Alias"
 msgstr "Alias"
 
@@ -62,7 +67,7 @@ msgid "Storages"
 msgstr "Almacenes"
 
 #: codenerix_storages/models.py:120 codenerix_storages/models.py:124
-#: codenerix_storages/models.py:143 codenerix_storages/models.py:153
+#: codenerix_storages/models.py:173 codenerix_storages/models.py:184
 msgid "Zone"
 msgstr "Zona"
 
@@ -72,61 +77,105 @@ msgid ""
 "and bacth"
 msgstr "No se puede eliminar la zona, hay lotes relacionados con ella"
 
-#: codenerix_storages/models.py:144 codenerix_storages/models.py:152
-msgid "Reference"
-msgstr "Referencia"
+#: codenerix_storages/models.py:191 codenerix_storages/models.py:202
+msgid "Hall"
+msgstr ""
 
-#: codenerix_storages/models.py:147
-msgid "Storage's Batch"
-msgstr "Lote de almacén"
+#: codenerix_storages/models.py:209 codenerix_storages/models.py:220
+msgid "Rack"
+msgstr ""
 
-#: codenerix_storages/models.py:148
-msgid "Storage's Batchs"
-msgstr "Lotes de almacén"
+#: codenerix_storages/models.py:226 codenerix_storages/models.py:241
+msgid "Shelf"
+msgstr ""
 
-#: codenerix_storages/views.py:48 codenerix_storages/views.py:115
-#: codenerix_storages/views.py:133 codenerix_storages/views.py:215
+#: codenerix_storages/models.py:227 codenerix_storages/models.py:242
+msgid "Length"
+msgstr ""
+
+#: codenerix_storages/models.py:228 codenerix_storages/models.py:243
+msgid "Width"
+msgstr ""
+
+#: codenerix_storages/models.py:229 codenerix_storages/models.py:244
+msgid "Heigth"
+msgstr ""
+
+#: codenerix_storages/models.py:230 codenerix_storages/models.py:245
+msgid "Weight"
+msgstr ""
+
+#: codenerix_storages/views.py:51 codenerix_storages/views.py:118
+#: codenerix_storages/views.py:136 codenerix_storages/views.py:382
+#: codenerix_storages/views.py:443 codenerix_storages/views.py:504
+#: codenerix_storages/views.py:565
 msgid "People"
 msgstr "Gente"
 
-#: codenerix_storages/views.py:60
+#: codenerix_storages/views.py:63
 msgid "The selected entry is already a storage, select another entry!"
 msgstr "La entrada seleccionada ya es un almacén, seleccione otra entrada!"
 
-#: codenerix_storages/views.py:61 codenerix_storages/views.py:86
+#: codenerix_storages/views.py:64 codenerix_storages/views.py:89
 msgid "The selected entry is not available anymore, please, try again!"
 msgstr ""
 "La entrada seleccionada ya no está disponible, por favor, ¡inténtelo de "
 "nuevo!"
 
-#: codenerix_storages/views.py:104
+#: codenerix_storages/views.py:107
 msgid "Zones"
 msgstr "Zonas"
 
-#: codenerix_storages/views.py:105
-msgid "Batches"
-msgstr "Lotes"
-
-#: codenerix_storages/views.py:106
+#: codenerix_storages/views.py:109
 msgid "Contacts"
 msgstr "Contactos"
 
-#: codenerix_storages/views.py:133
+#: codenerix_storages/views.py:136
 msgid "StorageZone"
 msgstr "Zona del almacén"
 
-#: codenerix_storages/views.py:197
-msgid "Bacthes"
-msgstr "Lotes"
-
-#: codenerix_storages/views.py:215
-msgid "StorageBatch"
-msgstr "Lote de almacén"
-
-#: codenerix_storages/views.py:274
-msgid "ref"
-msgstr "ref"
-
-#: codenerix_storages/views.py:338
+#: codenerix_storages/views.py:341
 msgid "Storage not seleted!"
 msgstr "Almacén no seleccionado"
+
+#: codenerix_storages/views.py:382
+#, fuzzy
+#| msgid "Storage"
+msgid "StorageHall"
+msgstr "Almacén"
+
+#: codenerix_storages/views.py:443
+#, fuzzy
+#| msgid "StorageBatch"
+msgid "StorageRack"
+msgstr "Lote de almacén"
+
+#: codenerix_storages/views.py:504
+#, fuzzy
+#| msgid "Storage"
+msgid "StorageShelf"
+msgstr "Almacén"
+
+#: codenerix_storages/views.py:565
+#, fuzzy
+#| msgid "Storage"
+msgid "StorageBox"
+msgstr "Almacén"
+
+#~ msgid "Reference"
+#~ msgstr "Referencia"
+
+#~ msgid "Storage's Batch"
+#~ msgstr "Lote de almacén"
+
+#~ msgid "Storage's Batchs"
+#~ msgstr "Lotes de almacén"
+
+#~ msgid "Batches"
+#~ msgstr "Lotes"
+
+#~ msgid "Bacthes"
+#~ msgstr "Lotes"
+
+#~ msgid "ref"
+#~ msgstr "ref"

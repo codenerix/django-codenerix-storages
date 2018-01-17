@@ -25,99 +25,30 @@ from codenerix.models import GenInterface, CodenerixModel
 from codenerix.models_people import GenRole
 
 from codenerix_extensions.helpers import get_external_method
+from codenerix_geodata.models import GeoAddress
+from codenerix_storages.settings import CDNX_STORAGE_PERMISSIONS
 
 
-# puente entre los datos del almacen y 'person'
-class GenStorage(GenInterface):
-    storage = models.OneToOneField("codenerix_storages.Storage", related_name='external', verbose_name=_("Storage"), null=True, on_delete=models.SET_NULL, blank=True)
-
-    class Meta:
-        abstract = True
-
-    class CodenerixMeta:
-        force_methods = {
-            'foreignkey_storage': ('CDNX_get_fk_info_storage', _('---')),
-        }
-
-
-# puente entre los contactos del almacen y 'person'
-class GenStorageContact(GenInterface):
-    storage_contacts = models.OneToOneField("codenerix_storages.StorageContact", related_name='external_contact', verbose_name=_("Contact persons of storage"), null=True, on_delete=models.SET_NULL, blank=True)
-
-    class Meta:
-        abstract = True
-
-    class CodenerixMeta:
-        force_methods = {
-            'foreignkey_storage': ('CDNX_get_fk_info_storage_contacts', _('---')),
-        }
-
-
-# almacen
-class Storage(GenRole, CodenerixModel):
-    class CodenerixMeta:
-        abstract = GenStorage
-        rol_groups = {}
-        rol_permissions = []
-        force_methods = {
-            'foreignkey_storage': ('CDNX_get_fk_info_storage_contacts', _('---')),
-        }
-
-    alias = models.CharField(_("Alias"), max_length=80, null=False, blank=False)
+class Storage(GeoAddress, CodenerixModel):
+    name = models.CharField(_("Storage"), max_length=80, null=False, blank=False)
 
     def __fields__(self, info):
-        fields = []
-        fields.append(('alias', _('Alias'), 100))
-        fields = get_external_method(Storage, '__fields_storage__', info, fields)
+        fields = super(Storage, self).__fields__(info)
+        fields.insert(0, ('name', _('Storage')))
         return fields
 
-    @staticmethod
-    def foreignkey_external():
-        return get_external_method(Storage, GenStorage.CodenerixMeta.force_methods['foreignkey_storage'][0])
+    def __str__(self):
+        return u"{}".format(self.name)
 
     def __unicode__(self):
-        return u"{}".format(self.alias)
-
-    def __str__(self):
-        return self.__unicode__()
-
-    def lock_delete(self):
-        if self.storage_contacts.exists():
-            return _("Cannot delete storage model, relationship between storage model and contacts")
-        elif self.storage_zones.exists():
-            return _("Cannot delete storage model, relationship between storage model and zones")
-        else:
-            return super(Storage, self).lock_delete()
-
-
-# contactos del almacen
-class StorageContact(CodenerixModel):
-    class CodenerixMeta:
-        abstract = GenStorageContact
-
-    storage = models.ManyToManyField(Storage, related_name='storage_contacts', verbose_name=_("Storage"), blank=False)
-
-    def __unicode__(self):
-        return u"{}".format("self.storage")
-
-    def __str__(self):
-        return self.__unicode__()
-
-    @staticmethod
-    def foreignkey_external():
-        return get_external_method(StorageContact, GenStorageContact.CodenerixMeta.force_methods['foreignkey_storage'][0])
-
-    def __fields__(self, info):
-        fields = []
-        fields.append(('storage', _('Storages'), 100))
-        fields = get_external_method(Storage, '__fields_storage_contacts__', info, fields)
-        return fields
+        return self.__str__()
 
 
 # zonas del almacen
 class StorageZone(CodenerixModel):
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name='storage_zones', verbose_name=_("Storage"), null=False, blank=False)
     name = models.CharField(_("Zone"), max_length=80, null=False, blank=False)
+    salable = models.BooleanField(_('Salable'), default=True)
 
     def __fields__(self, info):
         fields = []
@@ -125,11 +56,11 @@ class StorageZone(CodenerixModel):
         fields.append(('storage', _('Storage'), 100))
         return fields
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{}".format(self.name)
 
-    def __str__(self):
-        return self.__unicode__()
+    def __unicode__(self):
+        return self.__str__()
 
     def lock_delete(self):
         if self.storage_zones.exists():
@@ -138,30 +69,138 @@ class StorageZone(CodenerixModel):
             return super(StorageZone, self).lock_delete()
 
 
-# Lotes
-class StorageBatch(CodenerixModel):
-    zone = models.ForeignKey(StorageZone, on_delete=models.CASCADE, related_name='storage_zones', verbose_name=_("Zone"), null=False, blank=False)
-    ref = models.CharField(_("Reference"), max_length=80, null=False, blank=False)
+class StorageBoxStructure(CodenerixModel):
+    zone = models.ForeignKey(StorageZone, on_delete=models.CASCADE, related_name='storage_boxes_structure', verbose_name=_("Zone"), null=True, blank=True)
+    box_structure = models.ForeignKey('StorageBoxStructure', on_delete=models.CASCADE, related_name='storage_boxes_structure', verbose_name=_("Structure box"), null=True, blank=True)
+    length = models.FloatField(_('Length'), blank=True, null=True)
+    width = models.FloatField(_('Width'), blank=True, null=True)
+    heigth = models.FloatField(_('Heigth'), blank=True, null=True)
+    # peso de las cajas y estructuras de cajas contenidas
+    weight = models.FloatField(_('Weight'), blank=True, null=True)
+    max_weight = models.FloatField(_('Weight'), blank=True, null=True)
+    name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
 
-    class Meta(CodenerixModel.Meta):
-        verbose_name = _("Storage's Batch")
-        verbose_name_plural = _("Storage's Batchs")
+    def __str__(self):
+        return u"{}".format(self.name)
+
+    def __unicode__(self):
+        return self.__str__()
 
     def __fields__(self, info):
         fields = []
-        fields.append(('ref', _('Reference'), 100))
         fields.append(('zone', _('Zone'), 100))
-        fields.append(('zone__storage', _('Storage'), 100))
+        fields.append(('name', _('Name'), 100))
         return fields
 
-    def __unicode__(self):
-        return u"{}".format(self.ref)
+    def lock_delete(self):
+        if self.storage_boxes_structure.exists():
+            return _("Cannot delete storage zone model, related to himself")
+        elif self.storage_boxes.exists():
+            return _("Cannot delete storage zone model, relationship between storage structure model and storage box")
+        else:
+            return super(StorageZone, self).lock_delete()
+    
+
+class StorageBoxKind(CodenerixModel):
+    length = models.FloatField(_('Length'), blank=True, null=True)
+    width = models.FloatField(_('Width'), blank=True, null=True)
+    heigth = models.FloatField(_('Heigth'), blank=True, null=True)
+    # caja vacía
+    weight = models.FloatField(_('Weight'), blank=True, null=True)
+    max_weight = models.FloatField(_('Weight'), blank=True, null=True)
+    name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
 
     def __str__(self):
-        return self.__unicode__()
+        return u"{}".format(self.name)
 
-    def delete(self, *args, **kwargs):
-        try:
-            return super(StorageBatch, self).delete(*args, **kwargs)
-        except models.ProtectedError as e:
-            raise Exception(e[0])
+    def __unicode__(self):
+        return self.__str__()
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('name', _("Name")))
+        fields.append(('length', _('Length')))
+        fields.append(('width', _('Width')))
+        fields.append(('heigth', _('Heigth')))
+        fields.append(('weight', _('Weight')))
+        return fields
+
+    def lock_delete(self):
+        if self.storage_boxes.exists():
+            return _("Cannot delete storage zone model, relationship between storage box kind model and storage box")
+        else:
+            return super(StorageZone, self).lock_delete()
+
+
+class StorageBox(CodenerixModel):
+    box_structure = models.ForeignKey(StorageBoxStructure, on_delete=models.CASCADE, related_name='storage_boxes', verbose_name=_("Box Structure"), null=True, blank=True)
+    box_kind = models.ForeignKey(StorageBoxKind, on_delete=models.CASCADE, related_name='storage_boxes', verbose_name=_("Box Kind"), null=True, blank=True)
+    name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
+    # peso de los productos contenidos
+    weight = models.FloatField(_('Weight'), blank=True, null=True)
+
+    def __str__(self):
+        return u"{}".format(self.name)
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('name', _('Name'), 100))
+        fields.append(('box_structure', _('Box Structure'), 100))
+        fields.append(('box_kind', _('Box Kind'), 100))
+        fields.append(('weight', _('Weight'), 100))
+        return fields
+
+
+# ############################
+class ABSTRACT_GenStorateOperator(models.Model):  # META: Abstract class
+
+    class Meta(object):
+        abstract = True
+
+
+class StorageOperator(GenRole, CodenerixModel):
+    class CodenerixMeta:
+        abstract = ABSTRACT_GenStorateOperator
+        rol_groups = {
+            'StorageOperator': CDNX_STORAGE_PERMISSIONS['operator'],
+        }
+        rol_permissions = []
+        force_methods = {
+            'foreignkey_storageoperator': ('CDNX_get_fk_info_storageoperator', _('---')),
+        }
+
+    zone = models.ManyToManyField(StorageZone, related_name='storage_operators', verbose_name=_('Zones'))
+    enable = models.BooleanField(_("Enable"), blank=False, null=False, default=True)
+
+    @staticmethod
+    def foreignkey_external():
+        return get_external_method(StorageOperator, StorageOperator.CodenerixMeta.force_methods['foreignkey_storageoperator'][0])
+
+    def __str__(self):
+        return u"{}".format(self.pk)
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('zone', _("Zones")))
+        fields.append(('enable', _("Enable")))
+        fields = get_external_method(StorageOperator, '__fields_storage__', info, fields)
+        return fields
+
+
+# puente entre los datos del almacen y 'person'
+class GenStorageOperator(GenInterface, ABSTRACT_GenStorateOperator):
+    storage_operator = models.OneToOneField(StorageOperator, related_name='external', verbose_name=_("Storage operator"), null=True, on_delete=models.SET_NULL, blank=True)
+
+    class Meta(GenInterface.Meta, ABSTRACT_GenStorateOperator.Meta):
+        abstract = True
+
+    class CodenerixMeta:
+        force_methods = {
+            'foreignkey_storage_operator': ('CDNX_get_fk_info_storage_operator', _('---')),
+        }
