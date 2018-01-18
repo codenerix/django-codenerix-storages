@@ -136,7 +136,7 @@ class StorageZoneOwnForm(GenModelForm):
 class StorageBoxForm(GenModelForm):
     class Meta:
         model = StorageBox
-        exclude = []
+        exclude = ['weight', ]
 
     def __groups__(self):
         g = [
@@ -145,7 +145,6 @@ class StorageBoxForm(GenModelForm):
                 ['box_structure', 6],
                 ['box_kind', 6],
                 ['name', 6],
-                ['weight', 6],
             )
         ]
         return g
@@ -159,6 +158,24 @@ class StorageBoxForm(GenModelForm):
                 ['box_kind', 6],
                 ['name', 6],
                 ['weight', 6],
+            )
+        ]
+        return g
+
+
+class StorageBoxFormUpdate(GenModelForm):
+    class Meta:
+        model = StorageBox
+        exclude = []
+
+    def __groups__(self):
+        g = [
+            (
+                _('Details'), 12,
+                ['box_structure', 6],
+                ['box_kind', 6],
+                ['name', 6],
+                ['weight', 6, {'extra': ['ng-disabled=true']}],
             )
         ]
         return g
