@@ -40,9 +40,10 @@ from codenerix_storages.forms import StorageZoneForm, StorageZoneOwnForm
 from codenerix_storages.forms import StorageBoxForm, StorageBoxFormUpdate, StorageOperatorForm
 from codenerix_storages.forms import StorageBoxStructureForm, StorageBoxKindForm
 
+
 # ###########################################
 class GenStorageUrl(object):
-    ws_entry_point = '{}/storages'.format(settings.CDNX_STORAGES)
+    ws_entry_point = '{}/storages'.format(settings.CDNX_STORAGES_URL_COMMON)
 
 
 # Storage
@@ -98,7 +99,7 @@ class StorageSubList(GenStorageUrl, GenList):
 
 # ###########################################
 class GenStorageZoneUrl(object):
-    ws_entry_point = '{}/storagezones'.format(settings.CDNX_STORAGES)
+    ws_entry_point = '{}/storagezones'.format(settings.CDNX_STORAGES_URL_COMMON)
 
 
 # StorageZone
@@ -176,7 +177,7 @@ class StorageZoneDetailModal(GenDetailModal, StorageZoneDetail):
 
 # ###########################################
 class GenStorageBoxUrl(object):
-    ws_entry_point = '{}/storageboxs'.format(settings.CDNX_STORAGES)
+    ws_entry_point = '{}/storageboxs'.format(settings.CDNX_STORAGES_URL_COMMON)
 
 
 # StorageBox
@@ -233,7 +234,7 @@ class StorageBoxDetailModal(GenDetailModal, StorageBoxDetail):
 
 # ###########################################
 class StorageBoxStructureUrl(object):
-    ws_entry_point = '{}/storageboxstructures'.format(settings.CDNX_STORAGES)
+    ws_entry_point = '{}/storageboxstructures'.format(settings.CDNX_STORAGES_URL_COMMON)
 
 
 # StorageBoxStructure
@@ -287,7 +288,7 @@ class StorageBoxStructureDetailModal(GenDetailModal, StorageBoxStructureDetails)
 
 # ###########################################
 class StorageBoxKindUrl(object):
-    ws_entry_point = '{}/storageboxkinds'.format(settings.CDNX_STORAGES)
+    ws_entry_point = '{}/storageboxkinds'.format(settings.CDNX_STORAGES_URL_COMMON)
 
 
 # StorageBoxKind
@@ -364,7 +365,7 @@ class StorageOperatorCreate(GenCreate, GenCreateBridge):
         password2 = self.request.POST.get('password2', None)
         if external is None:
             errors = form._errors.setdefault("codenerix_external_field", ErrorList())
-            errors.append(_("Not related to a user"))
+            errors.append(_("Not related to a user (E1)"))
             return super(StorageOperatorCreate, self).form_invalid(form)
         else:
             model_tmp = None
@@ -380,11 +381,11 @@ class StorageOperatorCreate(GenCreate, GenCreateBridge):
                 operator = model_tmp.objects.filter(pk=external).first()
                 if operator is None or operator.user is None:
                     errors = form._errors.setdefault("codenerix_external_field", ErrorList())
-                    errors.append(_("Not related to a user"))
+                    errors.append(_("Not related to a user (E2)"))
                     return super(StorageOperatorCreate, self).form_invalid(form)
             else:
                 errors = form._errors.setdefault("codenerix_external_field", ErrorList())
-                errors.append(_("Not related to a user"))
+                errors.append(_("Not related to a user (E3)"))
                 return super(StorageOperatorCreate, self).form_invalid(form)
 
         if password1 is None or password2 is None:
@@ -434,7 +435,7 @@ class StorageOperatorUpdate(GenUpdate, GenUpdateBridge):
 
         if external is None:
             errors = form._errors.setdefault("codenerix_external_field", ErrorList())
-            errors.append(_("Not related to a user"))
+            errors.append(_("Not related to a user (E1)"))
             return super(StorageOperatorUpdate, self).form_invalid(form)
         else:
             model_tmp = None
@@ -450,11 +451,11 @@ class StorageOperatorUpdate(GenUpdate, GenUpdateBridge):
                 operator = model_tmp.objects.filter(pk=external).first()
                 if operator is None or operator.user is None:
                     errors = form._errors.setdefault("codenerix_external_field", ErrorList())
-                    errors.append(_("Not related to a user"))
+                    errors.append(_("Not related to a user (E2)"))
                     return super(StorageOperatorUpdate, self).form_invalid(form)
             else:
                 errors = form._errors.setdefault("codenerix_external_field", ErrorList())
-                errors.append(_("Not related to a user"))
+                errors.append(_("Not related to a user (E3)"))
                 return super(StorageOperatorUpdate, self).form_invalid(form)
 
         if password1 != password2:

@@ -1,0 +1,19 @@
+<td>{{row.name}}</td>
+<td>
+    <div ng-if="row.opened">
+        <span>{{row.opened}}</span>
+        <button class="btn btn-sm status btn-default ng-binding ng-scope">{{data.meta.gentranslate.start}}</button>
+    </div>
+    <div ng-if="!row.opened">
+        <button class="btn btn-sm status btn-default ng-binding ng-scope">{{data.meta.gentranslate.open}}</button>
+    </div>
+</td>
+<td>
+    <div ng-if="row.closed">
+        <span>{{row.closed}}</span>
+    </div>
+    <div ng-if="!row.closed">
+        <button ng-if="row.opened" class="btn btn-sm status btn-default ng-binding ng-scope">{{data.meta.gentranslate.close}}</button>
+        <span ng-if="!row.opened">-</span>
+    </div>
+</td>

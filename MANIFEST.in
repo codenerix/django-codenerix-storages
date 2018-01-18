@@ -4,3 +4,4 @@ include README.rst
 exclude *.pyc
 recursive-include codenerix_storages/locale *
 recursive-include codenerix_storages/migrations *
+recursive-include codenerix_storages/static *

@@ -18,10 +18,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from django.db.models import Q
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
-from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail
+from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
 
 from codenerix_storages.models_stockcontrol import Inventory, InventoryAlbaran, InventoryAlbaranLine
 from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryAlbaranForm, InventoryAlbaranLineForm
@@ -29,13 +30,19 @@ from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryAlbara
 
 # Inventory
 class GenInventoryUrl(object):
-    ws_entry_point = '{}/inventory'.format(settings.CDNX_STORAGES)
+    ws_entry_point = '{}/inventory'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
 
 
 class InventoryList(GenInventoryUrl, GenList):
     model = Inventory
     show_details = True
     extra_context = {'menu': ['storage', 'storage'], 'bread': [_('Inventory'), _('Inventory')]}
+    gentrans = {
+        'open': _("Open"),
+        'close': _("Close"),
+        'start': _("Start"),
+        'end': _("End"),
+    }
 
 
 class InventoryCreate(GenInventoryUrl, GenCreate):
@@ -61,17 +68,14 @@ class InventoryDelete(GenInventoryUrl, GenDelete):
     model = Inventory
 
 
-class InventoryDetails(GenInventoryUrl, GenDetail):
+class InventoryDetail(GenInventoryUrl, GenDetail):
     model = Inventory
     groups = InventoryForm.__groups_details__()
-    tabs = [
-        {'id': 'Zone', 'name': _('Zones'), 'ws': 'CDNX_storages_storagezones_sublist', 'rows': 'base'},
-    ]
 
 
 # InventoryAlbaran
 class GenInventoryAlbaranUrl(object):
-    ws_entry_point = '{}/inventoryalbaran'.format(settings.CDNX_STORAGES)
+    ws_entry_point = '{}/inventoryalbaran'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
 
 
 class InventoryAlbaranList(GenInventoryAlbaranUrl, GenList):
@@ -103,17 +107,17 @@ class InventoryAlbaranDelete(GenInventoryAlbaranUrl, GenDelete):
     model = InventoryAlbaran
 
 
-class InventoryAlbaranDetails(GenInventoryAlbaranUrl, GenDetail):
+class InventoryAlbaranDetail(GenInventoryAlbaranUrl, GenDetail):
     model = InventoryAlbaran
     groups = InventoryAlbaranForm.__groups_details__()
     tabs = [
-        {'id': 'Zone', 'name': _('Zones'), 'ws': 'CDNX_storages_storagezones_sublist', 'rows': 'base'},
+        {'id': 'Products', 'name': _('Products'), 'ws': 'CDNX_storages_inventoryalbaranline_sublist', 'rows': 'base'},
     ]
 
 
 # InventoryAlbaranLine
 class GenInventoryAlbaranLineUrl(object):
-    ws_entry_point = '{}/inventoryalbaranline'.format(settings.CDNX_STORAGES)
+    ws_entry_point = '{}/inventoryalbaranline'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
 
 
 class InventoryAlbaranLineList(GenInventoryAlbaranLineUrl, GenList):
@@ -145,9 +149,22 @@ class InventoryAlbaranLineDelete(GenInventoryAlbaranLineUrl, GenDelete):
     model = InventoryAlbaranLine
 
 
-class InventoryAlbaranLineDetails(GenInventoryAlbaranLineUrl, GenDetail):
+class InventoryAlbaranLineDetail(GenInventoryAlbaranLineUrl, GenDetail):
     model = InventoryAlbaranLine
     groups = InventoryAlbaranLineForm.__groups_details__()
-    tabs = [
-        {'id': 'Zone', 'name': _('Zones'), 'ws': 'CDNX_storages_storagezones_sublist', 'rows': 'base'},
-    ]
+
+
+class InventoryAlbaranLineDetailModal(GenDetailModal, InventoryAlbaranLineDetail):
+    pass
+
+
+class InventoryAlbaranLineSubList(GenInventoryAlbaranLineUrl, GenList):
+    model = InventoryAlbaranLine
+    linkadd = False
+    extra_context = {'menu': ['Storage', 'storage'], 'bread': [_('Storage'), _('Storage')]}
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['file_link'] = Q(inventory_albaran__pk=pk)
+        return limit

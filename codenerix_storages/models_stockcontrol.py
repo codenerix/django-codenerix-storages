@@ -28,9 +28,9 @@ from django.conf import settings
 from .models import Storage, StorageBox
 from codenerix.models import CodenerixModel
 from codenerix_products.models import ProductFinal, ProductUnique
+from codenerix_storages.models import StorageOperator
 
 
-# ############################
 class GenCode(CodenerixModel):
     class Meta(CodenerixModel.Meta):
         abstract = True
@@ -164,8 +164,8 @@ class OutgoingAlbaran(GenCode):
     def lock_delete(self):
         if self.line_outgoing_albarans.exists():
             return _("Cannot delete outgoing albaran model, relationship between outgoing albaran model and lines")
-        if self.ingoing_albarans.exists():
-            return _("Cannot delete outgoing albaran model, relationship between outgoing albaran model and ingoing albaran")
+        if self.incoming_albarans.exists():
+            return _("Cannot delete outgoing albaran model, relationship between outgoing albaran model and incoming albaran")
         else:
             return super(OutgoingAlbaran, self).lock_delete()
 
@@ -177,8 +177,8 @@ class OutgoingAlbaran(GenCode):
 class LineOutgoingAlbaran(CodenerixModel):
     outgoing_albaran = models.ForeignKey(OutgoingAlbaran, related_name='line_outgoing_albarans', verbose_name=_("Outgoing Albaran"), null=False, blank=False, on_delete=models.CASCADE)
     product_unique = models.ForeignKey(ProductUnique, related_name='line_outgoing_albarans', verbose_name=_("Outgoing Albaran"), null=False, blank=False, on_delete=models.CASCADE)
-    prepare_user = models.ForeignKey(User, related_name='line_outgoing_albarans', verbose_name=_("Prepare user"), blank=False, null=False, on_delete=models.CASCADE)
-    validator_user = models.ForeignKey(User, related_name='line_outgoing_albarans', verbose_name=_("Validator user"), blank=False, null=False, on_delete=models.CASCADE)
+    prepare_user = models.ForeignKey(User, related_name='line_outgoing_albarans_prepare', verbose_name=_("Prepare user"), blank=False, null=False, on_delete=models.CASCADE)
+    validator_user = models.ForeignKey(User, related_name='line_outgoing_albarans_validator', verbose_name=_("Validator user"), blank=False, null=False, on_delete=models.CASCADE)
     # box = 1
 
     def __fields__(self, info):
@@ -197,9 +197,9 @@ class LineOutgoingAlbaran(CodenerixModel):
         return self.__str__()
 
 
-class IngoingAlbaran(GenCode):
-    outgoing_albaran = models.ForeignKey(OutgoingAlbaran, related_name='ingoing_albarans', verbose_name=_("Outgoing Albaran"), null=False, blank=False, on_delete=models.CASCADE)
-    reception_user = models.ForeignKey(User, related_name='ingoing_albarans', verbose_name=_("Reception user"), blank=False, null=False, on_delete=models.CASCADE)
+class IncomingAlbaran(GenCode):
+    outgoing_albaran = models.ForeignKey(OutgoingAlbaran, related_name='incoming_albarans', verbose_name=_("Outgoing Albaran"), null=False, blank=False, on_delete=models.CASCADE)
+    reception_user = models.ForeignKey(User, related_name='incoming_albarans', verbose_name=_("Reception user"), blank=False, null=False, on_delete=models.CASCADE)
     reception_date = models.DateTimeField(_("Reception Date"), blank=True, null=True)
 
     def __fields__(self, info):
@@ -216,26 +216,26 @@ class IngoingAlbaran(GenCode):
         return self.__str__()
 
     def lock_delete(self):
-        if self.line_ingoing_albarans.exists():
-            return _("Cannot delete ingoing albaran model, relationship between ingoing albaran model and lines")
+        if self.line_incoming_albarans.exists():
+            return _("Cannot delete incoming albaran model, relationship between incoming albaran model and lines")
         else:
-            return super(IngoingAlbaran, self).lock_delete()
+            return super(IncomingAlbaran, self).lock_delete()
 
     def save(self, *args, **kwargs):
         self.code_format = getattr(settings, 'CDNX_STORAGE_CODE_INGOING_ALBARAN', 'OI{year}{day}{month}-{hour}{minute}--{number}')
-        return super(IngoingAlbaran, self).save(*args, **kwargs)
+        return super(IncomingAlbaran, self).save(*args, **kwargs)
 
 
-class LineIngoingAlbaran(CodenerixModel):
-    ingoing_albaran = models.ForeignKey(IngoingAlbaran, related_name='line_ingoing_albarans', verbose_name=_("Ingoing Albaran"), null=False, blank=False, on_delete=models.CASCADE)
-    box = models.ForeignKey(StorageBox, related_name='line_outgoing_albarans', verbose_name=_("Box"), null=False, blank=False, on_delete=models.CASCADE)
-    product_unique = models.ForeignKey(OutgoingAlbaran, related_name='line_outgoing_albarans', verbose_name=_("Product"), null=False, blank=False, on_delete=models.CASCADE)
+class LineIncomingAlbaran(CodenerixModel):
+    incoming_albaran = models.ForeignKey(IncomingAlbaran, related_name='line_incoming_albarans', verbose_name=_("Incoming Albaran"), null=False, blank=False, on_delete=models.CASCADE)
+    box = models.ForeignKey(StorageBox, related_name='line_ingoming_albarans', verbose_name=_("Box"), null=False, blank=False, on_delete=models.CASCADE)
+    product_unique = models.ForeignKey(OutgoingAlbaran, related_name='line_incoming_albarans', verbose_name=_("Product"), null=False, blank=False, on_delete=models.CASCADE)
     quantity = models.FloatField(_("Quantity"), null=False, blank=False)
-    validator_user = models.ForeignKey(User, related_name='line_outgoing_albarans', verbose_name=_("Validator user"), blank=False, null=False, on_delete=models.CASCADE)
+    validator_user = models.ForeignKey(User, related_name='line_incoming_albarans', verbose_name=_("Validator user"), blank=False, null=False, on_delete=models.CASCADE)
 
     def __fields__(self, info):
         fields = []
-        fields.append(('ingoing_albaran', _("Ingoing Albaran")))
+        fields.append(('incoming_albaran', _("Incoming Albaran")))
         fields.append(('box', _("Box")))
         fields.append(('product_unique', _("Product")))
         fields.append(('quantity', _("Quantity")))
@@ -249,12 +249,17 @@ class LineIngoingAlbaran(CodenerixModel):
         return self.__str__()
 
 
+# Inventory
 class Inventory(CodenerixModel):
     name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
+    opened = models.DateTimeField(_("Date"), blank=True, null=True, editable=False)
+    closed = models.DateTimeField(_("Date"), blank=True, null=True, editable=False)
 
     def __fields__(self, info):
-        fields = super(Storage, self).__fields__(info)
-        fields.insert(0, ('name', _('Name')))
+        fields = []
+        fields.append(('name', _('Name')))
+        fields.append(('opened', _('Opened')))
+        fields.append(('closed', _('Closed')))
         return fields
 
     def __str__(self):
@@ -267,11 +272,17 @@ class Inventory(CodenerixModel):
 class InventoryAlbaran(CodenerixModel):
     name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
     inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name='storage_inventoryalbarans', verbose_name=_("Inventory"), null=False, blank=False)
+    operator = models.ForeignKey(StorageOperator, on_delete=models.CASCADE, related_name='storage_inventoryalbarans', verbose_name=_("Storage Operator"), null=False, blank=False)
+
+    opened = models.DateTimeField(_("Date"), blank=False, null=False, editable=False, default=timezone.now)
+    closed = models.DateTimeField(_("Date"), blank=True, null=True, editable=False)
 
     def __fields__(self, info):
-        fields = super(Storage, self).__fields__(info)
-        fields.insert(0, ('name', _('Name')))
-        fields.insert(0, ('inventory', _('Inventory')))
+        fields = []
+        fields.append(('inventory', _('Inventory')))
+        fields.append(('name', _('Name')))
+        fields.append(('opened', _('Opened')))
+        fields.append(('closed', _('Closed')))
         return fields
 
     def __str__(self):
@@ -282,13 +293,12 @@ class InventoryAlbaran(CodenerixModel):
 
 
 class InventoryAlbaranLine(CodenerixModel):
-    name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
     inventory_albaran = models.ForeignKey(InventoryAlbaran, on_delete=models.CASCADE, related_name='storage_inventoryalbaranlines', verbose_name=_("Inventory Albaran"), null=False, blank=False)
+    product_unique = models.ForeignKey(ProductUnique, on_delete=models.CASCADE, related_name='storage_inventoryalbaranlines', verbose_name=_("Product"))
 
     def __fields__(self, info):
-        fields = super(Storage, self).__fields__(info)
-        fields.insert(0, ('name', _('Name')))
-        fields.insert(0, ('inventory_albaran', _('Albaran')))
+        fields = []
+        fields.append(('product_unique', _("Product")))
         return fields
 
     def __str__(self):

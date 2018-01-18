@@ -185,7 +185,7 @@ class StorageBoxStructureForm(GenModelForm):
     class Meta:
         model = StorageBoxStructure
         exclude = []
-    
+
     def __groups__(self):
         return [
             (
@@ -236,7 +236,7 @@ class StorageBoxKindForm(GenModelForm):
                 ['name', 6],
             )
         ]
-        
+
     @staticmethod
     def __groups_details__():
         return [

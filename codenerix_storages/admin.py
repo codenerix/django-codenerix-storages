@@ -20,6 +20,7 @@
 
 from django.contrib import admin
 from codenerix_storages.models import Storage, StorageZone, StorageBoxStructure, StorageBoxKind, StorageBox, StorageOperator
+from codenerix_storages.models_stockcontrol import RequestStock, LineRequestStock, OutgoingAlbaran, LineOutgoingAlbaran, IncomingAlbaran, LineIncomingAlbaran, InventoryAlbaran, InventoryAlbaranLine
 
 admin.site.register(Storage)
 admin.site.register(StorageZone)
@@ -27,3 +28,12 @@ admin.site.register(StorageBoxStructure)
 admin.site.register(StorageBoxKind)
 admin.site.register(StorageBox)
 admin.site.register(StorageOperator)
+
+admin.site.register(RequestStock)
+admin.site.register(LineRequestStock)
+admin.site.register(OutgoingAlbaran)
+admin.site.register(LineOutgoingAlbaran)
+admin.site.register(IncomingAlbaran)
+admin.site.register(LineIncomingAlbaran)
+admin.site.register(InventoryAlbaran)
+admin.site.register(InventoryAlbaranLine)
