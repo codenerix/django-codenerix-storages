@@ -42,7 +42,6 @@ class StorageForm(GenModelForm):
             ),
             (
                 _('Address'), 12,
-                ['alias', 12],
                 ['country', 3],
                 ['region', 3],
                 ['province', 3],
@@ -64,7 +63,6 @@ class StorageForm(GenModelForm):
             ),
             (
                 _('Address'), 12,
-                ['alias', 12],
                 ['country', 3],
                 ['region', 3],
                 ['province', 3],
