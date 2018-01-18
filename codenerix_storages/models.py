@@ -135,8 +135,8 @@ class StorageBoxKind(CodenerixModel):
 
 
 class StorageBox(CodenerixModel):
-    box_structure = models.ForeignKey(StorageBoxStructure, on_delete=models.CASCADE, related_name='storage_boxes', verbose_name=_("Box Structure"), null=True, blank=True)
-    box_kind = models.ForeignKey(StorageBoxKind, on_delete=models.CASCADE, related_name='storage_boxes', verbose_name=_("Box Kind"), null=True, blank=True)
+    box_structure = models.ForeignKey(StorageBoxStructure, on_delete=models.CASCADE, related_name='storage_boxes', verbose_name=_("Box Structure"), null=False, blank=False)
+    box_kind = models.ForeignKey(StorageBoxKind, on_delete=models.CASCADE, related_name='storage_boxes', verbose_name=_("Box Kind"), null=False, blank=False)
     name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
     # peso de los productos contenidos
     weight = models.FloatField(_('Weight'), blank=True, null=True)
