@@ -63,8 +63,10 @@ class StorageZone(CodenerixModel):
         return self.__str__()
 
     def lock_delete(self):
-        if self.storage_zones.exists():
-            return _("Cannot delete storage zone model, relationship between storage zone model and bacth")
+        if self.storage_operators.exists():
+            return _("Cannot delete storage zone model, relationship between storage zone model and storage operator")
+        elif self.storage_boxes_structure.exists():
+            return _("Cannot delete storage zone model, relationship between storage zone model and storage box structure")
         else:
             return super(StorageZone, self).lock_delete()
 
@@ -98,7 +100,7 @@ class StorageBoxStructure(CodenerixModel):
         elif self.storage_boxes.exists():
             return _("Cannot delete storage zone model, relationship between storage structure model and storage box")
         else:
-            return super(StorageZone, self).lock_delete()
+            return super(StorageBoxStructure, self).lock_delete()
     
 
 class StorageBoxKind(CodenerixModel):
@@ -107,7 +109,7 @@ class StorageBoxKind(CodenerixModel):
     heigth = models.FloatField(_('Heigth'), blank=True, null=True)
     # caja vacía
     weight = models.FloatField(_('Weight'), blank=True, null=True)
-    max_weight = models.FloatField(_('Weight'), blank=True, null=True)
+    max_weight = models.FloatField(_('Max weight'), blank=True, null=True)
     name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
 
     def __str__(self):
@@ -129,7 +131,7 @@ class StorageBoxKind(CodenerixModel):
         if self.storage_boxes.exists():
             return _("Cannot delete storage zone model, relationship between storage box kind model and storage box")
         else:
-            return super(StorageZone, self).lock_delete()
+            return super(StorageBoxKind, self).lock_delete()
 
 
 class StorageBox(CodenerixModel):
@@ -169,7 +171,7 @@ class StorageOperator(GenRole, CodenerixModel):
         }
         rol_permissions = []
         force_methods = {
-            'foreignkey_storageoperator': ('CDNX_get_fk_info_storageoperator', _('---')),
+            'foreignkey_storage_operator': ('CDNX_get_fk_info_storage_operator', _('---')),
         }
 
     zone = models.ManyToManyField(StorageZone, related_name='storage_operators', verbose_name=_('Zones'))
@@ -177,7 +179,7 @@ class StorageOperator(GenRole, CodenerixModel):
 
     @staticmethod
     def foreignkey_external():
-        return get_external_method(StorageOperator, StorageOperator.CodenerixMeta.force_methods['foreignkey_storageoperator'][0])
+        return get_external_method(StorageOperator, StorageOperator.CodenerixMeta.force_methods['foreignkey_storage_operator'][0])
 
     def __str__(self):
         return u"{}".format(self.pk)

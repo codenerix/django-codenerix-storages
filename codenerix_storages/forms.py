@@ -18,10 +18,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from django import forms
 from django.utils.translation import ugettext_lazy as _
+
 from codenerix.forms import GenModelForm
+from codenerix.widgets import MultiStaticSelect
+from codenerix_extensions.helpers import get_external_model
 from codenerix_storages.models import Storage, StorageZone
-from codenerix_storages.models import StorageBox, StorageBoxStructure, StorageBoxKind
+from codenerix_storages.models import StorageBox, StorageBoxStructure, StorageBoxKind, StorageOperator
 
 
 class StorageForm(GenModelForm):
@@ -35,6 +39,18 @@ class StorageForm(GenModelForm):
             (
                 _('Details'), 12,
                 ['name', 6],
+            ),
+            (
+                _('Address'), 12,
+                ['alias', 12],
+                ['country', 3],
+                ['region', 3],
+                ['province', 3],
+                ['city', 3],
+                ['town', 9],
+                ['zipcode', 3],
+                ['address', 9],
+                ['phone', 3],
             )
         ]
         return g
@@ -45,6 +61,18 @@ class StorageForm(GenModelForm):
             (
                 _('Details'), 12,
                 ['name', 6],
+            ),
+            (
+                _('Address'), 12,
+                ['alias', 12],
+                ['country', 3],
+                ['region', 3],
+                ['province', 3],
+                ['city', 3],
+                ['town', 9],
+                ['zipcode', 3],
+                ['address', 9],
+                ['phone', 3],
             )
         ]
         return g
@@ -116,12 +144,10 @@ class StorageBoxForm(GenModelForm):
         g = [
             (
                 _('Details'), 12,
-                ['shelf', 6],
-                ['length', 6],
-                ['width', 6],
-                ['heigth', 6],
+                ['box_structure', 6],
+                ['box_kind', 6],
+                ['name', 6],
                 ['weight', 6],
-                ['alias', 6],
             )
         ]
         return g
@@ -131,12 +157,10 @@ class StorageBoxForm(GenModelForm):
         g = [
             (
                 _('Details'), 12,
-                ['shelf', 6],
-                ['length', 6],
-                ['width', 6],
-                ['heigth', 6],
+                ['box_structure', 6],
+                ['box_kind', 6],
+                ['name', 6],
                 ['weight', 6],
-                ['alias', 6],
             )
         ]
         return g
@@ -150,7 +174,7 @@ class StorageBoxStructureForm(GenModelForm):
     def __groups__(self):
         return [
             (
-                _('Details', 12),
+                _('Details'), 12,
                 ['zone', 6],
                 ['box_structure', 6],
                 ['length', 6],
@@ -188,7 +212,7 @@ class StorageBoxKindForm(GenModelForm):
     def __groups__(self):
         return [
             (
-                _('Details', 12),
+                _('Details'), 12,
                 ['length', 6],
                 ['width', 6],
                 ['heigth', 6],
@@ -202,7 +226,7 @@ class StorageBoxKindForm(GenModelForm):
     def __groups_details__():
         return [
             (
-                _('Details', 12),
+                _('Details'), 12,
                 ['length', 6],
                 ['width', 6],
                 ['heigth', 6],
@@ -211,3 +235,59 @@ class StorageBoxKindForm(GenModelForm):
                 ['name', 6],
             )
         ]
+
+
+class StorageOperatorForm(GenModelForm):
+    codenerix_external_field = forms.ModelChoiceField(
+        label=StorageOperator.foreignkey_external()['label'],
+        queryset=get_external_model(StorageOperator).objects.all()
+    )
+    zone = forms.ModelMultipleChoiceField(
+        queryset=StorageZone.objects.all().order_by('name'),
+        label=_('Zones'),
+        required=False,
+        widget=MultiStaticSelect(
+            attrs={'manytomany': True, }
+        )
+    )
+
+    password1 = forms.CharField(label=_("Pin for storage software"), min_length=4, widget=forms.PasswordInput, required=False)
+    password2 = forms.CharField(label=_("Confirm pin"), min_length=4, widget=forms.PasswordInput, required=False)
+
+    class Meta:
+        model = StorageOperator
+        exclude = []
+        autofill = {
+            'codenerix_external_field': ['select', 3, StorageOperator.foreignkey_external()['related']],
+        }
+
+    def __groups__(self):
+        return [
+            (
+                _('Details'), 12,
+                ['codenerix_external_field', 6],
+                ['zone', 4],
+                ['enable', 2],
+                ['password1', 6],
+                ['password2', 6],
+            )
+        ]
+
+    @staticmethod
+    def __groups_details__():
+        return [
+            (
+                _('Details'), 12,
+                ['codenerix_external_field', 6],
+                ['zone', 4],
+                ['enable', 2],
+            )
+        ]
+
+    def clean(self):
+        cleaned_data = super(StorageOperatorForm, self).clean()
+
+        if cleaned_data.get('password1') != cleaned_data.get('password2'):
+            del cleaned_data['password1']
+            del cleaned_data['password2']
+            raise forms.ValidationError(_("Passwords do not match"))
