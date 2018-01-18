@@ -79,7 +79,7 @@ class StorageBoxStructure(CodenerixModel):
     heigth = models.FloatField(_('Heigth'), blank=True, null=True)
     # peso de las cajas y estructuras de cajas contenidas
     weight = models.FloatField(_('Weight'), blank=True, null=True)
-    max_weight = models.FloatField(_('Weight'), blank=True, null=True)
+    max_weight = models.FloatField(_('Max weight'), blank=True, null=True)
     name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
 
     def __str__(self):
@@ -91,7 +91,12 @@ class StorageBoxStructure(CodenerixModel):
     def __fields__(self, info):
         fields = []
         fields.append(('zone', _('Zone'), 100))
+        fields.append(('box_structure', _('Box structure'), 100))
         fields.append(('name', _('Name'), 100))
+        fields.append(('width', _('Width')))
+        fields.append(('heigth', _('Heigth')))
+        fields.append(('weight', _('Weight')))
+        fields.append(('max_weight', _('Max weight')))
         return fields
 
     def lock_delete(self):
