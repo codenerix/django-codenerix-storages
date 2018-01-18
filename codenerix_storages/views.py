@@ -37,7 +37,7 @@ from codenerix_storages.models import StorageBoxStructure, StorageBoxKind
 
 from codenerix_storages.forms import StorageForm
 from codenerix_storages.forms import StorageZoneForm, StorageZoneOwnForm
-from codenerix_storages.forms import StorageBoxForm, StorageOperatorForm
+from codenerix_storages.forms import StorageBoxForm, StorageBoxFormUpdate, StorageOperatorForm
 from codenerix_storages.forms import StorageBoxStructureForm, StorageBoxKindForm
 
 # ###########################################
@@ -198,7 +198,7 @@ class StorageBoxCreateModal(GenCreateModal, StorageBoxCreate):
 class StorageBoxUpdate(GenStorageBoxUrl, GenUpdate):
     model = StorageBox
     show_details = True
-    form_class = StorageBoxForm
+    form_class = StorageBoxFormUpdate
 
 
 class StorageBoxUpdateModal(GenUpdateModal, StorageBoxUpdate):
