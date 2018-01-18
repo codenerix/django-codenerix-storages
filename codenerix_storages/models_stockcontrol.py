@@ -115,7 +115,7 @@ class RequestStock(GenCode):
             return _("Cannot delete request stock model, relationship between request stock model and outgoing albaran")
         else:
             return super(RequestStock, self).lock_delete()
-    
+
     def save(self, *args, **kwargs):
         self.code_format = getattr(settings, 'CDNX_STORAGE_CODE_REQUEST_STOCK', 'RS{year}{day}{month}-{hour}{minute}--{number}')
         return super(RequestStock, self).save(*args, **kwargs)
@@ -168,7 +168,7 @@ class OutgoingAlbaran(GenCode):
             return _("Cannot delete outgoing albaran model, relationship between outgoing albaran model and ingoing albaran")
         else:
             return super(OutgoingAlbaran, self).lock_delete()
-    
+
     def save(self, *args, **kwargs):
         self.code_format = getattr(settings, 'CDNX_STORAGE_CODE_OUTGOING_ALBARAN', 'OA{year}{day}{month}-{hour}{minute}--{number}')
         return super(OutgoingAlbaran, self).save(*args, **kwargs)
@@ -220,7 +220,7 @@ class IngoingAlbaran(GenCode):
             return _("Cannot delete ingoing albaran model, relationship between ingoing albaran model and lines")
         else:
             return super(IngoingAlbaran, self).lock_delete()
-    
+
     def save(self, *args, **kwargs):
         self.code_format = getattr(settings, 'CDNX_STORAGE_CODE_INGOING_ALBARAN', 'OI{year}{day}{month}-{hour}{minute}--{number}')
         return super(IngoingAlbaran, self).save(*args, **kwargs)
@@ -244,6 +244,55 @@ class LineIngoingAlbaran(CodenerixModel):
 
     def __str__(self):
         return u"{} ({})".format(self.product_unique, self.quantity)
+
+    def __unicode__(self):
+        return self.__str__()
+
+
+class Inventory(CodenerixModel):
+    name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
+
+    def __fields__(self, info):
+        fields = super(Storage, self).__fields__(info)
+        fields.insert(0, ('name', _('Name')))
+        return fields
+
+    def __str__(self):
+        return u"{}".format(self.name)
+
+    def __unicode__(self):
+        return self.__str__()
+
+
+class InventoryAlbaran(CodenerixModel):
+    name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name='storage_inventoryalbarans', verbose_name=_("Inventory"), null=False, blank=False)
+
+    def __fields__(self, info):
+        fields = super(Storage, self).__fields__(info)
+        fields.insert(0, ('name', _('Name')))
+        fields.insert(0, ('inventory', _('Inventory')))
+        return fields
+
+    def __str__(self):
+        return u"{}".format(self.name)
+
+    def __unicode__(self):
+        return self.__str__()
+
+
+class InventoryAlbaranLine(CodenerixModel):
+    name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
+    inventory_albaran = models.ForeignKey(InventoryAlbaran, on_delete=models.CASCADE, related_name='storage_inventoryalbaranlines', verbose_name=_("Inventory Albaran"), null=False, blank=False)
+
+    def __fields__(self, info):
+        fields = super(Storage, self).__fields__(info)
+        fields.insert(0, ('name', _('Name')))
+        fields.insert(0, ('inventory_albaran', _('Albaran')))
+        return fields
+
+    def __str__(self):
+        return u"{}".format(self.name)
 
     def __unicode__(self):
         return self.__str__()

@@ -40,7 +40,6 @@ from codenerix_storages.forms import StorageZoneForm, StorageZoneOwnForm
 from codenerix_storages.forms import StorageBoxForm, StorageOperatorForm
 from codenerix_storages.forms import StorageBoxStructureForm, StorageBoxKindForm
 
-
 # ###########################################
 class GenStorageUrl(object):
     ws_entry_point = '{}/storages'.format(settings.CDNX_STORAGES)

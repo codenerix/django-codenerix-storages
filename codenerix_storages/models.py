@@ -106,7 +106,7 @@ class StorageBoxStructure(CodenerixModel):
             return _("Cannot delete storage zone model, relationship between storage structure model and storage box")
         else:
             return super(StorageBoxStructure, self).lock_delete()
-    
+
 
 class StorageBoxKind(CodenerixModel):
     length = models.FloatField(_('Length'), blank=True, null=True)

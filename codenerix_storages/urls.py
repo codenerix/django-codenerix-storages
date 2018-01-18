@@ -25,6 +25,7 @@ from codenerix_storages.views import StorageBoxList, StorageBoxCreate, StorageBo
 from codenerix_storages.views import StorageBoxStructureList, StorageBoxStructureCreate, StorageBoxStructureCreateModal, StorageBoxStructureUpdate, StorageBoxStructureUpdateModal, StorageBoxStructureDelete, StorageBoxStructureSubList, StorageBoxStructureDetails, StorageBoxStructureDetailModal
 from codenerix_storages.views import StorageBoxKindList, StorageBoxKindCreate, StorageBoxKindCreateModal, StorageBoxKindUpdate, StorageBoxKindUpdateModal, StorageBoxKindDelete, StorageBoxKindSubList, StorageBoxKindDetails, StorageBoxKindDetailModal
 from codenerix_storages.views import StorageOperatorList, StorageOperatorCreate, StorageOperatorCreateModal, StorageOperatorUpdate, StorageOperatorUpdateModal, StorageOperatorDelete, StorageOperatorSubList, StorageOperatorDetails, StorageOperatorDetailModal
+from codenerix_storages.views_stockcontrol import InventoryList, InventoryCreate, InventoryCreateModal, InventoryUpdate, InventoryUpdateModal, InventoryDelete, InventoryDetails
 
 urlpatterns = [
     url(r'^storages$', StorageList.as_view(), name='CDNX_storages_storages_list'),
@@ -67,7 +68,7 @@ urlpatterns = [
     url(r'^storageboxs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', StorageBoxUpdateModal.as_view(), name='CDNX_storages_storageboxs_sublist_edit'),
     url(r'^storageboxs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', StorageBoxUpdateModal.as_view(), name='CDNX_storages_storageboxs_sublist_editmodal'),
     url(r'^storageboxs/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', StorageBoxDelete.as_view(), name='CDNX_storages_storageboxs_sublist_delete'),
-    
+
     # StorageBoxStructure
     url(r'^storageboxstructures$', StorageBoxStructureList.as_view(), name='CDNX_storages_storageboxstructures_list'),
     url(r'^storageboxstructures/add$', StorageBoxStructureCreate.as_view(), name='CDNX_storages_storageboxstructures_add'),
@@ -114,5 +115,14 @@ urlpatterns = [
     url(r'^storageoperators/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', StorageOperatorUpdateModal.as_view(), name='CDNX_storages_storageoperators_sublist_edit'),
     url(r'^storageoperators/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', StorageOperatorUpdateModal.as_view(), name='CDNX_storages_storageoperators_sublist_editmodal'),
     url(r'^storageoperators/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', StorageOperatorDelete.as_view(), name='CDNX_storages_storageoperators_sublist_delete'),
+
+    url(r'^inventorys$', InventoryList.as_view(), name='CDNX_storages_inventory_list'),
+    url(r'^inventorys/add$', InventoryCreate.as_view(), name='CDNX_storages_inventory_add'),
+    url(r'^inventorys/addmodal$', InventoryCreateModal.as_view(), name='CDNX_storages_inventory_addmodal'),
+    url(r'^inventorys/(?P<pk>\w+)$', InventoryDetails.as_view(), name='CDNX_storages_inventory_details'),
+    url(r'^inventorys/(?P<pk>\w+)/edit$', InventoryUpdate.as_view(), name='CDNX_storages_inventory_edit'),
+    url(r'^inventorys/(?P<pk>\w+)/editmodal$', InventoryUpdateModal.as_view(), name='CDNX_storages_inventory_editmodal'),
+    url(r'^inventorys/(?P<pk>\w+)/delete$', InventoryDelete.as_view(), name='CDNX_storages_inventory_delete'),
+
 
 ]
