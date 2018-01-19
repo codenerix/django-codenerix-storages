@@ -104,7 +104,7 @@ class InventoryLineList(GenInventoryLineUrl, GenList):
 class InventoryLineWork(GenInventoryLineUrl, GenList):
     model = InventoryLine
     extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryLine'), _('InventoryLine')]}
-    static_partial_row = "codenerix_storages/inventoryslinework_rows.html"
+    static_partial_row = "codenerix_storages/inventory_work.html"
     defaultordering = "-created"
 
     def dispatch(self, *args, **kwargs):
