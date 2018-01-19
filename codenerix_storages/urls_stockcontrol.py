@@ -20,8 +20,7 @@
 
 from django.conf.urls import url
 from codenerix_storages.views_stockcontrol import InventoryList, InventoryCreate, InventoryCreateModal, InventoryUpdate, InventoryUpdateModal, InventoryDelete, InventoryDetail
-from codenerix_storages.views_stockcontrol import InventoryAlbaranList, InventoryAlbaranCreate, InventoryAlbaranCreateModal, InventoryAlbaranUpdate, InventoryAlbaranUpdateModal, InventoryAlbaranDelete, InventoryAlbaranDetail
-from codenerix_storages.views_stockcontrol import InventoryAlbaranLineList, InventoryAlbaranLineCreate, InventoryAlbaranLineCreateModal, InventoryAlbaranLineUpdate, InventoryAlbaranLineUpdateModal, InventoryAlbaranLineDelete, InventoryAlbaranLineDetail, InventoryAlbaranLineSubList, InventoryAlbaranLineDetailModal
+from codenerix_storages.views_stockcontrol import InventoryLineList, InventoryLineWork, InventoryLineCreate, InventoryLineCreateModal, InventoryLineUpdate, InventoryLineUpdateModal, InventoryLineDelete, InventoryLineDetail
 
 urlpatterns = [
     url(r'^inventory$', InventoryList.as_view(), name='CDNX_storages_inventory_list'),
@@ -32,26 +31,12 @@ urlpatterns = [
     url(r'^inventory/(?P<pk>\w+)/editmodal$', InventoryUpdateModal.as_view(), name='CDNX_storages_inventory_editmodal'),
     url(r'^inventory/(?P<pk>\w+)/delete$', InventoryDelete.as_view(), name='CDNX_storages_inventory_delete'),
 
-    url(r'^inventoryalbaran$', InventoryAlbaranList.as_view(), name='CDNX_storages_inventoryalbaran_list'),
-    url(r'^inventoryalbaran/add$', InventoryAlbaranCreate.as_view(), name='CDNX_storages_inventoryalbaran_add'),
-    url(r'^inventoryalbaran/addmodal$', InventoryAlbaranCreateModal.as_view(), name='CDNX_storages_inventoryalbaran_addmodal'),
-    url(r'^inventoryalbaran/(?P<pk>\w+)$', InventoryAlbaranDetail.as_view(), name='CDNX_storages_inventoryalbaran_details'),
-    url(r'^inventoryalbaran/(?P<pk>\w+)/edit$', InventoryAlbaranUpdate.as_view(), name='CDNX_storages_inventoryalbaran_edit'),
-    url(r'^inventoryalbaran/(?P<pk>\w+)/editmodal$', InventoryAlbaranUpdateModal.as_view(), name='CDNX_storages_inventoryalbaran_editmodal'),
-    url(r'^inventoryalbaran/(?P<pk>\w+)/delete$', InventoryAlbaranDelete.as_view(), name='CDNX_storages_inventoryalbaran_delete'),
-
-    url(r'^inventoryalbaranline$', InventoryAlbaranLineList.as_view(), name='CDNX_storages_inventoryalbaranline_list'),
-    url(r'^inventoryalbaranline/add$', InventoryAlbaranLineCreate.as_view(), name='CDNX_storages_inventoryalbaranline_add'),
-    url(r'^inventoryalbaranline/addmodal$', InventoryAlbaranLineCreateModal.as_view(), name='CDNX_storages_inventoryalbaranline_addmodal'),
-    url(r'^inventoryalbaranline/(?P<pk>\w+)$', InventoryAlbaranLineDetail.as_view(), name='CDNX_storages_inventoryalbaranline_details'),
-    url(r'^inventoryalbaranline/(?P<pk>\w+)/edit$', InventoryAlbaranLineUpdate.as_view(), name='CDNX_storages_inventoryalbaranline_edit'),
-    url(r'^inventoryalbaranline/(?P<pk>\w+)/editmodal$', InventoryAlbaranLineUpdateModal.as_view(), name='CDNX_storages_inventoryalbaranline_editmodal'),
-    url(r'^inventoryalbaranline/(?P<pk>\w+)/delete$', InventoryAlbaranLineDelete.as_view(), name='CDNX_storages_inventoryalbaranline_delete'),
-    url(r'^inventoryalbaranline/(?P<pk>\w+)/sublist$', InventoryAlbaranLineSubList.as_view(), name='CDNX_storages_inventoryalbaranline_sublist'),
-    url(r'^inventoryalbaranline/(?P<pk>\w+)/sublist/add$', InventoryAlbaranLineCreateModal.as_view(), name='CDNX_storages_inventoryalbaranline_sublist_add'),
-    url(r'^inventoryalbaranline/(?P<pk>\w+)/sublist/addmodal$', InventoryAlbaranLineCreateModal.as_view(), name='CDNX_storages_inventoryalbaranline_sublist_addmodal'),
-    url(r'^inventoryalbaranline/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', InventoryAlbaranLineDetailModal.as_view(), name='CDNX_storages_inventoryalbaranline_sublist_details'),
-    url(r'^inventoryalbaranline/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', InventoryAlbaranLineUpdateModal.as_view(), name='CDNX_storages_inventoryalbaranline_sublist_edit'),
-    url(r'^inventoryalbaranline/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', InventoryAlbaranLineUpdateModal.as_view(), name='CDNX_storages_inventoryalbaranline_sublist_editmodal'),
-    url(r'^inventoryalbaranline/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', InventoryAlbaranLineDelete.as_view(), name='CDNX_storages_inventoryalbaranline_sublist_delete'),
+    url(r'^inventoryline/(?P<ipk>\w+)$', InventoryLineList.as_view(), name='CDNX_storages_inventoryline_list'),
+    url(r'^inventoryline/(?P<ipk>\w+)/work$', InventoryLineWork.as_view(), name='CDNX_storages_inventoryline_work'),
+    url(r'^inventoryline/(?P<ipk>\w+)/add$', InventoryLineCreate.as_view(), name='CDNX_storages_inventoryline_add'),
+    url(r'^inventoryline/(?P<ipk>\w+)/addmodal$', InventoryLineCreateModal.as_view(), name='CDNX_storages_inventoryline_addmodal'),
+    url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)$', InventoryLineDetail.as_view(), name='CDNX_storages_inventoryline_details'),
+    url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/edit$', InventoryLineUpdate.as_view(), name='CDNX_storages_inventoryline_edit'),
+    url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/editmodal$', InventoryLineUpdateModal.as_view(), name='CDNX_storages_inventoryline_editmodal'),
+    url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/delete$', InventoryLineDelete.as_view(), name='CDNX_storages_inventoryline_delete'),
 ]

@@ -19,16 +19,18 @@
 # limitations under the License.
 
 import datetime
+
 from django.db import models, transaction
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from .models import Storage, StorageBox
 from codenerix.models import CodenerixModel
 from codenerix_products.models import ProductFinal, ProductUnique
-from codenerix_storages.models import StorageOperator
+
+from .models import Storage, StorageBox, StorageOperator
 
 
 class GenCode(CodenerixModel):
@@ -252,14 +254,15 @@ class LineIncomingAlbaran(CodenerixModel):
 # Inventory
 class Inventory(CodenerixModel):
     name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
-    opened = models.DateTimeField(_("Date"), blank=True, null=True, editable=False)
-    closed = models.DateTimeField(_("Date"), blank=True, null=True, editable=False)
+    start = models.DateTimeField(_("Starts"), blank=True, null=True)
+    end = models.DateTimeField(_("Ends"), blank=True, null=True)
 
     def __fields__(self, info):
         fields = []
         fields.append(('name', _('Name')))
-        fields.append(('opened', _('Opened')))
-        fields.append(('closed', _('Closed')))
+        fields.append(('start', _('Starts')))
+        fields.append(('end', _('Ends')))
+        fields.append((None, _('Actions')))
         return fields
 
     def __str__(self):
@@ -269,40 +272,28 @@ class Inventory(CodenerixModel):
         return self.__str__()
 
 
-class InventoryAlbaran(CodenerixModel):
-    name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
-    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name='storage_inventoryalbarans', verbose_name=_("Inventory"), null=False, blank=False)
-    operator = models.ForeignKey(StorageOperator, on_delete=models.CASCADE, related_name='storage_inventoryalbarans', verbose_name=_("Storage Operator"), null=False, blank=False)
-
-    opened = models.DateTimeField(_("Date"), blank=False, null=False, editable=False, default=timezone.now)
-    closed = models.DateTimeField(_("Date"), blank=True, null=True, editable=False)
+class InventoryLine(CodenerixModel):
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name='storage_inventorys', verbose_name=_("Inventory"), null=False, blank=False)
+    box = models.ForeignKey(StorageBox, on_delete=models.CASCADE, related_name='storage_inventorys', verbose_name=_("Box"), null=False, blank=False)
+    product_final = models.ForeignKey(ProductFinal, on_delete=models.CASCADE, related_name='storage_inventorylines', null=False, blank=False, verbose_name=_("Product Final"))
+    product_unique = models.ForeignKey(ProductUnique, on_delete=models.CASCADE, related_name='storage_inventorylines', null=False, blank=False, verbose_name=_("Product Unique"))
+    operator = models.ForeignKey(StorageOperator, on_delete=models.CASCADE, related_name='storage_inventorys', verbose_name=_("Storage Operator"), null=False, blank=False)
+    quantity = models.FloatField(_("Quantity"), null=False, blank=False, default=1.0)
 
     def __fields__(self, info):
         fields = []
-        fields.append(('inventory', _('Inventory')))
-        fields.append(('name', _('Name')))
-        fields.append(('opened', _('Opened')))
-        fields.append(('closed', _('Closed')))
+        fields.append(('box', _("Box")))
+        fields.append(('product_final', _("Produce")))
+        fields.append(('product_unique', _("Unique")))
+        fields.append(('operator', _("Operator")))
+        fields.append(('quantity', _("Quantity")))
         return fields
-
-    def __str__(self):
-        return u"{}".format(self.name)
 
     def __unicode__(self):
         return self.__str__()
 
-
-class InventoryAlbaranLine(CodenerixModel):
-    inventory_albaran = models.ForeignKey(InventoryAlbaran, on_delete=models.CASCADE, related_name='storage_inventoryalbaranlines', verbose_name=_("Inventory Albaran"), null=False, blank=False)
-    product_unique = models.ForeignKey(ProductUnique, on_delete=models.CASCADE, related_name='storage_inventoryalbaranlines', verbose_name=_("Product"))
-
-    def __fields__(self, info):
-        fields = []
-        fields.append(('product_unique', _("Product")))
-        return fields
-
-    def __str__(self):
-        return u"{}".format(self.name)
-
-    def __unicode__(self):
-        return self.__str__()
+    def __limitQ__(self, info):
+        limit = {}
+        ipk = info.kwargs.get('ipk', None)
+        limit['file_link'] = Q(inventory__pk=ipk)
+        return limit

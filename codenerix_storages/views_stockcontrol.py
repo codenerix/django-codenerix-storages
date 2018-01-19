@@ -21,11 +21,12 @@
 from django.db.models import Q
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.urls import reverse
 
-from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
+from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail
 
-from codenerix_storages.models_stockcontrol import Inventory, InventoryAlbaran, InventoryAlbaranLine
-from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryAlbaranForm, InventoryAlbaranLineForm
+from codenerix_storages.models_stockcontrol import Inventory, InventoryLine
+from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryLineForm
 
 
 # Inventory
@@ -35,14 +36,21 @@ class GenInventoryUrl(object):
 
 class InventoryList(GenInventoryUrl, GenList):
     model = Inventory
-    show_details = True
-    extra_context = {'menu': ['storage', 'storage'], 'bread': [_('Inventory'), _('Inventory')]}
-    gentrans = {
-        'open': _("Open"),
-        'close': _("Close"),
-        'start': _("Start"),
-        'end': _("End"),
+    extra_context = {
+        'menu': ['storage', 'storage'],
+        'bread': [_('Inventory'), _('Inventory')],
     }
+    gentrans = {
+        'getreport': _("Get report"),
+        'doinventory': _("Do inventory"),
+    }
+
+    def dispatch(self, *args, **kwargs):
+        self.client_context = {
+            'url_doinventory': reverse('CDNX_storages_inventoryline_work', kwargs={"ipk": "__IPK__"}),
+            'url_getreport': reverse('CDNX_storages_inventoryline_list', kwargs={"ipk": "__IPK__"}),
+        }
+        return super(InventoryList, self).dispatch(*args, **kwargs)
 
 
 class InventoryCreate(GenInventoryUrl, GenCreate):
@@ -56,7 +64,6 @@ class InventoryCreateModal(GenCreateModal, InventoryCreate):
 
 class InventoryUpdate(GenInventoryUrl, GenUpdate):
     model = Inventory
-    show_details = True
     form_class = InventoryForm
 
 
@@ -73,98 +80,66 @@ class InventoryDetail(GenInventoryUrl, GenDetail):
     groups = InventoryForm.__groups_details__()
 
 
-# InventoryAlbaran
-class GenInventoryAlbaranUrl(object):
-    ws_entry_point = '{}/inventoryalbaran'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
+# InventoryLine
+class GenInventoryLineUrl(object):
+    ws_entry_point = '{}/inventoryline'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
 
 
-class InventoryAlbaranList(GenInventoryAlbaranUrl, GenList):
-    model = InventoryAlbaran
-    show_details = True
-    extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryAlbaran'), _('InventoryAlbaran')]}
+class InventoryLineList(GenInventoryLineUrl, GenList):
+    model = InventoryLine
+    extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryLine'), _('InventoryLine')]}
+    defaultordering = "-created"
 
-
-class InventoryAlbaranCreate(GenInventoryAlbaranUrl, GenCreate):
-    model = InventoryAlbaran
-    form_class = InventoryAlbaranForm
-
-
-class InventoryAlbaranCreateModal(GenCreateModal, InventoryAlbaranCreate):
-    pass
-
-
-class InventoryAlbaranUpdate(GenInventoryAlbaranUrl, GenUpdate):
-    model = InventoryAlbaran
-    show_details = True
-    form_class = InventoryAlbaranForm
-
-
-class InventoryAlbaranUpdateModal(GenUpdateModal, InventoryAlbaranUpdate):
-    pass
-
-
-class InventoryAlbaranDelete(GenInventoryAlbaranUrl, GenDelete):
-    model = InventoryAlbaran
-
-
-class InventoryAlbaranDetail(GenInventoryAlbaranUrl, GenDetail):
-    model = InventoryAlbaran
-    groups = InventoryAlbaranForm.__groups_details__()
-    tabs = [
-        {'id': 'Products', 'name': _('Products'), 'ws': 'CDNX_storages_inventoryalbaranline_sublist', 'rows': 'base'},
-    ]
-
-
-# InventoryAlbaranLine
-class GenInventoryAlbaranLineUrl(object):
-    ws_entry_point = '{}/inventoryalbaranline'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
-
-
-class InventoryAlbaranLineList(GenInventoryAlbaranLineUrl, GenList):
-    model = InventoryAlbaranLine
-    show_details = True
-    extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryAlbaranLine'), _('InventoryAlbaranLine')]}
-
-
-class InventoryAlbaranLineCreate(GenInventoryAlbaranLineUrl, GenCreate):
-    model = InventoryAlbaranLine
-    form_class = InventoryAlbaranLineForm
-
-
-class InventoryAlbaranLineCreateModal(GenCreateModal, InventoryAlbaranLineCreate):
-    pass
-
-
-class InventoryAlbaranLineUpdate(GenInventoryAlbaranLineUrl, GenUpdate):
-    model = InventoryAlbaranLine
-    show_details = True
-    form_class = InventoryAlbaranLineForm
-
-
-class InventoryAlbaranLineUpdateModal(GenUpdateModal, InventoryAlbaranLineUpdate):
-    pass
-
-
-class InventoryAlbaranLineDelete(GenInventoryAlbaranLineUrl, GenDelete):
-    model = InventoryAlbaranLine
-
-
-class InventoryAlbaranLineDetail(GenInventoryAlbaranLineUrl, GenDetail):
-    model = InventoryAlbaranLine
-    groups = InventoryAlbaranLineForm.__groups_details__()
-
-
-class InventoryAlbaranLineDetailModal(GenDetailModal, InventoryAlbaranLineDetail):
-    pass
-
-
-class InventoryAlbaranLineSubList(GenInventoryAlbaranLineUrl, GenList):
-    model = InventoryAlbaranLine
-    linkadd = False
-    extra_context = {'menu': ['Storage', 'storage'], 'bread': [_('Storage'), _('Storage')]}
+    def dispatch(self, *args, **kwargs):
+        self.ipk = kwargs.get('ipk')
+        self.ws_entry_point = reverse('CDNX_storages_inventoryline_list', kwargs={"ipk": self.ipk})[1:]
+        return super(InventoryLineList, self).dispatch(*args, **kwargs)
 
     def __limitQ__(self, info):
         limit = {}
-        pk = info.kwargs.get('pk', None)
-        limit['file_link'] = Q(inventory_albaran__pk=pk)
+        limit['file_link'] = Q(inventory__pk=self.ipk)
         return limit
+
+
+class InventoryLineWork(GenInventoryLineUrl, GenList):
+    model = InventoryLine
+    extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryLine'), _('InventoryLine')]}
+    static_partial_row = "codenerix_storages/inventoryslinework_rows.html"
+    defaultordering = "-created"
+
+    def dispatch(self, *args, **kwargs):
+        self.ipk = kwargs.get('ipk')
+        self.ws_entry_point = reverse('CDNX_storages_inventoryline_work', kwargs={"ipk": self.ipk})[1:]
+        return super(InventoryLineWork, self).dispatch(*args, **kwargs)
+
+    def __limitQ__(self, info):
+        limit = {}
+        limit['file_link'] = Q(inventory__pk=self.ipk)
+        return limit
+
+
+class InventoryLineCreate(GenInventoryLineUrl, GenCreate):
+    model = InventoryLine
+    form_class = InventoryLineForm
+
+
+class InventoryLineCreateModal(GenCreateModal, InventoryLineCreate):
+    pass
+
+
+class InventoryLineUpdate(GenInventoryLineUrl, GenUpdate):
+    model = InventoryLine
+    form_class = InventoryLineForm
+
+
+class InventoryLineUpdateModal(GenUpdateModal, InventoryLineUpdate):
+    pass
+
+
+class InventoryLineDelete(GenInventoryLineUrl, GenDelete):
+    model = InventoryLine
+
+
+class InventoryLineDetail(GenInventoryLineUrl, GenDetail):
+    model = InventoryLine
+    groups = InventoryLineForm.__groups_details__()
