@@ -283,7 +283,7 @@ class InventoryLine(CodenerixModel):
     def __fields__(self, info):
         fields = []
         fields.append(('box', _("Box")))
-        fields.append(('product_final', _("Produce")))
+        fields.append(('product_final', _("Product")))
         fields.append(('product_unique', _("Unique")))
         fields.append(('operator', _("Operator")))
         fields.append(('quantity', _("Quantity")))

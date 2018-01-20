@@ -104,8 +104,16 @@ class InventoryLineList(GenInventoryLineUrl, GenList):
 class InventoryLineWork(GenInventoryLineUrl, GenList):
     model = InventoryLine
     extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryLine'), _('InventoryLine')]}
-    static_partial_row = "codenerix_storages/inventory_work.html"
     defaultordering = "-created"
+    static_partial_header = 'codenerix_storages/inventory_work_header.html'
+    static_app_row = 'codenerix_storages/inventory_work_app.js'
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('box', _("Box")))
+        fields.append(('product_final', _("Product")))
+        fields.append(('product_unique', _("Unique")))
+        return fields
 
     def dispatch(self, *args, **kwargs):
         self.ipk = kwargs.get('ipk')
