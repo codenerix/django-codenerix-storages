@@ -24,6 +24,7 @@ from django.utils.translation import ugettext as _
 from django.urls import reverse
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail
+from codenerix.widgets import DynamicInput, DynamicSelect
 
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine
 from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryLineForm
@@ -107,6 +108,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
     defaultordering = "-created"
     static_partial_header = 'codenerix_storages/inventory_work_header.html'
     static_app_row = 'codenerix_storages/inventory_work_app.js'
+    static_controllers_row = 'codenerix_storages/inventory_work_controllers.js'
 
     def __fields__(self, info):
         fields = []
@@ -116,8 +118,43 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         return fields
 
     def dispatch(self, *args, **kwargs):
+        # Get constants
         self.ipk = kwargs.get('ipk')
         self.ws_entry_point = reverse('CDNX_storages_inventoryline_work', kwargs={"ipk": self.ipk})[1:]
+
+        # Prepare form
+        fields = []
+        fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign'))
+        fields.append((DynamicInput, 'product_final', 333, 'CDNX_products_productfinals_foreign_sales'))
+        fields.append((DynamicInput, 'product_unique', 333,  'CDNX_products_productuniques_foreign'))
+        form = InventoryLineForm()
+        for (widget, key, minchars, url) in fields:
+            wattrs = form.fields[key].widget.attrs
+            form.fields[key].widget = widget(wattrs)
+            form.fields[key].widget.form_name = form.form_name
+            form.fields[key].widget.field_name = key
+            form.fields[key].widget.autofill_deepness = minchars
+            form.fields[key].widget.autofill_url = url
+            form.fields[key].widget.autofill = []
+
+        # Prepare context
+        self.client_context = {
+            'ipk': self.ipk,
+            'final_focus': 'true',
+            'unique_focus': 'false',
+            'unique_disabled': 'true',
+            'form_zone': form.fields['box'].widget.render('box', None, {}),
+            'form_product': form.fields['product_final'].widget.render('product_final', None, {
+                'codenerix-on-enter':'product_final=product_changed(product_final)',
+                'codenerix-focus': 'data.meta.context.final_focus',
+                'autofocus': '',
+            }),
+            'form_unique': form.fields['product_unique'].widget.render('unique', None, {
+                'codenerix-on-enter':'Array(product_final, product_unique)==unique_changed(product_final, product_unique); product_final=""; product_unique=""',
+                'codenerix-focus': 'data.meta.context.unique_focus',
+                'ng-disabled': 'data.meta.context.unique_disabled',
+            }),
+        }
         return super(InventoryLineWork, self).dispatch(*args, **kwargs)
 
     def __limitQ__(self, info):

@@ -21,7 +21,7 @@
 from django.conf.urls import url
 from codenerix_storages.views import StorageList, StorageCreate, StorageCreateModal, StorageUpdate, StorageUpdateModal, StorageDelete, StorageDetails
 from codenerix_storages.views import StorageZoneList, StorageZoneCreate, StorageZoneCreateModal, StorageZoneUpdate, StorageZoneUpdateModal, StorageZoneDelete, StorageZoneSubList, StorageZoneDetail, StorageZoneDetailModal, OwnStorageZoneCreateModal, OwnStorageZoneUpdateModal
-from codenerix_storages.views import StorageBoxList, StorageBoxCreate, StorageBoxCreateModal, StorageBoxDetail, StorageBoxUpdate, StorageBoxUpdateModal, StorageBoxDelete, StorageBoxSubList, StorageBoxDetailModal
+from codenerix_storages.views import StorageBoxList, StorageBoxCreate, StorageBoxCreateModal, StorageBoxDetail, StorageBoxUpdate, StorageBoxUpdateModal, StorageBoxDelete, StorageBoxSubList, StorageBoxDetailModal, StorageBoxForeign
 from codenerix_storages.views import StorageBoxStructureList, StorageBoxStructureCreate, StorageBoxStructureCreateModal, StorageBoxStructureUpdate, StorageBoxStructureUpdateModal, StorageBoxStructureDelete, StorageBoxStructureSubList, StorageBoxStructureDetails, StorageBoxStructureDetailModal
 from codenerix_storages.views import StorageBoxKindList, StorageBoxKindCreate, StorageBoxKindCreateModal, StorageBoxKindUpdate, StorageBoxKindUpdateModal, StorageBoxKindDelete, StorageBoxKindSubList, StorageBoxKindDetails, StorageBoxKindDetailModal
 from codenerix_storages.views import StorageOperatorList, StorageOperatorCreate, StorageOperatorCreateModal, StorageOperatorUpdate, StorageOperatorUpdateModal, StorageOperatorDelete, StorageOperatorSubList, StorageOperatorDetails, StorageOperatorDetailModal
@@ -55,6 +55,7 @@ urlpatterns = [
     url(r'^storageboxs$', StorageBoxList.as_view(), name='CDNX_storages_storageboxs_list'),
     url(r'^storageboxs/add$', StorageBoxCreate.as_view(), name='CDNX_storages_storageboxs_add'),
     url(r'^storageboxs/addmodal$', StorageBoxCreateModal.as_view(), name='CDNX_storages_storageboxs_addmodal'),
+    url(r'^storageboxs/foreign/(?P<search>[\w\W]+|\*)$', StorageBoxForeign.as_view(), name='CDNX_storages_storageboxs_foreign'),
     url(r'^storageboxs/(?P<pk>\w+)$', StorageBoxDetail.as_view(), name='CDNX_storages_storagezones_detail'),
     url(r'^storageboxs/(?P<pk>\w+)/edit$', StorageBoxUpdate.as_view(), name='CDNX_storages_storageboxs_edit'),
     url(r'^storageboxs/(?P<pk>\w+)/editmodal$', StorageBoxUpdateModal.as_view(), name='CDNX_storages_storageboxs_editmodal'),

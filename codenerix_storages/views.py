@@ -29,7 +29,7 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
-from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
+from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal, GenForeignKey
 
 from codenerix_storages.models import Storage, StorageZone
 from codenerix_storages.models import StorageBox, StorageOperator
@@ -230,6 +230,14 @@ class StorageBoxDetail(GenStorageBoxUrl, GenDetail):
 
 class StorageBoxDetailModal(GenDetailModal, StorageBoxDetail):
     pass
+
+
+class StorageBoxForeign(GenForeignKey):
+    model = StorageBox
+    label = "{name}"
+
+    def get_foreign(self, queryset, search, filter):
+        return queryset.all()
 
 
 # ###########################################
