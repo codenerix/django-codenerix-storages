@@ -113,6 +113,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
     def __fields__(self, info):
         fields = []
         fields.append(('box', _("Box")))
+        fields.append(('quantity', _("Quantity")))
         fields.append(('product_final', _("Product")))
         fields.append(('product_unique', _("Unique")))
         return fields
@@ -125,8 +126,8 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         # Prepare form
         fields = []
         fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign'))
-        fields.append((DynamicInput, 'product_final', 333, 'CDNX_products_productfinals_foreign_sales'))
-        fields.append((DynamicInput, 'product_unique', 333,  'CDNX_products_productuniques_foreign'))
+        fields.append((DynamicInput, 'product_final', 3, 'CDNX_products_productfinalsean13_foreign'))
+        fields.append((DynamicInput, 'product_unique', 3,  'CDNX_products_productuniquescode_foreign'))
         form = InventoryLineForm()
         for (widget, key, minchars, url) in fields:
             wattrs = form.fields[key].widget.attrs
@@ -144,13 +145,14 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
             'unique_focus': 'false',
             'unique_disabled': 'true',
             'form_zone': form.fields['box'].widget.render('box', None, {}),
+            'form_quantity': form.fields['quantity'].widget.render('quantity', None, {'ng-init': 'quantity=1.0'}),
             'form_product': form.fields['product_final'].widget.render('product_final', None, {
-                'codenerix-on-enter':'product_final=product_changed(product_final)',
+                'codenerix-on-enter': 'product_final=product_changed(product_final)',
                 'codenerix-focus': 'data.meta.context.final_focus',
                 'autofocus': '',
             }),
             'form_unique': form.fields['product_unique'].widget.render('unique', None, {
-                'codenerix-on-enter':'Array(product_final, product_unique)==unique_changed(product_final, product_unique); product_final=""; product_unique=""',
+                'codenerix-on-enter': 'Array(product_final, product_unique)==unique_changed(product_final, product_unique); product_final=""; product_unique=""',
                 'codenerix-focus': 'data.meta.context.unique_focus',
                 'ng-disabled': 'data.meta.context.unique_disabled',
             }),

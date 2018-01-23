@@ -17,6 +17,10 @@
             ng-href="{{data.meta.context.url_getreport.replace('__IPK__', row.pk)}}"
             ng-click="$event.stopPropagation()"
             class="btn btn-sm status btn-default ng-binding ng-scope">{{data.meta.gentranslate.getreport}}</a>
+        <a
+            ng-href="{{data.meta.context.url_getreport.replace('__IPK__', row.pk)}}"
+            ng-click="$event.stopPropagation()"
+            class="btn btn-sm status btn-default ng-binding ng-scope">Regularizacion de stock</a>
     </div>
     <span ng-if="!row.start">-</span>
 </td>
