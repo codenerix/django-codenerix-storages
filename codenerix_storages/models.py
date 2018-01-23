@@ -54,6 +54,7 @@ class StorageZone(CodenerixModel):
         fields = []
         fields.append(('name', _('Zone'), 100))
         fields.append(('storage', _('Storage'), 100))
+        fields.append(('salable', _('Salable'), 100))
         return fields
 
     def __str__(self):
