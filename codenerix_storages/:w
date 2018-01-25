@@ -20,7 +20,7 @@
 
 from django.conf.urls import url
 from codenerix_storages.views_stockcontrol import InventoryList, InventoryCreate, InventoryCreateModal, InventoryUpdate, InventoryUpdateModal, InventoryDelete, InventoryDetail
-from codenerix_storages.views_stockcontrol import InventoryLineList, InventoryLineWork, InventoryLineCreate, InventoryLineCreateModal, InventoryLineUpdate, InventoryLineUpdateModal, InventoryLineDelete, InventoryLineDetail, InventoryLineEAN13Fullinfo, InventoryLineUniqueFullinfo
+from codenerix_storages.views_stockcontrol import InventoryLineList, InventoryLineWork, InventoryLineCreate, InventoryLineCreateModal, InventoryLineUpdate, InventoryLineUpdateModal, InventoryLineDelete, InventoryLineDetail, InventoryLineEAN13Fullinfo
 
 urlpatterns = [
     url(r'^inventory$', InventoryList.as_view(), name='CDNX_storages_inventory_list'),
@@ -40,6 +40,5 @@ urlpatterns = [
     url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/editmodal$', InventoryLineUpdateModal.as_view(), name='CDNX_storages_inventoryline_editmodal'),
     url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/delete$', InventoryLineDelete.as_view(), name='CDNX_storages_inventoryline_delete'),
 
-    url(r'^inventorylineean13/(?P<ean13>[a-zA-Z0-9+-_/]+)/fullinfo$', InventoryLineEAN13Fullinfo.as_view(), name='CDNX_storages_inventoryline_ean13_fullinfo'),
-    url(r'^inventorylineunique/(?P<unique>[a-zA-Z0-9+-_/]+)/fullinfo$', InventoryLineUniqueFullinfo.as_view(), name='CDNX_storages_inventoryline_unique_fullinfo'),
+    url(r'^inventorylineean13/(?P<pk>\w+)/fullinfo$', InventoryLineEAN13Fullinfo.as_view(), name='CDNX_storages_inventoryline_ean13_fullinfo'),
 ]

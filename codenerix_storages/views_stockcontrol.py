@@ -18,14 +18,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+
 from django.db.models import Q
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.urls import reverse
+from django.http import HttpResponse
+from django.views.generic import View
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail
 from codenerix.widgets import DynamicInput, DynamicSelect
 
+from codenerix_products.models import ProductFinal, ProductUnique
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine
 from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryLineForm
 
@@ -116,45 +123,55 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         fields.append(('quantity', _("Quantity")))
         fields.append(('product_final', _("Product")))
         fields.append(('product_unique', _("Unique")))
+        fields.append(('caducity', _("Caducity")))
         return fields
 
     def dispatch(self, *args, **kwargs):
         # Get constants
         self.ipk = kwargs.get('ipk')
         self.ws_entry_point = reverse('CDNX_storages_inventoryline_work', kwargs={"ipk": self.ipk})[1:]
+        self.ws_ean13_fullinfo = reverse('CDNX_storages_inventoryline_ean13_fullinfo', kwargs={"ean13": 'PRODUCT_FINAL_EAN13'})[1:]
+        self.ws_unique_fullinfo = reverse('CDNX_storages_inventoryline_unique_fullinfo', kwargs={"unique": 'PRODUCT_FINAL_UNIQUE'})[1:]
 
         # Prepare form
         fields = []
-        fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign'))
-        fields.append((DynamicInput, 'product_final', 3, 'CDNX_products_productfinalsean13_foreign'))
-        fields.append((DynamicInput, 'product_unique', 3,  'CDNX_products_productuniquescode_foreign'))
+        fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign', []))
+        fields.append((DynamicInput, 'product_final', 3, 'CDNX_products_productfinalsean13_foreign', []))
+        fields.append((DynamicInput, 'product_unique', 3,  'CDNX_products_productuniquescode_foreign', ['product_final']))
         form = InventoryLineForm()
-        for (widget, key, minchars, url) in fields:
+        for (widget, key, minchars, url, autofill) in fields:
             wattrs = form.fields[key].widget.attrs
             form.fields[key].widget = widget(wattrs)
             form.fields[key].widget.form_name = form.form_name
             form.fields[key].widget.field_name = key
             form.fields[key].widget.autofill_deepness = minchars
             form.fields[key].widget.autofill_url = url
-            form.fields[key].widget.autofill = []
+            form.fields[key].widget.autofill = autofill
 
         # Prepare context
         self.client_context = {
             'ipk': self.ipk,
-            'final_focus': 'true',
-            'unique_focus': 'false',
-            'unique_disabled': 'true',
+            'final_focus': True,
+            'unique_focus': False,
+            'unique_disabled': True,
+            'caducity_focus': True,
+            'caducity_disabled': True,
             'form_zone': form.fields['box'].widget.render('box', None, {}),
             'form_quantity': form.fields['quantity'].widget.render('quantity', None, {'ng-init': 'quantity=1.0'}),
             'form_product': form.fields['product_final'].widget.render('product_final', None, {
-                'codenerix-on-enter': 'product_final=product_changed(product_final)',
+                'codenerix-on-enter': 'product_changed(product_final, this, "{}")'.format(self.ws_ean13_fullinfo),
                 'codenerix-focus': 'data.meta.context.final_focus',
+                'ng-class': '{"bg-danger": final_error}',
                 'autofocus': '',
-            }),
+            })+" <span class='fa fa-warning text-danger' ng-show='final_error' title='{}'></span>".format(_("Product not found!")),
             'form_unique': form.fields['product_unique'].widget.render('unique', None, {
-                'codenerix-on-enter': 'Array(product_final, product_unique)==unique_changed(product_final, product_unique); product_final=""; product_unique=""',
+                'codenerix-on-enter': 'unique_changed(product_unique, this, "{}")'.format(self.ws_unique_fullinfo),
                 'codenerix-focus': 'data.meta.context.unique_focus',
                 'ng-disabled': 'data.meta.context.unique_disabled',
+            }),
+            'form_caducity': form.fields['caducity'].widget.render('caducity', None, {
+                'codenerix-focus': 'data.meta.context.caducity_focus',
+                'ng-disabled': 'data.meta.context.caducity_disabled',
             }),
         }
         return super(InventoryLineWork, self).dispatch(*args, **kwargs)
@@ -190,3 +207,57 @@ class InventoryLineDelete(GenInventoryLineUrl, GenDelete):
 class InventoryLineDetail(GenInventoryLineUrl, GenDetail):
     model = InventoryLine
     groups = InventoryLineForm.__groups_details__()
+
+
+class InventoryLineEAN13Fullinfo(View):
+
+    @method_decorator(login_required)
+    def get(self, *args, **kwargs):
+
+        # Get incoming info
+        ean13 = kwargs.get("ean13", None)
+
+        # Prepare answer
+        answer = {}
+
+        # If we got a ean13 code
+        if ean13:
+            pf = ProductFinal.objects.filter(ean13=ean13).first()
+            if pf:
+                fe = answer['unique'] = pf.product.feature_special
+                if fe:
+                    unique = bool(fe.unique)
+                else:
+                    unique = False
+
+                # Prepare answer
+                answer['pk'] = pf.pk
+                answer['caducable'] = pf.product.caducable
+                answer['unique'] = unique
+
+        # Return answer
+        json_answer = json.dumps(answer)
+        return HttpResponse(json_answer, content_type='application/json')
+
+
+class InventoryLineUniqueFullinfo(View):
+
+    @method_decorator(login_required)
+    def get(self, *args, **kwargs):
+
+        # Get incoming info
+        unique = kwargs.get("unique", None)
+
+        # Prepare answer
+        answer = {}
+
+        # If we got a ean13 code
+        if unique:
+            pu = ProductUnique.objects.filter(value=unique).first()
+            # Prepare answer
+            if pu:
+                answer['pk'] = pu.pk
+
+        # Return answer
+        json_answer = json.dumps(answer)
+        return HttpResponse(json_answer, content_type='application/json')

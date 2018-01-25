@@ -56,17 +56,9 @@ class InventoryLineForm(GenModelForm):
 
     def __groups__(self):
         g = []
-        # (
-        #     _('Details'), 12,
-        #     ['name', 6],
-        # ),
         return g
 
     @staticmethod
     def __groups_details__():
         g = []
-        # (
-        #    _('Details'), 12,
-        #    ['name', 6],
-        # ),
         return g
