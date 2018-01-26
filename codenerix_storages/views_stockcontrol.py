@@ -100,13 +100,12 @@ class InventoryLineList(GenInventoryLineUrl, GenList):
     defaultordering = "-created"
 
     def dispatch(self, *args, **kwargs):
-        self.ipk = kwargs.get('ipk')
-        self.ws_entry_point = reverse('CDNX_storages_inventoryline_list', kwargs={"ipk": self.ipk})[1:]
+        self.ws_entry_point = reverse('CDNX_storages_inventoryline_list', kwargs={"ipk": kwargs.get('ipk')})[1:]
         return super(InventoryLineList, self).dispatch(*args, **kwargs)
 
     def __limitQ__(self, info):
         limit = {}
-        limit['file_link'] = Q(inventory__pk=self.ipk)
+        limit['file_link'] = Q(inventory__pk=info.kwargs.get('ipk'))
         return limit
 
 
@@ -117,6 +116,8 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
     static_partial_header = 'codenerix_storages/inventory_work_header.html'
     static_app_row = 'codenerix_storages/inventory_work_app.js'
     static_controllers_row = 'codenerix_storages/inventory_work_controllers.js'
+    linkedit = False
+    linkadd = False
 
     def __fields__(self, info):
         fields = []
@@ -125,6 +126,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         fields.append(('product_final', _("Product")))
         fields.append(('product_unique', _("Unique")))
         fields.append(('caducity', _("Caducity")))
+        fields.append(('product_unique_value', None))
         return fields
 
     def dispatch(self, *args, **kwargs):
@@ -219,6 +221,7 @@ class InventoryLineCreateModal(GenCreateModal, InventoryLineCreate):
 
 class InventoryLineCreateWS(InventoryLineCreate):
     def form_valid(self, form):
+        raise IOError(form.cleaned_data.get('product_unique_value', None))
         form.instance.product_unique_value = form.cleaned_data.get('product_unique_value', None)
         return super(InventoryLineCreateWS, self).form_valid(form)
 
@@ -226,6 +229,10 @@ class InventoryLineCreateWS(InventoryLineCreate):
 class InventoryLineUpdate(GenInventoryLineUrl, GenUpdate):
     model = InventoryLine
     form_class = InventoryLineForm
+
+    def dispatch(self, *args, **kwargs):
+        self.ipk = kwargs.get('ipk')
+        return super(InventoryLineUpdate, self).dispatch(*args, **kwargs)
 
 
 class InventoryLineUpdateModal(GenUpdateModal, InventoryLineUpdate):
@@ -239,6 +246,10 @@ class InventoryLineDelete(GenInventoryLineUrl, GenDelete):
 class InventoryLineDetail(GenInventoryLineUrl, GenDetail):
     model = InventoryLine
     groups = InventoryLineForm.__groups_details__()
+
+    def dispatch(self, *args, **kwargs):
+        self.ipk = kwargs.get('ipk')
+        return super(InventoryLineDetail, self).dispatch(*args, **kwargs)
 
 
 class InventoryLineEAN13Fullinfo(View):
