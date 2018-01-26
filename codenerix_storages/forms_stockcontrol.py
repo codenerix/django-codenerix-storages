@@ -52,7 +52,7 @@ class InventoryLineForm(GenModelForm):
 
     class Meta:
         model = InventoryLine
-        exclude = []
+        exclude = ['inventory', 'operator']
 
     def __groups__(self):
         g = []

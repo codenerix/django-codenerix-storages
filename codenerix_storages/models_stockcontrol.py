@@ -287,7 +287,7 @@ class InventoryLine(CodenerixModel):
         fields.append(('box', _("Box")))
         fields.append(('product_final', _("Product")))
         fields.append(('product_unique', _("Unique")))
-        fields.append(('product_uniquevalue', _("Unique Value")))
+        fields.append(('product_unique_value', _("Unique Value")))
         fields.append(('operator', _("Operator")))
         fields.append(('quantity', _("Quantity")))
         fields.append(('caducity', _("Caducity")))
