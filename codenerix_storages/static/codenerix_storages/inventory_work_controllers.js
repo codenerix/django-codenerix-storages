@@ -50,6 +50,13 @@ angular.module('codenerixSTORAGESControllers', [])
             $scope.data.meta.context.final_focus = true;
             $scope.data.meta.context.unique_disabled = true;
             $scope.data.meta.context.caducity_disabled = true;
+            $scope.data.meta.context.errors = {
+                'zone': null,
+                'quantity': null,
+                'product': null,
+                'unique': null,
+                'caducity': null,
+            };
             $scope.refresh();
         };
 
@@ -176,9 +183,20 @@ angular.module('codenerixSTORAGESControllers', [])
 
             $http.post( url, data, {} )
             .success(function(answer, stat) {
+                angular.forEach($scope.data.meta.context.errors, function (value, key) {
+                    $scope.data.meta.context.errors[key] = null;
+                });
                 if (stat==200 || stat ==202) {
-                    // We are done here
-                    $scope.clean_up();
+                    if ((typeof(answer['head'])!='undefined') && (typeof(answer['head']['errors'])!='undefined')) {
+                        angular.forEach(answer['head']['errors'], function (value, key) {
+                            angular.forEach(value, function(error) {
+                                $scope.data.meta.context.errors[key] += value+".";
+                            });
+                        });
+                    } else {
+                        // We are done here
+                        $scope.clean_up();
+                    }
                 } else {
                      // Error happened, show an alert$
                      console.log("ERROR "+stat+": "+answer);

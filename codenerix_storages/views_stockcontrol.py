@@ -114,10 +114,17 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
     extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryLine'), _('InventoryLine')]}
     defaultordering = "-created"
     static_partial_header = 'codenerix_storages/inventory_work_header.html'
+    static_partial_row = 'codenerix_storages/inventory_work_row'
     static_app_row = 'codenerix_storages/inventory_work_app.js'
     static_controllers_row = 'codenerix_storages/inventory_work_controllers.js'
     linkedit = False
     linkadd = False
+    default_ordering = '-created'
+    gentrans = {
+        'new': _('Unique product is new!'),
+        'notfound': _('Product not found!'),
+        'removerecord': _('Are you sure you want to remove "<name>"?'),
+    }
 
     def __fields__(self, info):
         fields = []
@@ -160,30 +167,43 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
             'unique_disabled': True,
             'caducity_focus': True,
             'caducity_disabled': True,
+            'errors': {
+                'zone': None,
+                'quantity': None,
+                'product': None,
+                'unique': None,
+                'caducity': None,
+            },
             'ws': {
                 'ean13_fullinfo': self.ws_ean13_fullinfo,
                 'unique_fullinfo': self.ws_unique_fullinfo,
                 'submit': self.ws_submit,
             },
-            'form_zone': form.fields['box'].widget.render('box', None, {}),
-            'form_quantity': form.fields['quantity'].widget.render('quantity', None, {'ng-init': 'quantity=1.0'}),
+            'form_zone': form.fields['box'].widget.render('box', None, {
+                'ng-class': '{"bg-danger": data.meta.context.errors.zone}',
+            }),
+            'form_quantity': form.fields['quantity'].widget.render('quantity', None, {
+                'ng-init': 'quantity=1.0',
+                'ng-class': '{"bg-danger": data.meta.context.errors.quantity}',
+            }),
             'form_product': form.fields['product_final'].widget.render('product_final', None, {
                 'codenerix-on-enter': 'product_changed(this)',
                 'ng-disabled': '!(box>0 && quantity>0)',
                 'codenerix-focus': 'data.meta.context.final_focus',
-                'ng-class': '{"bg-danger": final_error}',
+                'ng-class': '{"bg-danger": final_error || data.meta.context.errors.product}',
                 'autofocus': '',
-            })+" <span class='fa fa-warning text-danger' ng-show='final_error' title='{}'></span>".format(_("Product not found!")),
+            }),
             'form_unique': form.fields['product_unique'].widget.render('unique', None, {
                 'codenerix-on-enter': 'unique_changed()',
                 'codenerix-focus': 'data.meta.context.unique_focus',
                 'ng-disabled': 'data.meta.context.unique_disabled',
-                'ng-class': '{"bg-info": unique_new}',
-            })+" <span class='fa fa-cart-plus text-primary' ng-show='unique_new' title='{}'></span>".format(_("Unique product is new!")),
+                'ng-class': '{"bg-info": unique_new, "bg-danger": data.meta.context.errors.unique}',
+            }),
             'form_caducity': form.fields['caducity'].widget.render('caducity', None, {
                 'codenerix-on-enter': 'submit_scenario()',
                 'codenerix-focus': 'data.meta.context.caducity_focus',
                 'ng-disabled': 'data.meta.context.caducity_disabled',
+                'ng-class': '{"bg-danger": data.meta.context.errors.caducity}',
                 'placeholder': 'dd/mm/aaaa',
             }),
         }
@@ -191,7 +211,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
 
     def __limitQ__(self, info):
         limit = {}
-        limit['file_link'] = Q(inventory__pk=self.ipk)
+        limit['file_link'] = Q(inventory__pk=info.kwargs.get('ipk'))
         return limit
 
 
@@ -220,9 +240,10 @@ class InventoryLineCreateModal(GenCreateModal, InventoryLineCreate):
 
 
 class InventoryLineCreateWS(InventoryLineCreate):
+    json = True
+
     def form_valid(self, form):
-        raise IOError(form.cleaned_data.get('product_unique_value', None))
-        form.instance.product_unique_value = form.cleaned_data.get('product_unique_value', None)
+        form.instance.product_unique_value = self.request.POST.get('product_unique_value', None)
         return super(InventoryLineCreateWS, self).form_valid(form)
 
 

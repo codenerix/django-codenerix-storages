@@ -33,6 +33,7 @@ urlpatterns = [
 
     url(r'^inventoryline/(?P<ipk>\w+)$', InventoryLineList.as_view(), name='CDNX_storages_inventoryline_list'),
     url(r'^inventoryline/(?P<ipk>\w+)/work$', InventoryLineWork.as_view(), name='CDNX_storages_inventoryline_work'),
+    url(r'^inventoryline/(?P<ipk>\w+)/work/(?P<pk>\w+)/delete$', InventoryLineDelete.as_view(), name='CDNX_storages_inventoryline_work_delete'),
     url(r'^inventoryline/(?P<ipk>\w+)/add$', InventoryLineCreate.as_view(), name='CDNX_storages_inventoryline_add'),
     url(r'^inventoryline/(?P<ipk>\w+)/addws$', InventoryLineCreateWS.as_view(), name='CDNX_storages_inventoryline_addws'),
     url(r'^inventoryline/(?P<ipk>\w+)/addmodal$', InventoryLineCreateModal.as_view(), name='CDNX_storages_inventoryline_addmodal'),
