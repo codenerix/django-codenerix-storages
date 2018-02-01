@@ -28,7 +28,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from codenerix.models import CodenerixModel
-from codenerix_products.models import ProductFinal, ProductUnique
+from codenerix_products.models import ProductFinal, ProductUnique, PRODUCT_UNIQUE_VALUE_LENGTH
 
 from .models import Storage, StorageBox, StorageOperator
 
@@ -276,17 +276,21 @@ class InventoryLine(CodenerixModel):
     inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name='storage_inventorys', verbose_name=_("Inventory"), null=False, blank=False)
     box = models.ForeignKey(StorageBox, on_delete=models.CASCADE, related_name='storage_inventorys', verbose_name=_("Box"), null=False, blank=False)
     product_final = models.ForeignKey(ProductFinal, on_delete=models.CASCADE, related_name='storage_inventorylines', null=False, blank=False, verbose_name=_("Product Final"))
-    product_unique = models.ForeignKey(ProductUnique, on_delete=models.CASCADE, related_name='storage_inventorylines', null=False, blank=False, verbose_name=_("Product Unique"))
+    product_unique = models.ForeignKey(ProductUnique, on_delete=models.CASCADE, related_name='storage_inventorylines', null=True, blank=True, verbose_name=_("Product Unique"))
+    product_unique_value = models.CharField(_("Product Unique Value"), max_length=PRODUCT_UNIQUE_VALUE_LENGTH, blank=True, null=True, default=None, editable=False)
     operator = models.ForeignKey(StorageOperator, on_delete=models.CASCADE, related_name='storage_inventorys', verbose_name=_("Storage Operator"), null=False, blank=False)
     quantity = models.FloatField(_("Quantity"), null=False, blank=False, default=1.0)
+    caducity = models.DateField(_("Caducity"), blank=True, null=True, default=None)
 
     def __fields__(self, info):
         fields = []
         fields.append(('box', _("Box")))
         fields.append(('product_final', _("Product")))
         fields.append(('product_unique', _("Unique")))
+        fields.append(('product_unique_value', _("Unique Value")))
         fields.append(('operator', _("Operator")))
         fields.append(('quantity', _("Quantity")))
+        fields.append(('caducity', _("Caducity")))
         return fields
 
     def __unicode__(self):

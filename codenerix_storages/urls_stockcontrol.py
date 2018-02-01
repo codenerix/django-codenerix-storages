@@ -20,7 +20,7 @@
 
 from django.conf.urls import url
 from codenerix_storages.views_stockcontrol import InventoryList, InventoryCreate, InventoryCreateModal, InventoryUpdate, InventoryUpdateModal, InventoryDelete, InventoryDetail
-from codenerix_storages.views_stockcontrol import InventoryLineList, InventoryLineWork, InventoryLineCreate, InventoryLineCreateModal, InventoryLineUpdate, InventoryLineUpdateModal, InventoryLineDelete, InventoryLineDetail
+from codenerix_storages.views_stockcontrol import InventoryLineList, InventoryLineWork, InventoryLineCreate, InventoryLineCreateWS, InventoryLineCreateModal, InventoryLineUpdate, InventoryLineUpdateModal, InventoryLineDelete, InventoryLineDetail, InventoryLineEAN13Fullinfo, InventoryLineUniqueFullinfo
 
 urlpatterns = [
     url(r'^inventory$', InventoryList.as_view(), name='CDNX_storages_inventory_list'),
@@ -33,10 +33,15 @@ urlpatterns = [
 
     url(r'^inventoryline/(?P<ipk>\w+)$', InventoryLineList.as_view(), name='CDNX_storages_inventoryline_list'),
     url(r'^inventoryline/(?P<ipk>\w+)/work$', InventoryLineWork.as_view(), name='CDNX_storages_inventoryline_work'),
+    url(r'^inventoryline/(?P<ipk>\w+)/work/(?P<pk>\w+)/delete$', InventoryLineDelete.as_view(), name='CDNX_storages_inventoryline_work_delete'),
     url(r'^inventoryline/(?P<ipk>\w+)/add$', InventoryLineCreate.as_view(), name='CDNX_storages_inventoryline_add'),
+    url(r'^inventoryline/(?P<ipk>\w+)/addws$', InventoryLineCreateWS.as_view(), name='CDNX_storages_inventoryline_addws'),
     url(r'^inventoryline/(?P<ipk>\w+)/addmodal$', InventoryLineCreateModal.as_view(), name='CDNX_storages_inventoryline_addmodal'),
     url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)$', InventoryLineDetail.as_view(), name='CDNX_storages_inventoryline_details'),
     url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/edit$', InventoryLineUpdate.as_view(), name='CDNX_storages_inventoryline_edit'),
     url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/editmodal$', InventoryLineUpdateModal.as_view(), name='CDNX_storages_inventoryline_editmodal'),
     url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/delete$', InventoryLineDelete.as_view(), name='CDNX_storages_inventoryline_delete'),
+
+    url(r'^inventorylineean13/(?P<ean13>[a-zA-Z0-9+-_/]+)/fullinfo$', InventoryLineEAN13Fullinfo.as_view(), name='CDNX_storages_inventoryline_ean13_fullinfo'),
+    url(r'^inventorylineunique/(?P<unique>[a-zA-Z0-9+-_/]+)/fullinfo$', InventoryLineUniqueFullinfo.as_view(), name='CDNX_storages_inventoryline_unique_fullinfo'),
 ]
