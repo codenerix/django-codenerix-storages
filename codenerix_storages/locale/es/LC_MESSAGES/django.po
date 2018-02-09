@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-12 11:06+0100\n"
-"PO-Revision-Date: 2017-11-22 16:59-0015\n"
-"Last-Translator: b'nombe apellidos <jsoler@centrologic.com>'\n"
+"PO-Revision-Date: 2018-02-09 14:11-0015\n"
+"Last-Translator: b'Juan Miguel 7110eda4d09e062aa5e4a390b0a572 <juanmi@centrologic.com>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -79,31 +79,31 @@ msgstr "No se puede eliminar la zona, hay lotes relacionados con ella"
 
 #: codenerix_storages/models.py:191 codenerix_storages/models.py:202
 msgid "Hall"
-msgstr ""
+msgstr "Pasillo"
 
 #: codenerix_storages/models.py:209 codenerix_storages/models.py:220
 msgid "Rack"
-msgstr ""
+msgstr "Rack"
 
 #: codenerix_storages/models.py:226 codenerix_storages/models.py:241
 msgid "Shelf"
-msgstr ""
+msgstr "Estantería"
 
 #: codenerix_storages/models.py:227 codenerix_storages/models.py:242
 msgid "Length"
-msgstr ""
+msgstr "Longitud"
 
 #: codenerix_storages/models.py:228 codenerix_storages/models.py:243
 msgid "Width"
-msgstr ""
+msgstr "Ancho"
 
 #: codenerix_storages/models.py:229 codenerix_storages/models.py:244
 msgid "Heigth"
-msgstr ""
+msgstr "Altura"
 
 #: codenerix_storages/models.py:230 codenerix_storages/models.py:245
 msgid "Weight"
-msgstr ""
+msgstr "Peso"
 
 #: codenerix_storages/views.py:51 codenerix_storages/views.py:118
 #: codenerix_storages/views.py:136 codenerix_storages/views.py:382
@@ -132,35 +132,31 @@ msgstr "Contactos"
 
 #: codenerix_storages/views.py:136
 msgid "StorageZone"
-msgstr "Zona del almacén"
+msgstr "Zona"
 
 #: codenerix_storages/views.py:341
 msgid "Storage not seleted!"
 msgstr "Almacén no seleccionado"
 
 #: codenerix_storages/views.py:382
-#, fuzzy
 #| msgid "Storage"
 msgid "StorageHall"
-msgstr "Almacén"
+msgstr "Pasillo"
 
 #: codenerix_storages/views.py:443
-#, fuzzy
 #| msgid "StorageBatch"
 msgid "StorageRack"
-msgstr "Lote de almacén"
+msgstr "Rack"
 
 #: codenerix_storages/views.py:504
-#, fuzzy
 #| msgid "Storage"
 msgid "StorageShelf"
-msgstr "Almacén"
+msgstr "Estantería"
 
 #: codenerix_storages/views.py:565
-#, fuzzy
 #| msgid "Storage"
 msgid "StorageBox"
-msgstr "Almacén"
+msgstr "Caja"
 
 #~ msgid "Reference"
 #~ msgstr "Referencia"

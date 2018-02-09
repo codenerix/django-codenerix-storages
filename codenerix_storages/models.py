@@ -163,7 +163,7 @@ class StorageBox(CodenerixModel):
 
 
 # ############################
-class ABSTRACT_GenStorateOperator(models.Model):  # META: Abstract class
+class ABSTRACT_GenStorageOperator(models.Model):  # META: Abstract class
 
     class Meta(object):
         abstract = True
@@ -171,7 +171,7 @@ class ABSTRACT_GenStorateOperator(models.Model):  # META: Abstract class
 
 class StorageOperator(GenRole, CodenerixModel):
     class CodenerixMeta:
-        abstract = ABSTRACT_GenStorateOperator
+        abstract = ABSTRACT_GenStorageOperator
         rol_groups = {
             'StorageOperator': CDNX_STORAGE_PERMISSIONS['operator'],
         }
@@ -202,10 +202,10 @@ class StorageOperator(GenRole, CodenerixModel):
 
 
 # puente entre los datos del almacen y 'person'
-class GenStorageOperator(GenInterface, ABSTRACT_GenStorateOperator):
+class GenStorageOperator(GenInterface, ABSTRACT_GenStorageOperator):
     storage_operator = models.OneToOneField(StorageOperator, related_name='external', verbose_name=_("Storage operator"), null=True, on_delete=models.SET_NULL, blank=True)
 
-    class Meta(GenInterface.Meta, ABSTRACT_GenStorateOperator.Meta):
+    class Meta(GenInterface.Meta, ABSTRACT_GenStorageOperator.Meta):
         abstract = True
 
     class CodenerixMeta:
