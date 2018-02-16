@@ -29,6 +29,8 @@ from django.conf import settings
 
 from codenerix.models import CodenerixModel
 from codenerix_products.models import ProductFinal, ProductUnique, PRODUCT_UNIQUE_VALUE_LENGTH
+from codenerix_invoicing.models_purchases import Provider
+from codenerix_invoicing.models_sales import SalesOrder
 
 from .models import Storage, StorageBox, StorageOperator
 
@@ -251,35 +253,43 @@ class LineIncomingAlbaran(CodenerixModel):
         return self.__str__()
 
 
+# Generic classes for Inventory and Inventory Line
+class GenInventory(CodenerixModel):
+    end = models.DateTimeField(_("Ends"), blank=True, null=True, editable=False)
+    class Meta(CodenerixModel.Meta):
+        abstract = True
+
+class GenInventoryLine(CodenerixModel):
+    box = models.ForeignKey(StorageBox, on_delete=models.CASCADE, related_name='storage_%(class)s', verbose_name=_("Box"), null=False, blank=False)
+    product_final = models.ForeignKey(ProductFinal, on_delete=models.CASCADE, related_name='storage_%(class)s', null=False, blank=False, verbose_name=_("Product Final"))
+    product_unique = models.ForeignKey(ProductUnique, on_delete=models.CASCADE, related_name='storage_%(class)s', null=True, blank=True, verbose_name=_("Product Unique"))
+    product_unique_value = models.CharField(_("Product Unique Value"), max_length=PRODUCT_UNIQUE_VALUE_LENGTH, blank=True, null=True, default=None, editable=False)
+    operator = models.ForeignKey(StorageOperator, on_delete=models.CASCADE, related_name='storage_%(class)s', verbose_name=_("Storage Operator"), null=False, blank=False)
+    quantity = models.FloatField(_("Quantity"), null=False, blank=False, default=1.0)
+
+    class Meta(CodenerixModel.Meta):
+        abstract = True
+
+
 # Inventory
-class Inventory(CodenerixModel):
-    name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
-    start = models.DateTimeField(_("Starts"), blank=True, null=True)
-    end = models.DateTimeField(_("Ends"), blank=True, null=True)
+class Inventory(GenInventory):
 
     def __fields__(self, info):
         fields = []
-        fields.append(('name', _('Name')))
-        fields.append(('start', _('Starts')))
+        fields.append(('created', _('Starts')))
         fields.append(('end', _('Ends')))
         fields.append((None, _('Actions')))
         return fields
 
     def __str__(self):
-        return u"{}".format(self.name)
+        return u"{}::{}".format(self.provider, self.created)
 
     def __unicode__(self):
         return self.__str__()
 
 
-class InventoryLine(CodenerixModel):
+class InventoryLine(GenInventoryLine):
     inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name='storage_inventorys', verbose_name=_("Inventory"), null=False, blank=False)
-    box = models.ForeignKey(StorageBox, on_delete=models.CASCADE, related_name='storage_inventorys', verbose_name=_("Box"), null=False, blank=False)
-    product_final = models.ForeignKey(ProductFinal, on_delete=models.CASCADE, related_name='storage_inventorylines', null=False, blank=False, verbose_name=_("Product Final"))
-    product_unique = models.ForeignKey(ProductUnique, on_delete=models.CASCADE, related_name='storage_inventorylines', null=True, blank=True, verbose_name=_("Product Unique"))
-    product_unique_value = models.CharField(_("Product Unique Value"), max_length=PRODUCT_UNIQUE_VALUE_LENGTH, blank=True, null=True, default=None, editable=False)
-    operator = models.ForeignKey(StorageOperator, on_delete=models.CASCADE, related_name='storage_inventorys', verbose_name=_("Storage Operator"), null=False, blank=False)
-    quantity = models.FloatField(_("Quantity"), null=False, blank=False, default=1.0)
     caducity = models.DateField(_("Caducity"), blank=True, null=True, default=None)
 
     def __fields__(self, info):
@@ -291,6 +301,91 @@ class InventoryLine(CodenerixModel):
         fields.append(('operator', _("Operator")))
         fields.append(('quantity', _("Quantity")))
         fields.append(('caducity', _("Caducity")))
+        return fields
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __limitQ__(self, info):
+        limit = {}
+        ipk = info.kwargs.get('ipk', None)
+        limit['file_link'] = Q(inventory__pk=ipk)
+        return limit
+
+# InventoryIn
+class InventoryIn(GenInventory):
+    provider = models.ForeignKey(Provider, on_delete=models.PROTECT, related_name='inventorys', verbose_name='Provider', blank=False, null=False)
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('provider', _('Provider')))
+        fields.append(('created', _('Starts')))
+        fields.append(('end', _('Ends')))
+        fields.append((None, _('Actions')))
+        return fields
+
+    def __str__(self):
+        return u"{}::{}".format(self.provider, self.created)
+
+    def __unicode__(self):
+        return self.__str__()
+
+
+class InventoryInLine(GenInventoryLine):
+    inventory = models.ForeignKey(InventoryIn, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory line"), null=False, blank=False)
+    caducity = models.DateField(_("Caducity"), blank=True, null=True, default=None)
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('box', _("Box")))
+        fields.append(('product_final', _("Product")))
+        fields.append(('product_unique', _("Unique")))
+        fields.append(('product_unique_value', _("Unique Value")))
+        fields.append(('operator', _("Operator")))
+        fields.append(('quantity', _("Quantity")))
+        fields.append(('caducity', _("Caducity")))
+        return fields
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __limitQ__(self, info):
+        limit = {}
+        ipk = info.kwargs.get('ipk', None)
+        limit['file_link'] = Q(inventory__pk=ipk)
+        return limit
+
+
+# InventoryOut
+class InventoryOut(GenInventory):
+    order = models.ForeignKey(SalesOrder, on_delete=models.PROTECT, related_name='inventorys', verbose_name='Order', blank=False, null=False)
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('order', _('Order')))
+        fields.append(('created', _('Starts')))
+        fields.append(('end', _('Ends')))
+        fields.append((None, _('Actions')))
+        return fields
+
+    def __str__(self):
+        return u"{}::{}".format(self.order, self.created)
+
+    def __unicode__(self):
+        return self.__str__()
+
+
+class InventoryOutLine(GenInventoryLine):
+    inventory = models.ForeignKey(InventoryOut, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory line"), null=False, blank=False)
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('box', _("Box")))
+        fields.append(('product_final', _("Product")))
+        fields.append(('product_unique', _("Unique")))
+        fields.append(('product_unique_value', _("Unique Value")))
+        fields.append(('operator', _("Operator")))
+        fields.append(('quantity', _("Quantity")))
         return fields
 
     def __unicode__(self):

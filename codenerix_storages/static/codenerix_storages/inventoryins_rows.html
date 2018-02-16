@@ -1,3 +1,4 @@
+<td>{{row.provider}}</td>
 <td>{{row.created}}</td>
 <td>
     <span ng-if="row.end">{{row.end}}</span>
@@ -12,8 +13,4 @@
         ng-href="{{data.meta.context.url_getreport.replace('__IPK__', row.pk)}}"
         ng-click="$event.stopPropagation()"
         class="btn btn-sm status btn-default ng-binding ng-scope">{{data.meta.gentranslate.getreport}}</a>
-    <a
-        ng-href="{{data.meta.context.url_getreport.replace('__IPK__', row.pk)}}"
-        ng-click="$event.stopPropagation()"
-        class="btn btn-sm status btn-default ng-binding ng-scope">Regularizacion de stock</a>
 </td>
