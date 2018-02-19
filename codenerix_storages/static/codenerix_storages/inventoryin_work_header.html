@@ -1,5 +1,9 @@
 <th ng-show="data.table.head.extra_fields.field_check!=None"></th>
 <th>
+    <span codenerix-html-compile="data.meta.context.form_order"></span>
+    <span class='fa fa-warning text-danger' ng-show='data.meta.context.errors.order' uib-popover='{{data.meta.context.errors.order}}' popover-placement='top' popover-trigger='mouseenter'></span>
+</th>
+<th>
     <span codenerix-html-compile="data.meta.context.form_zone"></span>
     <span class='fa fa-warning text-danger' ng-show='data.meta.context.errors.zone' uib-popover='{{data.meta.context.errors.zone}}' popover-placement='top' popover-trigger='mouseenter'></span>
 </th>

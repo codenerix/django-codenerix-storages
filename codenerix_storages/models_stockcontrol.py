@@ -29,7 +29,7 @@ from django.conf import settings
 
 from codenerix.models import CodenerixModel
 from codenerix_products.models import ProductFinal, ProductUnique, PRODUCT_UNIQUE_VALUE_LENGTH
-from codenerix_invoicing.models_purchases import Provider
+from codenerix_invoicing.models_purchases import Provider, PurchasesOrder
 from codenerix_invoicing.models_sales import SalesOrder
 
 from .models import Storage, StorageBox, StorageOperator
@@ -332,11 +332,13 @@ class InventoryIn(GenInventory):
 
 
 class InventoryInLine(GenInventoryLine):
+    purchasesorder = models.ForeignKey(PurchasesOrder, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory line"), null=True, blank=True)
     inventory = models.ForeignKey(InventoryIn, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory line"), null=False, blank=False)
     caducity = models.DateField(_("Caducity"), blank=True, null=True, default=None)
 
     def __fields__(self, info):
         fields = []
+        fields.append(('purchasesorder', _("Purchases Order")))
         fields.append(('box', _("Box")))
         fields.append(('product_final', _("Product")))
         fields.append(('product_unique', _("Unique")))

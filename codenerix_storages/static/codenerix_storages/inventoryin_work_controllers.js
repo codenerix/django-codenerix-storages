@@ -37,6 +37,12 @@ angular.module('codenerixSTORAGESControllers', [])
         $scope.unique_new = false;
         $scope.inscope = null;
 
+        $scope.order_change = function(row_pk, purchasesorder_pk) {
+            console.log(row_pk);
+            console.log(purchasesorder_pk);
+            $scope.refresh();
+        };
+
         $scope.clean_up = function () {
             // We are done here
             $scope.final_error = false;

@@ -420,6 +420,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
 
     def __fields__(self, info):
         fields = []
+        fields.append(('purchasesorder', _("Order")))
         fields.append(('box', _("Box")))
         fields.append(('quantity', _("Quantity")))
         fields.append(('product_final', _("Product")))
@@ -438,12 +439,14 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
 
         # Prepare form
         fields = []
-        fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign', []))
-        fields.append((DynamicInput, 'product_final', 3, 'CDNX_products_productfinalsean13_foreign', []))
-        fields.append((DynamicInput, 'product_unique', 3,  'CDNX_products_productuniquescode_foreign', ['product_final']))
+        fields.append((DynamicSelect, 'purchasesorder', 3, 'CDNX_invoicing_orderpurchasess_foreign', ['provider:{}'.format(self.ipk)], {'ng-change': 'order_change($externalScope.row.pk, $externalScope.purchasesorder)'}))
+        fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign', [], {}))
+        fields.append((DynamicInput, 'product_final', 3, 'CDNX_products_productfinalsean13_foreign', [], {}))
+        fields.append((DynamicInput, 'product_unique', 3,  'CDNX_products_productuniquescode_foreign', ['product_final'], {}))
         form = InventoryInLineForm()
-        for (widget, key, minchars, url, autofill) in fields:
+        for (widget, key, minchars, url, autofill, newattrs) in fields:
             wattrs = form.fields[key].widget.attrs
+            wattrs.update(newattrs)
             form.fields[key].widget = widget(wattrs)
             form.fields[key].widget.form_name = form.form_name
             form.fields[key].widget.field_name = key
@@ -471,6 +474,12 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
                 'unique_fullinfo': self.ws_unique_fullinfo,
                 'submit': self.ws_submit,
             },
+            'form_order': form.fields['purchasesorder'].widget.render('purchasesorder', None, {
+                'ng-class': '{"bg-danger": data.meta.context.errors.order}',
+            }),
+            'form_order_row': form.fields['purchasesorder'].widget.render('purchasesorder', None, {
+                'ng-class': '{"bg-danger": data.meta.context.errors.order_row}',
+            }),
             'form_zone': form.fields['box'].widget.render('box', None, {
                 'ng-class': '{"bg-danger": data.meta.context.errors.zone}',
             }),
