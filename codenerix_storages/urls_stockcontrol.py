@@ -23,7 +23,7 @@ from codenerix_storages.views_stockcontrol import InventoryList, InventoryCreate
 from codenerix_storages.views_stockcontrol import InventoryLineList, InventoryLineWork, InventoryLineCreate, InventoryLineCreateWS, InventoryLineCreateModal, InventoryLineUpdate, InventoryLineUpdateModal, InventoryLineDelete, InventoryLineDetail, InventoryLineEAN13Fullinfo, InventoryLineUniqueFullinfo
 
 from codenerix_storages.views_stockcontrol import InventoryInList, InventoryInCreate, InventoryInCreateModal, InventoryInUpdate, InventoryInUpdateModal, InventoryInDelete, InventoryInDetail
-from codenerix_storages.views_stockcontrol import InventoryInLineList, InventoryInLineWork, InventoryInLineCreate, InventoryInLineCreateWS, InventoryInLineCreateModal, InventoryInLineUpdate, InventoryInLineUpdateModal, InventoryInLineDelete, InventoryInLineDetail, InventoryInLineEAN13Fullinfo, InventoryInLineUniqueFullinfo
+from codenerix_storages.views_stockcontrol import InventoryInLineList, InventoryInLineWork, InventoryInLineCreate, InventoryInLineCreateWS, InventoryInLineCreateModal, InventoryInLineUpdate, InventoryInLineUpdateModal, InventoryInLineDelete, InventoryInLineDetail, InventoryInLineEAN13Fullinfo, InventoryInLineUniqueFullinfo, InventoryInLinePurhcaseOrder
 
 from codenerix_storages.views_stockcontrol import InventoryOutList, InventoryOutCreate, InventoryOutCreateModal, InventoryOutUpdate, InventoryOutUpdateModal, InventoryOutDelete, InventoryOutDetail
 from codenerix_storages.views_stockcontrol import InventoryOutLineList, InventoryOutLineWork, InventoryOutLineCreate, InventoryOutLineCreateWS, InventoryOutLineCreateModal, InventoryOutLineUpdate, InventoryOutLineUpdateModal, InventoryOutLineDelete, InventoryOutLineDetail, InventoryOutLineEAN13Fullinfo, InventoryOutLineUniqueFullinfo
@@ -70,6 +70,7 @@ urlpatterns = [
     url(r'^inventoryinline/(?P<ipk>\w+)/(?P<pk>\w+)/delete$', InventoryInLineDelete.as_view(), name='CDNX_storages_inventoryinline_delete'),
     url(r'^inventoryinlineean13/(?P<ean13>[a-zA-Z0-9+-_/]+)/fullinfo$', InventoryInLineEAN13Fullinfo.as_view(), name='CDNX_storages_inventoryinline_ean13_fullinfo'),
     url(r'^inventoryinlineunique/(?P<unique>[a-zA-Z0-9+-_/]+)/fullinfo$', InventoryInLineUniqueFullinfo.as_view(), name='CDNX_storages_inventoryinline_unique_fullinfo'),
+    url(r'^inventoryinlinepurchaseorder/(?P<inventoryinline_pk>\w+)/(?P<purchasesorder_pk>\w+)$', InventoryInLinePurhcaseOrder.as_view(), name='CDNX_storages_inventoryinline_purchase_order'),
 
     url(r'^inventoryout$', InventoryOutList.as_view(), name='CDNX_storages_inventoryout_list'),
     url(r'^inventoryout/add$', InventoryOutCreate.as_view(), name='CDNX_storages_inventoryout_add'),

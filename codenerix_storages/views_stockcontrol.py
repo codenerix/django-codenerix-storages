@@ -33,6 +33,7 @@ from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUp
 from codenerix.widgets import DynamicInput, DynamicSelect
 
 from codenerix_products.models import ProductFinal, ProductUnique
+from codenerix_invoicing.models_purchases import PurchasesOrder
 from codenerix_storages.models import StorageOperator
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine
 from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryLineForm, InventoryInForm, InventoryInLineForm, InventoryOutForm, InventoryOutLineForm
@@ -436,10 +437,15 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
         self.ws_ean13_fullinfo = reverse('CDNX_storages_inventoryinline_ean13_fullinfo', kwargs={"ean13": 'PRODUCT_FINAL_EAN13'})[1:]
         self.ws_unique_fullinfo = reverse('CDNX_storages_inventoryinline_unique_fullinfo', kwargs={"unique": 'PRODUCT_FINAL_UNIQUE'})[1:]
         self.ws_submit = reverse('CDNX_storages_inventoryinline_addws', kwargs={"ipk": self.ipk})[1:]
+        self.ws_inventoryinline_purchasesorder = reverse('CDNX_storages_inventoryinline_purchase_order', kwargs={"inventoryinline_pk": 1, "purchasesorder_pk": 1})[1:]
 
         # Prepare form
         fields = []
-        fields.append((DynamicSelect, 'purchasesorder', 3, 'CDNX_invoicing_orderpurchasess_foreign', ['provider:{}'.format(self.ipk)], {'ng-change': 'order_change($externalScope.row.pk, $externalScope.purchasesorder)'}))
+        fields.append((DynamicSelect, 'purchasesorder', 3, 'CDNX_invoicing_orderpurchasess_foreign', ['provider:{}'.format(self.ipk)], {
+            'ng-change': 'order_change($externalScope.row.pk, $externalScope.purchasesorder)',
+            'placeholder': '{{{{row.purchasesorder|default:"{}"}}}}'.format(_("Press * or start typing")),
+            'ng-placeholder': '(row.purchasesorder || \'{}\')'.format(_("Press * or start typing")),
+        }))
         fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign', [], {}))
         fields.append((DynamicInput, 'product_final', 3, 'CDNX_products_productfinalsean13_foreign', [], {}))
         fields.append((DynamicInput, 'product_unique', 3,  'CDNX_products_productuniquescode_foreign', ['product_final'], {}))
@@ -473,6 +479,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
                 'ean13_fullinfo': self.ws_ean13_fullinfo,
                 'unique_fullinfo': self.ws_unique_fullinfo,
                 'submit': self.ws_submit,
+                'inventoryinline_purchasesorder': self.ws_inventoryinline_purchasesorder,
             },
             'form_order': form.fields['purchasesorder'].widget.render('purchasesorder', None, {
                 'ng-class': '{"bg-danger": data.meta.context.errors.order}',
@@ -498,8 +505,8 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
                 'codenerix-on-enter': 'unique_changed()',
                 'codenerix-focus': 'data.meta.context.unique_focus',
                 'ng-disabled': 'data.meta.context.unique_disabled',
-                'ng-class': '{"bg-info": unique_new, "bg-danger": data.meta.context.errors.unique}',
-            }),
+                'ng-class': '{"bg-danger": data.meta.context.errors.unique || unique_error}',
+            })+" <span class='fa fa-exclamation-triangle text-danger' ng-show='unique_error' alt='{{unique_error}}' title='{{unique_error}}'></span>",
             'form_caducity': form.fields['caducity'].widget.render('caducity', None, {
                 'codenerix-on-enter': 'submit_scenario()',
                 'codenerix-focus': 'data.meta.context.caducity_focus',
@@ -616,12 +623,56 @@ class InventoryInLineUniqueFullinfo(View):
         # Prepare answer
         answer = {}
 
-        # If we got a ean13 code
+        # If we got a unique code
         if unique:
             pu = ProductUnique.objects.filter(value=unique).first()
+            pl = InventoryInLine.objects.filter(product_unique_value=unique).first()
             # Prepare answer
             if pu:
                 answer['pk'] = pu.pk
+                answer['error'] = True
+                answer['errortxt'] = _("Unique product already exists in our database!") + " [PK:{}]".format(pu.pk)
+            if pl:
+                answer['pl'] = pl.pk
+                answer['error'] = True
+                answer['errortxt'] = _("Unique product already registered here!") + " [PK:{}]".format(pl.pk)
+
+        # Return answer
+        json_answer = json.dumps(answer)
+        return HttpResponse(json_answer, content_type='application/json')
+
+
+class InventoryInLinePurhcaseOrder(View):
+
+    def dispatch(self, *args, **kwargs):
+        # Get args
+        ipk = kwargs.get('inventoryinline_pk', None)
+        ppk = kwargs.get('purchasesorder_pk', None)
+
+        # Prepare answer
+        answer = {}
+
+        # Find line
+        inventoryinline = InventoryInLine.objects.filter(pk=ipk).first()
+        if inventoryinline:
+            if ppk == 'null':
+                inventoryinline.purchasesorder = None
+                inventoryinline.save()
+                answer['result'] = 'OK'
+                answer['error'] = False
+            else:
+                purchasesorder = PurchasesOrder.objects.filter(pk=ppk).first()
+                if purchasesorder:
+                    inventoryinline.purchasesorder = purchasesorder
+                    inventoryinline.save()
+                    answer['result'] = 'OK'
+                    answer['error'] = False
+                else:
+                    answer['error'] = True
+                    answer['errortxt'] = _("Purchase order not found!")+" [PK:{}]".format(ppk)
+        else:
+            answer['error'] = True
+            answer['errortxt'] = _("Inventory IN Line not found!")+" [PK:{}]".format(ipk)
 
         # Return answer
         json_answer = json.dumps(answer)

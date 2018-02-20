@@ -1,29 +1,21 @@
-<td>
+<td
+    ng-class="{'bg-warning': !row.purchasesorder}">
     <span codenerix-html-compile="data.meta.context.form_order_row"></span>
 </td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.product_unique}">{{row.box}}</td>
+    ng-class="{'bg-warning': !row.purchasesorder}">{{row.box}}</td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.product_unique}">{{row.quantity}}</td>
+    ng-class="{'bg-warning': !row.purchasesorder}">{{row.quantity}}</td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.product_unique}">{{row.product_final}}</td>
+    ng-class="{'bg-warning': !row.purchasesorder}">{{row.product_final}}</td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.product_unique}">
-    <script type="text/ng-template" id="crew"></script>
-    <span ng-show='row.product_unique'>{{row.product_unique}}</span>
-    <span ng-hide='row.product_unique'>
-        {{row.product_unique_value}}
-        <span
-            class='fa fa-cart-plus text-primary'
-            uib-popover="{{data.meta.gentranslate.new}}"
-            popover-placement="top"
-            popover-trigger="mouseenter"></span>
-    </span>
+    ng-class="{'bg-warning': !row.purchasesorder}">
+    <span>{{row.product_unique_value|codenerix}}</span>
 </td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.product_unique}">{{row.caducity}}</td>
+    ng-class="{'bg-warning': !row.purchasesorder}">{{row.caducity}}</td>

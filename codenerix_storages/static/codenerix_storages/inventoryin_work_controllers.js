@@ -29,24 +29,46 @@ angular.module('codenerixSTORAGESControllers', [])
         if (ws_entry_point==undefined) { ws_entry_point=""; }
         multilist($scope, $rootScope, $timeout, $location, $uibModal, $templateCache, $http, $state, Register, ListMemory, 0, "/"+ws_entry_point);
 
+        $scope.purchasesorder_pk = null;
         $scope.product_final = null;
         $scope.product_final_pk = null;
         $scope.product_unique = null;
-        $scope.product_unique_pk = null;
         $scope.final_error = false;
-        $scope.unique_new = false;
+        $scope.unique_error = false;
         $scope.inscope = null;
 
         $scope.order_change = function(row_pk, purchasesorder_pk) {
-            console.log(row_pk);
-            console.log(purchasesorder_pk);
-            $scope.refresh();
+            if (row_pk) {
+                var url = $scope.data.meta.context.ws.inventoryinline_purchasesorder;
+                url = "/"+url.substring(0, url.length-3)+row_pk+"/"+purchasesorder_pk;
+
+                $http.post( url, {}, {} )
+                .success(function(answer, stat) {
+                    if (stat==200 || stat ==202) {
+                        $scope.refresh();
+                    } else {
+                        // Error happened, show an alert$
+                        console.log("ERROR "+stat+": "+answer);
+                        console.log(answer);
+                        alert("ERROR "+stat+": "+answer);
+                    }
+                })
+                .error(function(data, status, headers, config) {
+                    if (cnf_debug){
+                        alert(data);
+                    } else {
+                        alert(cnf_debug_txt)
+                    }
+                });
+            } else {
+                $scope.purchasesorder_pk = purchasesorder_pk;
+            }
         };
 
         $scope.clean_up = function () {
             // We are done here
             $scope.final_error = false;
-            $scope.unique_new = false;
+            $scope.unique_error = false;
             $scope.inscope.product_final = "";
             $scope.inscope.product_unique = "";
             $scope.product_final = null;
@@ -145,17 +167,15 @@ angular.module('codenerixSTORAGESControllers', [])
             .success(function(answer, stat) {
                 if (stat==200 || stat ==202) {
                     if (Object.keys(answer).length) {
-                        $scope.product_unique_pk = answer.pk;
-                        $scope.unique_new = false;
+                        $scope.unique_error = answer['errortxt'];
                     } else {
-                        $scope.product_unique_pk = null;
-                        $scope.unique_new = true;
-                    }
-                    if (!$scope.data.meta.context.caducity_disabled) {
-                        $scope.data.meta.context.caducity_focus = true;
-                    } else {
-                        // We are done here
-                        $scope.submit_scenario();
+                        $scope.unique_error = false;
+                        if (!$scope.data.meta.context.caducity_disabled) {
+                            $scope.data.meta.context.caducity_focus = true;
+                        } else {
+                            // We are done here
+                            $scope.submit_scenario();
+                        }
                     }
                 } else {
                      // Error happened, show an alert$
@@ -174,49 +194,52 @@ angular.module('codenerixSTORAGESControllers', [])
         }
 
         $scope.submit_scenario = function () {
-            // Prepare URL
-            var url = '/'+$scope.data.meta.context.ws.submit;
+            if (!$scope.unique_error) {
+                // Prepare URL
+                var url = '/'+$scope.data.meta.context.ws.submit;
 
-            // Prepare DATA
-            var data = {
-                'product_final': $scope.product_final_pk,
-                'product_unique': $scope.product_unique_pk,
-                'product_unique_value': $scope.product_unique,
-                'box': $scope.inscope.box,
-                'quantity': $scope.inscope.quantity,
-                'caducity': $scope.inscope.caducity,
-            }
+                // Prepare DATA
+                var data = {
+                    'purchasesorder': $scope.purchasesorder_pk,
+                    'product_final': $scope.product_final_pk,
+                    'product_unique': $scope.product_unique_pk,
+                    'product_unique_value': $scope.product_unique,
+                    'box': $scope.inscope.box,
+                    'quantity': $scope.inscope.quantity,
+                    'caducity': $scope.inscope.caducity,
+                }
 
-            $http.post( url, data, {} )
-            .success(function(answer, stat) {
-                angular.forEach($scope.data.meta.context.errors, function (value, key) {
-                    $scope.data.meta.context.errors[key] = null;
-                });
-                if (stat==200 || stat ==202) {
-                    if ((typeof(answer['head'])!='undefined') && (typeof(answer['head']['errors'])!='undefined')) {
-                        angular.forEach(answer['head']['errors'], function (value, key) {
-                            angular.forEach(value, function(error) {
-                                $scope.data.meta.context.errors[key] += value+".";
+                $http.post( url, data, {} )
+                .success(function(answer, stat) {
+                    angular.forEach($scope.data.meta.context.errors, function (value, key) {
+                        $scope.data.meta.context.errors[key] = null;
+                    });
+                    if (stat==200 || stat ==202) {
+                        if ((typeof(answer['head'])!='undefined') && (typeof(answer['head']['errors'])!='undefined')) {
+                            angular.forEach(answer['head']['errors'], function (value, key) {
+                                angular.forEach(value, function(error) {
+                                    $scope.data.meta.context.errors[key] += value+".";
+                                });
                             });
-                        });
+                        } else {
+                            // We are done here
+                            $scope.clean_up();
+                        }
                     } else {
-                        // We are done here
-                        $scope.clean_up();
+                         // Error happened, show an alert$
+                         console.log("ERROR "+stat+": "+answer);
+                         console.log(answer);
+                         alert("ERROR "+stat+": "+answer);
                     }
-                } else {
-                     // Error happened, show an alert$
-                     console.log("ERROR "+stat+": "+answer);
-                     console.log(answer);
-                     alert("ERROR "+stat+": "+answer);
-                }
-            })
-            .error(function(data, status, headers, config) {
-                if (cnf_debug){
-                    alert(data);
-                } else {
-                    alert(cnf_debug_txt)
-                }
-            });
+                })
+                .error(function(data, status, headers, config) {
+                    if (cnf_debug){
+                        alert(data);
+                    } else {
+                        alert(cnf_debug_txt)
+                    }
+                });
+            }
         };
     }
 ]);
