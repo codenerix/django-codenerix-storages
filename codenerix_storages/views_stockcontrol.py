@@ -20,7 +20,7 @@
 
 import json
 
-from django.db.models import Q
+from django.db.models import Q, F, Sum, Count
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.urls import reverse
@@ -33,7 +33,7 @@ from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUp
 from codenerix.widgets import DynamicInput, DynamicSelect
 
 from codenerix_products.models import ProductFinal, ProductUnique
-from codenerix_invoicing.models_purchases import PurchasesOrder
+from codenerix_invoicing.models_purchases import PurchasesOrder, PurchasesLineOrder
 from codenerix_storages.models import StorageOperator
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine
 from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryLineForm, InventoryInForm, InventoryInLineForm, InventoryOutForm, InventoryOutLineForm
@@ -425,6 +425,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
         fields.append(('box', _("Box")))
         fields.append(('quantity', _("Quantity")))
         fields.append(('product_final', _("Product")))
+        fields.append(('product_final__pk', None))
         fields.append(('product_unique', _("Unique")))
         fields.append(('caducity', _("Caducity")))
         fields.append(('product_unique_value', None))
@@ -521,6 +522,68 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
         limit = {}
         limit['file_link'] = Q(inventory__pk=info.kwargs.get('ipk'))
         return limit
+
+    def json_builder(self, answer, context):
+
+        # Get the list of purhasesorders for this inventory
+        qs = self.get_queryset(raw_query=True)
+        temp = list(set(qs.values_list('purchasesorder')))
+        purchasesorders = []
+        for ele in temp:
+            if ele[0] is not None:
+                purchasesorders.append(ele[0])
+
+        # List of registered products and quantity
+        # registered = self.model.objects.filter(inventory__pk=self.ipk).values("product_final").annotate(total=Count("quantity"))
+        registered = self.bodybuilder(context['object_list'], self.autorules())
+
+        # Get purchases (requested products)
+        requested = PurchasesLineOrder.objects.filter(order__pk__in=purchasesorders).values("order", "product",  "product__code", "product__ean13").annotate(total=Sum("quantity"))
+        # raise IOError(requested)
+
+        # Process registered products
+        body_registered = []
+        for g in registered:
+            g['missing'] = float(g['quantity'])
+
+            if g['purchasesorder']:
+                for r in requested:
+                    if r['order']:
+                        if r['product'] == int(g['product_final__pk']):
+                            if r['total'] > g['missing']:
+                                r['total'] -= g['missing']
+                                g['missing'] = 0.0
+                            else:
+                                g['missing'] -= r['total']
+                                r['total'] = 0.0
+
+            # Add a new token
+            body_registered.append(g)
+
+        # Process unregistered products
+        body_requested = []
+        for r in requested:
+            # If still left
+            if r['total'] > 0:
+                token = {
+                    'caducity': None,
+                    'purchasesorder': None,
+                    'product_unique_value': None,
+                    'product_final': '{} ({})'.format(r['product__code'], r['product__ean13']),
+                    'product_final__pk': None,
+                    'product_unique': None,
+                    'pk': None,
+                    'quantity': r['total'],
+                    'box': None,
+                    'total': None,
+                }
+
+            # Add a new token
+            body_requested.append(token)
+
+        # Return answer
+        answer['table']['body'] = body_requested + body_registered
+        return answer
 
 
 class InventoryInLineCreate(GenInventoryInLineUrl, GenCreate):

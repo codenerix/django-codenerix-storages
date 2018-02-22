@@ -7,7 +7,7 @@
     ng-class="{'bg-warning': !row.purchasesorder}">{{row.box}}</td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.purchasesorder}">{{row.quantity}}</td>
+    ng-class="{'bg-warning': !row.purchasesorder}">{{row.quantity}} ({{row.missing}})</td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
     ng-class="{'bg-warning': !row.purchasesorder}">{{row.product_final}}</td>

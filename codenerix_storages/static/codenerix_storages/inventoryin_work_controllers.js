@@ -94,62 +94,64 @@ angular.module('codenerixSTORAGESControllers', [])
 
             // Filter product final
             $scope.product_final = $scope.inscope.product_final.split(" ")[0];
-            $scope.final_error = false;
-            $scope.inscope.product_final = $scope.product_final;
+            if ($scope.product_final) {
+                $scope.final_error = false;
+                $scope.inscope.product_final = $scope.product_final;
 
-            // Prepare URL
-            var url = $scope.data.meta.context.ws.ean13_fullinfo;
-            var eanurl = "/" + url.replace("/PRODUCT_FINAL_EAN13/", "/"+$scope.product_final+"/");
+                // Prepare URL
+                var url = $scope.data.meta.context.ws.ean13_fullinfo;
+                var eanurl = "/" + url.replace("/PRODUCT_FINAL_EAN13/", "/"+$scope.product_final+"/");
 
-            // Query the product
-            $http.get( eanurl, {}, {} )
-            .success(function(answer, stat) {
-                if (stat==200 || stat ==202) {
-                    // Decide next step
-                    if (Object.keys(answer).length) {
-                        // Set caducity status
-                        $scope.data.meta.context.caducity_disabled = !answer.caducable;
-                        $scope.data.meta.context.unique_disabled = !answer.unique;
-                        $scope.product_final_pk = answer.pk
+                // Query the product
+                $http.get( eanurl, {}, {} )
+                .success(function(answer, stat) {
+                    if (stat==200 || stat ==202) {
+                        // Decide next step
+                        if (Object.keys(answer).length) {
+                            // Set caducity status
+                            $scope.data.meta.context.caducity_disabled = !answer.caducable;
+                            $scope.data.meta.context.unique_disabled = !answer.unique;
+                            $scope.product_final_pk = answer.pk
 
-                        // Check for unique
-                        if (answer.unique) {
-                            $scope.data.meta.context.unique_focus = true;
-                        } else {
-                            if (answer.caducable) {
-                                $scope.data.meta.context.caducity_focus = true;
+                            // Check for unique
+                            if (answer.unique) {
+                                $scope.data.meta.context.unique_focus = true;
                             } else {
-                                // We are done here
-                                $scope.submit_scenario();
+                                if (answer.caducable) {
+                                    $scope.data.meta.context.caducity_focus = true;
+                                } else {
+                                    // We are done here
+                                    $scope.submit_scenario();
+                                }
                             }
+                        } else {
+                            // No answer, invalid product
+                            $scope.product_final = null;
+                            $scope.product_final_pk = null;
+                            $scope.data.meta.context.unique_disabled = true;
+                            $scope.data.meta.context.caducity_disabled = true;
+                            $scope.data.meta.context.final_focus = true;
+                            $scope.final_error = true;
                         }
                     } else {
-                        // No answer, invalid product
-                        $scope.product_final = null;
-                        $scope.product_final_pk = null;
+                        // Error happened, show an alert$
+                        console.log("ERROR "+stat+": "+answer);
+                        console.log(answer);
                         $scope.data.meta.context.unique_disabled = true;
                         $scope.data.meta.context.caducity_disabled = true;
                         $scope.data.meta.context.final_focus = true;
                         $scope.final_error = true;
+                        alert("ERROR "+stat+": "+answer);
                     }
-                } else {
-                    // Error happened, show an alert$
-                    console.log("ERROR "+stat+": "+answer);
-                    console.log(answer);
-                    $scope.data.meta.context.unique_disabled = true;
-                    $scope.data.meta.context.caducity_disabled = true;
-                    $scope.data.meta.context.final_focus = true;
-                    $scope.final_error = true;
-                    alert("ERROR "+stat+": "+answer);
-                }
-            })
-            .error(function(data, status, headers, config) {
-                if (cnf_debug){
-                    alert(data);
-                } else {
-                    alert(cnf_debug_txt)
-                }
-            });
+                })
+                .error(function(data, status, headers, config) {
+                    if (cnf_debug){
+                        alert(data);
+                    } else {
+                        alert(cnf_debug_txt)
+                    }
+                });
+            }
         };
 
         $scope.unique_changed = function () {
@@ -157,44 +159,46 @@ angular.module('codenerixSTORAGESControllers', [])
             // Filter product final
             var url = $scope.data.meta.context.ws.unique_fullinfo;
             $scope.product_unique = $scope.inscope.product_unique.split(" ")[0];
-            $scope.inscope.product_unique = $scope.product_unique;
+            if ($scope.product_unique) {
+                $scope.inscope.product_unique = $scope.product_unique;
 
-            // Prepare URL
-            var uniqueurl = "/" + url.replace("/PRODUCT_FINAL_UNIQUE/", "/"+$scope.product_unique+"/");
+                // Prepare URL
+                var uniqueurl = "/" + url.replace("/PRODUCT_FINAL_UNIQUE/", "/"+$scope.product_unique+"/");
 
-            // Query the product
-            $http.get( uniqueurl, {}, {} )
-            .success(function(answer, stat) {
-                if (stat==200 || stat ==202) {
-                    if (Object.keys(answer).length) {
-                        $scope.unique_error = answer['errortxt'];
-                    } else {
-                        $scope.unique_error = false;
-                        if (!$scope.data.meta.context.caducity_disabled) {
-                            $scope.data.meta.context.caducity_focus = true;
+                // Query the product
+                $http.get( uniqueurl, {}, {} )
+                .success(function(answer, stat) {
+                    if (stat==200 || stat ==202) {
+                        if (Object.keys(answer).length) {
+                            $scope.unique_error = answer['errortxt'];
                         } else {
-                            // We are done here
-                            $scope.submit_scenario();
+                            $scope.unique_error = false;
+                            if (!$scope.data.meta.context.caducity_disabled) {
+                                $scope.data.meta.context.caducity_focus = true;
+                            } else {
+                                // We are done here
+                                $scope.submit_scenario();
+                            }
                         }
+                    } else {
+                         // Error happened, show an alert$
+                         console.log("ERROR "+stat+": "+answer);
+                         console.log(answer);
+                         alert("ERROR "+stat+": "+answer);
                     }
-                } else {
-                     // Error happened, show an alert$
-                     console.log("ERROR "+stat+": "+answer);
-                     console.log(answer);
-                     alert("ERROR "+stat+": "+answer);
-                }
-            })
-            .error(function(data, status, headers, config) {
-                if (cnf_debug){
-                    alert(data);
-                } else {
-                    alert(cnf_debug_txt)
-                }
-            });
+                })
+                .error(function(data, status, headers, config) {
+                    if (cnf_debug){
+                        alert(data);
+                    } else {
+                        alert(cnf_debug_txt)
+                    }
+                });
+            }
         }
 
         $scope.submit_scenario = function () {
-            if (!$scope.unique_error) {
+            if (!$scope.unique_error && ($scope.inscope.caducity)) {
                 // Prepare URL
                 var url = '/'+$scope.data.meta.context.ws.submit;
 
