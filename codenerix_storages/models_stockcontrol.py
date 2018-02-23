@@ -30,7 +30,7 @@ from django.conf import settings
 from codenerix.models import CodenerixModel
 from codenerix_products.models import ProductFinal, ProductUnique, PRODUCT_UNIQUE_VALUE_LENGTH
 from codenerix_invoicing.models_purchases import Provider, PurchasesOrder
-from codenerix_invoicing.models_sales import SalesOrder
+from codenerix_invoicing.models_sales import SalesAlbaran
 
 from .models import Storage, StorageBox, StorageOperator
 
@@ -360,18 +360,18 @@ class InventoryInLine(GenInventoryLine):
 
 # InventoryOut
 class InventoryOut(GenInventory):
-    order = models.ForeignKey(SalesOrder, on_delete=models.PROTECT, related_name='inventorys', verbose_name='Order', blank=False, null=False)
+    albaran = models.ForeignKey(SalesAlbaran, on_delete=models.PROTECT, related_name='inventorys', verbose_name='Albaran', blank=False, null=False)
 
     def __fields__(self, info):
         fields = []
-        fields.append(('order', _('Order')))
+        fields.append(('albaran', _('Albaran')))
         fields.append(('created', _('Starts')))
         fields.append(('end', _('Ends')))
         fields.append((None, _('Actions')))
         return fields
 
     def __str__(self):
-        return u"{}::{}".format(self.order, self.created)
+        return u"{}::{}".format(self.albaran, self.created)
 
     def __unicode__(self):
         return self.__str__()
@@ -379,6 +379,7 @@ class InventoryOut(GenInventory):
 
 class InventoryOutLine(GenInventoryLine):
     inventory = models.ForeignKey(InventoryOut, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory line"), null=False, blank=False)
+    caducity = models.DateField(_("Caducity"), blank=True, null=True, default=None)
 
     def __fields__(self, info):
         fields = []
@@ -388,6 +389,7 @@ class InventoryOutLine(GenInventoryLine):
         fields.append(('product_unique_value', _("Unique Value")))
         fields.append(('operator', _("Operator")))
         fields.append(('quantity', _("Quantity")))
+        fields.append(('caducity', _("Caducity")))
         return fields
 
     def __unicode__(self):

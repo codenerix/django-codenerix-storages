@@ -34,6 +34,7 @@ from codenerix.widgets import DynamicInput, DynamicSelect
 
 from codenerix_products.models import ProductFinal, ProductUnique
 from codenerix_invoicing.models_purchases import PurchasesOrder, PurchasesLineOrder
+from codenerix_invoicing.models_sales import SalesLines
 from codenerix_storages.models import StorageOperator
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine
 from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryLineForm, InventoryInForm, InventoryInLineForm, InventoryOutForm, InventoryOutLineForm
@@ -408,7 +409,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
     defaultordering = "-created"
     static_partial_header = 'codenerix_storages/inventoryin_work_header.html'
     static_partial_row = 'codenerix_storages/inventoryin_work_row'
-    static_app_row = 'codenerix_storages/inventoryin_work_app.js'
+    static_app_row = 'codenerix_storages/inventory_work_app.js'
     static_controllers_row = 'codenerix_storages/inventoryin_work_controllers.js'
     linkedit = False
     linkadd = False
@@ -825,11 +826,14 @@ class InventoryOutLineList(GenInventoryOutLineUrl, GenList):
 
 class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
     model = InventoryOutLine
-    extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryOutLine'), _('InventoryOutLine')]}
+    extra_context = {
+        'menu': ['storage', 'inventoryout'],
+        'bread': [_('Storage'), _('Outgoing Stock')],
+    }
     defaultordering = "-created"
     static_partial_header = 'codenerix_storages/inventoryout_work_header.html'
     static_partial_row = 'codenerix_storages/inventoryout_work_row'
-    static_app_row = 'codenerix_storages/inventoryout_work_app.js'
+    static_app_row = 'codenerix_storages/inventory_work_app.js'
     static_controllers_row = 'codenerix_storages/inventoryout_work_controllers.js'
     linkedit = False
     linkadd = False
@@ -845,6 +849,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
         fields.append(('box', _("Box")))
         fields.append(('quantity', _("Quantity")))
         fields.append(('product_final', _("Product")))
+        fields.append(('product_final__pk', None))
         fields.append(('product_unique', _("Unique")))
         fields.append(('caducity', _("Caducity")))
         fields.append(('product_unique_value', None))
@@ -860,12 +865,13 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
 
         # Prepare form
         fields = []
-        fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign', []))
-        fields.append((DynamicInput, 'product_final', 3, 'CDNX_products_productfinalsean13_foreign', []))
-        fields.append((DynamicInput, 'product_unique', 3,  'CDNX_products_productuniquescode_foreign', ['product_final']))
-        form = InventoryOutLineForm()
-        for (widget, key, minchars, url, autofill) in fields:
+        fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign', [], {}))
+        fields.append((DynamicInput, 'product_final', 3, 'CDNX_products_productfinalsean13_foreign', [], {}))
+        fields.append((DynamicInput, 'product_unique', 3,  'CDNX_products_productuniquescode_foreign', ['product_final'], {}))
+        form = InventoryInLineForm()
+        for (widget, key, minchars, url, autofill, newattrs) in fields:
             wattrs = form.fields[key].widget.attrs
+            wattrs.update(newattrs)
             form.fields[key].widget = widget(wattrs)
             form.fields[key].widget.form_name = form.form_name
             form.fields[key].widget.field_name = key
@@ -911,8 +917,8 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
                 'codenerix-on-enter': 'unique_changed()',
                 'codenerix-focus': 'data.meta.context.unique_focus',
                 'ng-disabled': 'data.meta.context.unique_disabled',
-                'ng-class': '{"bg-info": unique_new, "bg-danger": data.meta.context.errors.unique}',
-            }),
+                'ng-class': '{"bg-danger": data.meta.context.errors.unique || unique_error}',
+            })+" <span class='fa fa-exclamation-triangle text-danger' ng-show='unique_error' alt='{{unique_error}}' title='{{unique_error}}'></span>",
             'form_caducity': form.fields['caducity'].widget.render('caducity', None, {
                 'codenerix-on-enter': 'submit_scenario()',
                 'codenerix-focus': 'data.meta.context.caducity_focus',
@@ -927,6 +933,71 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
         limit = {}
         limit['file_link'] = Q(inventory__pk=info.kwargs.get('ipk'))
         return limit
+
+    def json_builder(self, answer, context):
+
+        # List of registered products and quantity
+        registered = self.bodybuilder(context['object_list'], self.autorules())
+        # raise IOError(registered)
+        # G: [{'pk': '1', 'caducity': None, 'product_final': 'asdf (1234)',
+        #    'product_unique_value': 'asadfasdf', 'product_final__pk': '1', 'box': 'BOX1234', 'product_unique': None, 'quantity': '1.0'}]
+
+        # Get albaran
+        inventory = InventoryOut.objects.filter(pk=self.ipk).first()
+        if inventory:
+            albaran_pk = inventory.albaran.pk
+        else:
+            albaran_pk = None
+
+        # Get purchasedproducts (requested products)
+        requested = SalesLines.objects.filter(albaran__pk=albaran_pk).values("product_final",  "product_final__code", "product_final__ean13").annotate(total=Sum("quantity"))
+        # raise IOError(requested)
+        # R: <QuerySet [{'total': 20.0, 'product_final__code': 'aaa', 'product_final': 1, 'product_final__ean13': '1234'}]>
+
+        # Process registered products
+        body_registered = []
+        for g in registered:
+            # It is not a virtual line
+            g['virtual'] = False
+            # Copy quantity
+            g['missing'] = float(g['quantity'])
+
+            for r in requested:
+                if r['product_final'] == int(g['product_final__pk']):
+                    if r['total'] > g['missing']:
+                        r['total'] -= g['missing']
+                        g['missing'] = 0.0
+                    else:
+                        g['missing'] -= r['total']
+                        r['total'] = 0.0
+
+            # Add a new token
+            body_registered.append(g)
+
+        # Process unregistered products
+        body_requested = []
+        for r in requested:
+            # If still left
+            if r['total'] > 0:
+                token = {
+                    'caducity': None,
+                    'product_unique_value': None,
+                    'product_final': '{} ({})'.format(r['product_final__code'], r['product_final__ean13']),
+                    'product_final__pk': None,
+                    'product_unique': None,
+                    'pk': None,
+                    'quantity': r['total'],
+                    'box': None,
+                    'total': None,
+                    'virtual': True,
+                }
+
+                # Add a new token
+                body_requested.append(token)
+
+        # Return answer
+        answer['table']['body'] = body_requested + body_registered
+        return answer
 
 
 class InventoryOutLineCreate(GenInventoryOutLineUrl, GenCreate):
