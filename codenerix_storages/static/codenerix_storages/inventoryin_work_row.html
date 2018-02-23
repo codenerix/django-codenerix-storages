@@ -1,21 +1,21 @@
 <td
-    ng-class="{'bg-warning': !row.purchasesorder}">
-    <span codenerix-html-compile="data.meta.context.form_order_row"></span>
+    ng-class="{'bg-info': row.virtual, 'bg-danger': !row.virtual && !row.purchasesorder, 'bg-success': !row.virtual && row.missing}">
+    <span ng-if='!row.virtual' codenerix-html-compile="data.meta.context.form_order_row"></span>
 </td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.purchasesorder}">{{row.box}}</td>
+    ng-class="{'bg-info': row.virtual, 'bg-danger': !row.virtual && !row.purchasesorder, 'bg-success': !row.virtual && row.missing}">{{row.box}}</td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.purchasesorder}">{{row.quantity}} ({{row.missing}})</td>
+    ng-class="{'bg-info': row.virtual, 'bg-danger': !row.virtual && !row.purchasesorder, 'bg-success': !row.virtual && row.missing}">{{row.quantity}}<span ng-if='row.missing' class='text-success'><b> (+{{row.missing}})</b></span></td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.purchasesorder}">{{row.product_final}}</td>
+    ng-class="{'bg-info': row.virtual, 'bg-danger': !row.virtual && !row.purchasesorder, 'bg-success': !row.virtual && row.missing}">{{row.product_final}}</td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.purchasesorder}">
+    ng-class="{'bg-info': row.virtual, 'bg-danger': !row.virtual && !row.purchasesorder, 'bg-success': !row.virtual && row.missing}">
     <span>{{row.product_unique_value|codenerix}}</span>
 </td>
 <td
     ng-click='removerecord(row.pk, data.meta.gentranslate.removerecord, {"name": row.product_final+": "+(row.product_unique || row.product_unique_value)})'
-    ng-class="{'bg-warning': !row.purchasesorder}">{{row.caducity}}</td>
+    ng-class="{'bg-info': row.virtual, 'bg-danger': !row.virtual && !row.purchasesorder, 'bg-success': !row.virtual && row.missing}">{{row.caducity}}</td>

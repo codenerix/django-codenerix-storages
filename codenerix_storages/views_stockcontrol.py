@@ -421,7 +421,8 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
 
     def __fields__(self, info):
         fields = []
-        fields.append(('purchasesorder', _("Order")))
+        fields.append(('purchasesorder', _("Purchase Order")))
+        fields.append(('purchasesorder__pk', None))
         fields.append(('box', _("Box")))
         fields.append(('quantity', _("Quantity")))
         fields.append(('product_final', _("Product")))
@@ -536,26 +537,39 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
         # List of registered products and quantity
         # registered = self.model.objects.filter(inventory__pk=self.ipk).values("product_final").annotate(total=Count("quantity"))
         registered = self.bodybuilder(context['object_list'], self.autorules())
+        # raise IOError(registered)
 
         # Get purchases (requested products)
         requested = PurchasesLineOrder.objects.filter(order__pk__in=purchasesorders).values("order", "product",  "product__code", "product__ean13").annotate(total=Sum("quantity"))
         # raise IOError(requested)
 
+        # Get already purchased products
+        alreadyin = ProductUnique.objects.filter(line_albaran_purchases__line_order__order__pk__in=purchasesorders).values('product_final').annotate(total=Sum('stock_original'))
+
+        # Recalculate quantity of requested products
+        for r in requested:
+            for i in alreadyin:
+                if i['product_final'] == r['product']:
+                    r['total'] -= i['total']
+                    break
+
         # Process registered products
         body_registered = []
         for g in registered:
+            # It is not a virtual line
+            g['virtual'] = False
+            # Copy quantity
             g['missing'] = float(g['quantity'])
+            if g['purchasesorder__pk']:
 
-            if g['purchasesorder']:
                 for r in requested:
-                    if r['order']:
-                        if r['product'] == int(g['product_final__pk']):
-                            if r['total'] > g['missing']:
-                                r['total'] -= g['missing']
-                                g['missing'] = 0.0
-                            else:
-                                g['missing'] -= r['total']
-                                r['total'] = 0.0
+                    if r['order'] and (r['product'] == int(g['product_final__pk'])) and (r['order']  == int(g['purchasesorder__pk'])):
+                        if r['total'] > g['missing']:
+                            r['total'] -= g['missing']
+                            g['missing'] = 0.0
+                        else:
+                            g['missing'] -= r['total']
+                            r['total'] = 0.0
 
             # Add a new token
             body_registered.append(g)
@@ -576,10 +590,11 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
                     'quantity': r['total'],
                     'box': None,
                     'total': None,
+                    'virtual': True,
                 }
 
-            # Add a new token
-            body_requested.append(token)
+                # Add a new token
+                body_requested.append(token)
 
         # Return answer
         answer['table']['body'] = body_requested + body_registered
