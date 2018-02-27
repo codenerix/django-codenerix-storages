@@ -1,10 +1,11 @@
-<td>{{row.albaran}}</td>
-<td>{{row.created}}</td>
-<td>
-    <span ng-if="row.end">{{row.end}}</span>
-    <span ng-if="!row.end">-</span>
+<td class="text-center" ng-click="$event.stopPropagation()" ng-show="data.table.head.extra_fields.field_check!=None">
+       <input type="checkbox" name="checkline" value="{{ row.pk }}" ng-checked="CDNX_checkline_head" ng-model="CDNX_checkline[row.pk]" />
 </td>
-<td>
+
+<td ng-click="gotourl(data.meta.context.url_doinventory.replace('__IPK__', row.pk)); $event.stopPropagation()">{{row.albaran}}</td>
+<td ng-click="gotourl(data.meta.context.url_doinventory.replace('__IPK__', row.pk)); $event.stopPropagation()">{{row.created}}</td>
+<td ng-click="gotourl(data.meta.context.url_doinventory.replace('__IPK__', row.pk)); $event.stopPropagation()">{{row.end|codenerix}}</td>
+<td ng-click="gotourl(data.meta.context.url_doinventory.replace('__IPK__', row.pk)); $event.stopPropagation()">
     <a
         ng-href="{{data.meta.context.url_doinventory.replace('__IPK__', row.pk)}}"
         ng-click="$event.stopPropagation()"
@@ -17,4 +18,8 @@
         ng-href="{{data.meta.context.url_getreport.replace('__IPK__', row.pk)}}"
         ng-click="$event.stopPropagation()"
         class="btn btn-sm status btn-default ng-binding ng-scope">Regularizacion de stock</a>
+</td>
+
+<td class="text-center" ng-click="$event.stopPropagation()" ng-show="data.table.head.extra_fields.field_delete">
+        <i ng-click="removerecord(row.pk, 'Delete items?');$event.stopPropagation()" class="glyphicon glyphicon-trash pointer"></i>
 </td>

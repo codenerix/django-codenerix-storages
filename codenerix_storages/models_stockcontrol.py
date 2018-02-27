@@ -29,7 +29,7 @@ from django.conf import settings
 
 from codenerix.models import CodenerixModel
 from codenerix_products.models import ProductFinal, ProductUnique, PRODUCT_UNIQUE_VALUE_LENGTH
-from codenerix_invoicing.models_purchases import Provider, PurchasesOrder
+from codenerix_invoicing.models_purchases import Provider, PurchasesOrder, PurchasesLineAlbaran
 from codenerix_invoicing.models_sales import SalesAlbaran
 
 from .models import Storage, StorageBox, StorageOperator
@@ -332,13 +332,15 @@ class InventoryIn(GenInventory):
 
 
 class InventoryInLine(GenInventoryLine):
-    purchasesorder = models.ForeignKey(PurchasesOrder, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory line"), null=True, blank=True)
-    inventory = models.ForeignKey(InventoryIn, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory line"), null=False, blank=False)
+    purchasesorder = models.ForeignKey(PurchasesOrder, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Order"), null=True, blank=True)
+    purchaseslinealbaran = models.ForeignKey(PurchasesLineAlbaran, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Line Albaran"), null=True, blank=True)
+    inventory = models.ForeignKey(InventoryIn, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory"), null=False, blank=False)
     caducity = models.DateField(_("Caducity"), blank=True, null=True, default=None)
 
     def __fields__(self, info):
         fields = []
         fields.append(('purchasesorder', _("Purchases Order")))
+        fields.append(('purchaseslinealbaran', _("Purchases Line Albaran")))
         fields.append(('box', _("Box")))
         fields.append(('product_final', _("Product")))
         fields.append(('product_unique', _("Unique")))
@@ -379,7 +381,6 @@ class InventoryOut(GenInventory):
 
 class InventoryOutLine(GenInventoryLine):
     inventory = models.ForeignKey(InventoryOut, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory line"), null=False, blank=False)
-    caducity = models.DateField(_("Caducity"), blank=True, null=True, default=None)
 
     def __fields__(self, info):
         fields = []
@@ -389,7 +390,6 @@ class InventoryOutLine(GenInventoryLine):
         fields.append(('product_unique_value', _("Unique Value")))
         fields.append(('operator', _("Operator")))
         fields.append(('quantity', _("Quantity")))
-        fields.append(('caducity', _("Caducity")))
         return fields
 
     def __unicode__(self):

@@ -20,7 +20,7 @@
 
 import json
 
-from django.db.models import Q, F, Sum, Count
+from django.db.models import Q, Sum
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.urls import reverse
@@ -87,6 +87,11 @@ class InventoryDelete(GenInventoryUrl, GenDelete):
 
 
 class InventoryDetail(GenInventoryUrl, GenDetail):
+    model = Inventory
+    groups = InventoryForm.__groups_details__()
+
+
+class InventorySetStock(GenInventoryUrl, GenDetail):
     model = Inventory
     groups = InventoryForm.__groups_details__()
 
@@ -336,6 +341,8 @@ class GenInventoryInUrl(object):
 
 class InventoryInList(GenInventoryInUrl, GenList):
     model = InventoryIn
+    linkedit = False
+    field_delete = True
     extra_context = {
         'menu': ['storage', 'inventoryin'],
         'bread': [_('Storage'), _('Incoming Stock')],
@@ -380,6 +387,35 @@ class InventoryInDetail(GenInventoryInUrl, GenDetail):
     groups = InventoryInForm.__groups_details__()
 
 
+class InventoryInAlbaranar(View):
+
+    @method_decorator(login_required)
+    def get(self, *args, **kwargs):
+
+        # Get Inventory PK
+        pk = kwargs.get('pk', None)
+        inventory = InventoryIn.objects.filters(pk=pk).first()
+
+        # Prepare answer
+        answer = {}
+
+        # Check answer
+        if inventory:
+            # Create Albaran
+            # For each product
+                # Create Unique Product
+                # Set Stock
+                # Save in Albaran
+            pass
+        else:
+            answer['error'] = True
+            answer['errortxt'] = _("Incoming Inventory not found!")
+
+        # Return answer
+        json_answer = json.dumps(answer)
+        return HttpResponse(json_answer, content_type='application/json')
+
+
 # Inventory Incoming Stock Line
 class GenInventoryInLineUrl(object):
     ws_entry_point = '{}/inventorylinein'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
@@ -409,7 +445,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
     defaultordering = "-created"
     static_partial_header = 'codenerix_storages/inventoryin_work_header.html'
     static_partial_row = 'codenerix_storages/inventoryin_work_row'
-    static_app_row = 'codenerix_storages/inventory_work_app.js'
+    static_app_row = 'codenerix_storages/inventoryin_work_app.js'
     static_controllers_row = 'codenerix_storages/inventoryin_work_controllers.js'
     linkedit = False
     linkadd = False
@@ -418,6 +454,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
         'new': _('Unique product is new!'),
         'notfound': _('Product not found!'),
         'removerecord': _('Are you sure you want to remove "<name>"?'),
+        'albaranar': _("Albaranar"),
     }
 
     def __fields__(self, info):
@@ -536,7 +573,6 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
                 purchasesorders.append(ele[0])
 
         # List of registered products and quantity
-        # registered = self.model.objects.filter(inventory__pk=self.ipk).values("product_final").annotate(total=Count("quantity"))
         registered = self.bodybuilder(context['object_list'], self.autorules())
         # raise IOError(registered)
 
@@ -564,7 +600,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
             if g['purchasesorder__pk']:
 
                 for r in requested:
-                    if r['order'] and (r['product'] == int(g['product_final__pk'])) and (r['order']  == int(g['purchasesorder__pk'])):
+                    if r['order'] and (r['product'] == int(g['product_final__pk'])) and (r['order'] == int(g['purchasesorder__pk'])):
                         if r['total'] > g['missing']:
                             r['total'] -= g['missing']
                             g['missing'] = 0.0
@@ -577,6 +613,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
 
         # Process unregistered products
         body_requested = []
+        readytosubmit = True
         for r in requested:
             # If still left
             if r['total'] > 0:
@@ -593,11 +630,13 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
                     'total': None,
                     'virtual': True,
                 }
+                readytosubmit = False
 
                 # Add a new token
                 body_requested.append(token)
 
         # Return answer
+        answer['meta']['readytosubmit'] = readytosubmit
         answer['table']['body'] = body_requested + body_registered
         return answer
 
@@ -765,6 +804,8 @@ class GenInventoryOutUrl(object):
 
 class InventoryOutList(GenInventoryOutUrl, GenList):
     model = InventoryOut
+    linkedit = False
+    field_delete = True
     extra_context = {
         'menu': ['storage', 'inventoryout'],
         'bread': [_('Storage'), _('Outgoing stock (Orders)')],
@@ -809,6 +850,11 @@ class InventoryOutDetail(GenInventoryOutUrl, GenDetail):
     groups = InventoryOutForm.__groups_details__()
 
 
+class InventoryOutAlbaranar(GenInventoryOutUrl, GenDetail):
+    model = InventoryOut
+    groups = InventoryOutForm.__groups_details__()
+
+
 # Inventory Outoging Stock Line
 class GenInventoryOutLineUrl(object):
     ws_entry_point = '{}/inventoryoutline'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
@@ -833,7 +879,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
     defaultordering = "-created"
     static_partial_header = 'codenerix_storages/inventoryout_work_header.html'
     static_partial_row = 'codenerix_storages/inventoryout_work_row'
-    static_app_row = 'codenerix_storages/inventory_work_app.js'
+    static_app_row = 'codenerix_storages/inventoryout_work_app.js'
     static_controllers_row = 'codenerix_storages/inventoryout_work_controllers.js'
     linkedit = False
     linkadd = False
@@ -842,6 +888,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
         'new': _('Unique product is new!'),
         'notfound': _('Product not found!'),
         'removerecord': _('Are you sure you want to remove "<name>"?'),
+        'send': _("Enviar"),
     }
 
     def __fields__(self, info):
@@ -851,7 +898,6 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
         fields.append(('product_final', _("Product")))
         fields.append(('product_final__pk', None))
         fields.append(('product_unique', _("Unique")))
-        fields.append(('caducity', _("Caducity")))
         fields.append(('product_unique_value', None))
         return fields
 
@@ -885,14 +931,11 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
             'final_focus': True,
             'unique_focus': False,
             'unique_disabled': True,
-            'caducity_focus': True,
-            'caducity_disabled': True,
             'errors': {
                 'zone': None,
                 'quantity': None,
                 'product': None,
                 'unique': None,
-                'caducity': None,
             },
             'ws': {
                 'ean13_fullinfo': self.ws_ean13_fullinfo,
@@ -919,13 +962,6 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
                 'ng-disabled': 'data.meta.context.unique_disabled',
                 'ng-class': '{"bg-danger": data.meta.context.errors.unique || unique_error}',
             })+" <span class='fa fa-exclamation-triangle text-danger' ng-show='unique_error' alt='{{unique_error}}' title='{{unique_error}}'></span>",
-            'form_caducity': form.fields['caducity'].widget.render('caducity', None, {
-                'codenerix-on-enter': 'submit_scenario()',
-                'codenerix-focus': 'data.meta.context.caducity_focus',
-                'ng-disabled': 'data.meta.context.caducity_disabled',
-                'ng-class': '{"bg-danger": data.meta.context.errors.caducity}',
-                'placeholder': 'dd/mm/aaaa',
-            }),
         }
         return super(InventoryOutLineWork, self).dispatch(*args, **kwargs)
 
@@ -980,7 +1016,6 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
             # If still left
             if r['total'] > 0:
                 token = {
-                    'caducity': None,
                     'product_unique_value': None,
                     'product_final': '{} ({})'.format(r['product_final__code'], r['product_final__ean13']),
                     'product_final__pk': None,
@@ -1081,7 +1116,6 @@ class InventoryOutLineEAN13Fullinfo(View):
 
                 # Prepare answer
                 answer['pk'] = pf.pk
-                answer['caducable'] = pf.product.caducable
                 answer['unique'] = unique
 
         # Return answer

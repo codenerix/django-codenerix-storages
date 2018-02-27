@@ -245,5 +245,33 @@ angular.module('codenerixSTORAGESControllers', [])
                 });
             }
         };
+
+        $scope.albaranar = function(tempurl) {
+            if ($scope.data.meta.readytosubmit) {
+                // Prepare URL
+                var url = tempurl+'/../albaranar';
+                url = url.replace("inventoryinline", "inventoryin")
+
+                // Post request
+                $http.get( url, {}, {} )
+                .success(function(answer, stat) {
+                    if (stat==200 || stat ==202) {
+                        console.log("OK");
+                    } else {
+                        // Error happened, show an alert$
+                        console.log("ERROR "+stat+": "+answer);
+                        console.log(answer);
+                        alert("ERROR "+stat+": "+answer);
+                    }
+                })
+                .error(function(data, status, headers, config) {
+                    if (cnf_debug){
+                        alert(data);
+                    } else {
+                        alert(cnf_debug_txt)
+                    }
+                });
+            }
+        };
     }
 ]);
