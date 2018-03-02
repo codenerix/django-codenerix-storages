@@ -402,11 +402,15 @@ class InventoryInAlbaranar(View):
         # Check answer
         if inventory:
             # Create Albaran
-            # For each product
+            pa = PurchasesAlbaran()
+            pa.code
+            pa.date = datetime.datetime.now()
+            # For each line in inventory
+            for line in inventory.inventory_lines.all():
                 # Create Unique Product
                 # Set Stock
                 # Save in Albaran
-            pass
+                pass
         else:
             answer['error'] = True
             answer['errortxt'] = _("Incoming Inventory not found!")
@@ -479,9 +483,16 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
         self.ws_submit = reverse('CDNX_storages_inventoryinline_addws', kwargs={"ipk": self.ipk})[1:]
         self.ws_inventoryinline_purchasesorder = reverse('CDNX_storages_inventoryinline_purchase_order', kwargs={"inventoryinline_pk": 1, "purchasesorder_pk": 1})[1:]
 
+        # Find provider_pk
+        inv = InventoryIn.objects.filter(pk=self.ipk).first()
+        if inv:
+            provider_pk = inv.provider.pk
+        else:
+            provider_pk = None
+
         # Prepare form
         fields = []
-        fields.append((DynamicSelect, 'purchasesorder', 3, 'CDNX_invoicing_orderpurchasess_foreign', ['provider:{}'.format(self.ipk)], {
+        fields.append((DynamicSelect, 'purchasesorder', 3, 'CDNX_invoicing_orderpurchasess_foreign', ['provider:{}'.format(provider_pk)], {
             'ng-change': 'order_change($externalScope.row.pk, $externalScope.purchasesorder)',
             'placeholder': '{{{{row.purchasesorder|default:"{}"}}}}'.format(_("Press * or start typing")),
             'ng-placeholder': '(row.purchasesorder || \'{}\')'.format(_("Press * or start typing")),

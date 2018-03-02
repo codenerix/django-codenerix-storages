@@ -198,7 +198,8 @@ angular.module('codenerixSTORAGESControllers', [])
         }
 
         $scope.submit_scenario = function () {
-            if (!$scope.unique_error && ($scope.inscope.caducity)) {
+            console.log($scope);
+            if (!$scope.unique_error && ($scope.data.meta.context.caducity_disabled || $scope.inscope.caducity)) {
                 // Prepare URL
                 var url = '/'+$scope.data.meta.context.ws.submit;
 
