@@ -312,6 +312,19 @@ class InventoryLine(GenInventoryLine):
         limit['file_link'] = Q(inventory__pk=ipk)
         return limit
 
+
+# Distrubion
+class Distribution(CodenerixModel):
+    purchasesorder = models.ForeignKey(PurchasesOrder, on_delete=models.CASCADE, related_name='distributions', verbose_name=_("Order"), null=True, blank=True)
+
+
+class DistributionLine(CodenerixModel):
+    distribution = models.ForeignKey(Distribution, on_delete=models.PROTECT, related_name='distribution_lines', verbose_name='Distribution List', blank=False, null=False)
+    storage = models.ForeignKey(Storage, related_name='distribution_lines', verbose_name=_("Storage"), null=False, blank=False, on_delete=models.PROTECT)
+    quantity = models.FloatField(_("Quantity"), null=False, blank=False, default=1.0)
+    expected_date = models.DateTimeField(_("Desired Date"), blank=True, null=True)
+
+
 # InventoryIn
 class InventoryIn(GenInventory):
     provider = models.ForeignKey(Provider, on_delete=models.PROTECT, related_name='inventorys', verbose_name='Provider', blank=False, null=False)
