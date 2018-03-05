@@ -198,7 +198,8 @@ angular.module('codenerixSTORAGESControllers', [])
         }
 
         $scope.submit_scenario = function () {
-            if (!$scope.unique_error && ($scope.inscope.caducity)) {
+            console.log($scope);
+            if (!$scope.unique_error && ($scope.data.meta.context.caducity_disabled || $scope.inscope.caducity)) {
                 // Prepare URL
                 var url = '/'+$scope.data.meta.context.ws.submit;
 
@@ -234,6 +235,34 @@ angular.module('codenerixSTORAGESControllers', [])
                          console.log("ERROR "+stat+": "+answer);
                          console.log(answer);
                          alert("ERROR "+stat+": "+answer);
+                    }
+                })
+                .error(function(data, status, headers, config) {
+                    if (cnf_debug){
+                        alert(data);
+                    } else {
+                        alert(cnf_debug_txt)
+                    }
+                });
+            }
+        };
+
+        $scope.albaranar = function(tempurl) {
+            if ($scope.data.meta.readytosubmit) {
+                // Prepare URL
+                var url = tempurl+'/../albaranar';
+                url = url.replace("inventoryinline", "inventoryin")
+
+                // Post request
+                $http.get( url, {}, {} )
+                .success(function(answer, stat) {
+                    if (stat==200 || stat ==202) {
+                        console.log("OK");
+                    } else {
+                        // Error happened, show an alert$
+                        console.log("ERROR "+stat+": "+answer);
+                        console.log(answer);
+                        alert("ERROR "+stat+": "+answer);
                     }
                 })
                 .error(function(data, status, headers, config) {

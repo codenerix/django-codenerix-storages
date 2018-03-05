@@ -49,13 +49,11 @@ angular.module('codenerixSTORAGESControllers', [])
             $scope.product_unique_pk = null;
             $scope.data.meta.context.final_focus = true;
             $scope.data.meta.context.unique_disabled = true;
-            $scope.data.meta.context.caducity_disabled = true;
             $scope.data.meta.context.errors = {
                 'zone': null,
                 'quantity': null,
                 'product': null,
                 'unique': null,
-                'caducity': null,
             };
             $scope.refresh();
         };
@@ -79,8 +77,7 @@ angular.module('codenerixSTORAGESControllers', [])
                 if (stat==200 || stat ==202) {
                     // Decide next step
                     if (Object.keys(answer).length) {
-                        // Set caducity status
-                        $scope.data.meta.context.caducity_disabled = !answer.caducable;
+                        // Set unique status
                         $scope.data.meta.context.unique_disabled = !answer.unique;
                         $scope.product_final_pk = answer.pk
 
@@ -88,19 +85,14 @@ angular.module('codenerixSTORAGESControllers', [])
                         if (answer.unique) {
                             $scope.data.meta.context.unique_focus = true;
                         } else {
-                            if (answer.caducable) {
-                                $scope.data.meta.context.caducity_focus = true;
-                            } else {
-                                // We are done here
-                                $scope.submit_scenario();
-                            }
+                            // We are done here
+                            $scope.submit_scenario();
                         }
                     } else {
                         // No answer, invalid product
                         $scope.product_final = null;
                         $scope.product_final_pk = null;
                         $scope.data.meta.context.unique_disabled = true;
-                        $scope.data.meta.context.caducity_disabled = true;
                         $scope.data.meta.context.final_focus = true;
                         $scope.final_error = true;
                     }
@@ -109,7 +101,6 @@ angular.module('codenerixSTORAGESControllers', [])
                     console.log("ERROR "+stat+": "+answer);
                     console.log(answer);
                     $scope.data.meta.context.unique_disabled = true;
-                    $scope.data.meta.context.caducity_disabled = true;
                     $scope.data.meta.context.final_focus = true;
                     $scope.final_error = true;
                     alert("ERROR "+stat+": "+answer);
@@ -145,12 +136,8 @@ angular.module('codenerixSTORAGESControllers', [])
                         $scope.product_unique_pk = null;
                         $scope.unique_new = true;
                     }
-                    if (!$scope.data.meta.context.caducity_disabled) {
-                        $scope.data.meta.context.caducity_focus = true;
-                    } else {
-                        // We are done here
-                        $scope.submit_scenario();
-                    }
+                    // We are done here
+                    $scope.submit_scenario();
                 } else {
                      // Error happened, show an alert$
                      console.log("ERROR "+stat+": "+answer);
@@ -178,7 +165,6 @@ angular.module('codenerixSTORAGESControllers', [])
                 'product_unique_value': $scope.product_unique,
                 'box': $scope.inscope.box,
                 'quantity': $scope.inscope.quantity,
-                'caducity': $scope.inscope.caducity,
             }
 
             $http.post( url, data, {} )
