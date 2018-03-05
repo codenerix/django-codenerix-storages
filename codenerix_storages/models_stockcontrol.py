@@ -35,7 +35,7 @@ from codenerix_invoicing.models_sales import SalesAlbaran
 from .models import Storage, StorageBox, StorageOperator
 
 
-class GenCode(CodenerixModel):
+class GenCode(CodenerixModel):  # META: Abstract class
     class Meta(CodenerixModel.Meta):
         abstract = True
 
@@ -254,12 +254,14 @@ class LineIncomingAlbaran(CodenerixModel):
 
 
 # Generic classes for Inventory and Inventory Line
-class GenInventory(CodenerixModel):
+class GenInventory(CodenerixModel):  # META: Abstract class
     end = models.DateTimeField(_("Ends"), blank=True, null=True, editable=False)
+
     class Meta(CodenerixModel.Meta):
         abstract = True
 
-class GenInventoryLine(CodenerixModel):
+
+class GenInventoryLine(CodenerixModel):  # META: Abstract class
     box = models.ForeignKey(StorageBox, on_delete=models.CASCADE, related_name='storage_%(class)s', verbose_name=_("Box"), null=False, blank=False)
     product_final = models.ForeignKey(ProductFinal, on_delete=models.CASCADE, related_name='storage_%(class)s', null=False, blank=False, verbose_name=_("Product Final"))
     product_unique = models.ForeignKey(ProductUnique, on_delete=models.CASCADE, related_name='storage_%(class)s', null=True, blank=True, verbose_name=_("Product Unique"))
@@ -312,9 +314,10 @@ class InventoryLine(GenInventoryLine):
         limit['file_link'] = Q(inventory__pk=ipk)
         return limit
 
+
 # InventoryIn
 class InventoryIn(GenInventory):
-    provider = models.ForeignKey(Provider, on_delete=models.PROTECT, related_name='inventorys', verbose_name='Provider', blank=False, null=False)
+    provider = models.ForeignKey(Provider, on_delete=models.PROTECT, related_name='inventorys', verbose_name=_('Provider'), blank=False, null=False)
 
     def __fields__(self, info):
         fields = []
@@ -360,7 +363,7 @@ class InventoryInLine(GenInventoryLine):
 
 # InventoryOut
 class InventoryOut(GenInventory):
-    albaran = models.ForeignKey(SalesAlbaran, on_delete=models.PROTECT, related_name='inventorys', verbose_name='Albaran', blank=False, null=False)
+    albaran = models.ForeignKey(SalesAlbaran, on_delete=models.PROTECT, related_name='inventorys', verbose_name=_('Albaran'), blank=False, null=False)
 
     def __fields__(self, info):
         fields = []
