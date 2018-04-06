@@ -36,8 +36,8 @@ from codenerix_products.models import ProductFinal, ProductUnique
 from codenerix_invoicing.models_purchases import PurchasesOrder, PurchasesLineOrder
 from codenerix_invoicing.models_sales import SalesLines
 from codenerix_storages.models import StorageOperator
-from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine
-from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryLineForm, InventoryInForm, InventoryInLineForm, InventoryOutForm, InventoryOutLineForm
+from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine
+from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryLineForm, InventoryInForm, InventoryInLineForm, InventoryOutForm, InventoryOutLineForm, DistributionForm, DistributionLineForm
 
 
 # Inventory
@@ -195,6 +195,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
             }),
             'form_product': form.fields['product_final'].widget.render('product_final', None, {
                 'codenerix-on-enter': 'product_changed(this)',
+                'codenerix-on-tab': 'product_changed(this)',
                 'ng-disabled': '!(box>0 && quantity>0)',
                 'codenerix-focus': 'data.meta.context.final_focus',
                 'ng-class': '{"bg-danger": final_error || data.meta.context.errors.product}',
@@ -202,12 +203,14 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
             }),
             'form_unique': form.fields['product_unique'].widget.render('unique', None, {
                 'codenerix-on-enter': 'unique_changed()',
+                'codenerix-on-tab': 'unique_changed()',
                 'codenerix-focus': 'data.meta.context.unique_focus',
                 'ng-disabled': 'data.meta.context.unique_disabled',
                 'ng-class': '{"bg-info": unique_new, "bg-danger": data.meta.context.errors.unique}',
             }),
             'form_caducity': form.fields['caducity'].widget.render('caducity', None, {
                 'codenerix-on-enter': 'submit_scenario()',
+                'codenerix-on-tab': 'submit_scenario()',
                 'codenerix-focus': 'data.meta.context.caducity_focus',
                 'ng-disabled': 'data.meta.context.caducity_disabled',
                 'ng-class': '{"bg-danger": data.meta.context.errors.caducity}',
@@ -334,6 +337,344 @@ class InventoryLineUniqueFullinfo(View):
         return HttpResponse(json_answer, content_type='application/json')
 
 
+# Distribution List
+class DistributionList(GenList):
+    model = Distribution
+    linkedit = False
+    field_delete = True
+    extra_context = {
+        'menu': ['storage', 'inventoryin'],
+        'bread': [_('Storage'), _('Incoming Stock')],
+    }
+    gentrans = {
+        'getreport': _("Get report"),
+        'doinventory': _("Do inventory"),
+    }
+
+    def dispatch(self, *args, **kwargs):
+        self.client_context = {
+            'url_doinventory': reverse('CDNX_storages_inventoryinline_work', kwargs={"ipk": "__IPK__"}),
+            'url_getreport': reverse('CDNX_storages_inventoryinline_list', kwargs={"ipk": "__IPK__"}),
+        }
+        return super(DistributionList, self).dispatch(*args, **kwargs)
+
+
+class DistributionCreate(GenCreate):
+    model = Distribution
+    form_class = DistributionForm
+
+
+class DistributionCreateModal(GenCreateModal, DistributionCreate):
+    pass
+
+
+class DistributionUpdate(GenUpdate):
+    model = Distribution
+    form_class = DistributionForm
+
+
+class DistributionUpdateModal(GenUpdateModal, DistributionUpdate):
+    pass
+
+
+class DistributionDelete(GenDelete):
+    model = Distribution
+
+
+class DistributionDetail(GenDetail):
+    model = Distribution
+    groups = DistributionForm.__groups_details__()
+
+
+# Distribution List Line
+class DistributionLineList(GenList):
+    model = DistributionLine
+    extra_context = {'menu': ['storage', 'storage'], 'bread': [_('DistributionLine'), _('DistributionLine')]}
+    defaultordering = "-created"
+
+    def dispatch(self, *args, **kwargs):
+        self.ws_entry_point = reverse('CDNX_storages_inventoryinline_list', kwargs={"ipk": kwargs.get('ipk')})[1:]
+        return super(DistributionLineList, self).dispatch(*args, **kwargs)
+
+    def __limitQ__(self, info):
+        limit = {}
+        limit['file_link'] = Q(inventory__pk=info.kwargs.get('ipk'))
+        return limit
+
+
+class DistributionLineWork(GenList):
+    model = DistributionLine
+    extra_context = {
+        'menu': ['storage', 'inventoryin'],
+        'bread': [_('Storage'), _('Incoming Stock')],
+    }
+    defaultordering = "-created"
+    static_partial_header = 'codenerix_storages/inventoryin_work_header.html'
+    static_partial_row = 'codenerix_storages/inventoryin_work_row'
+    static_app_row = 'codenerix_storages/inventoryin_work_app.js'
+    static_controllers_row = 'codenerix_storages/inventoryin_work_controllers.js'
+    linkedit = False
+    linkadd = False
+    default_ordering = '-created'
+    gentrans = {
+        'new': _('Unique product is new!'),
+        'notfound': _('Product not found!'),
+        'removerecord': _('Are you sure you want to remove "<name>"?'),
+        'albaranar': _("Albaranar"),
+    }
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('purchasesorder', _("Purchase Order")))
+        fields.append(('purchasesorder__pk', None))
+        fields.append(('box', _("Box")))
+        fields.append(('quantity', _("Quantity")))
+        fields.append(('product_final', _("Product")))
+        fields.append(('product_final__pk', None))
+        fields.append(('product_unique', _("Unique")))
+        fields.append(('caducity', _("Caducity")))
+        fields.append(('product_unique_value', None))
+        return fields
+
+    def dispatch(self, *args, **kwargs):
+        # Get constants
+        self.ipk = kwargs.get('ipk')
+        self.ws_entry_point = reverse('CDNX_storages_inventoryinline_work', kwargs={"ipk": self.ipk})[1:]
+        self.ws_ean13_fullinfo = reverse('CDNX_storages_inventoryinline_ean13_fullinfo', kwargs={"ean13": 'PRODUCT_FINAL_EAN13'})[1:]
+        self.ws_unique_fullinfo = reverse('CDNX_storages_inventoryinline_unique_fullinfo', kwargs={"unique": 'PRODUCT_FINAL_UNIQUE'})[1:]
+        self.ws_submit = reverse('CDNX_storages_inventoryinline_addws', kwargs={"ipk": self.ipk})[1:]
+        self.ws_inventoryinline_purchasesorder = reverse('CDNX_storages_inventoryinline_purchase_order', kwargs={"inventoryinline_pk": 1, "purchasesorder_pk": 1})[1:]
+
+        # Find provider_pk
+        inv = Distribution.objects.filter(pk=self.ipk).first()
+        if inv:
+            provider_pk = inv.provider.pk
+        else:
+            provider_pk = None
+
+        # Prepare form
+        fields = []
+        fields.append((DynamicSelect, 'purchasesorder', 3, 'CDNX_invoicing_orderpurchasess_foreign', ['provider:{}'.format(provider_pk)], {
+            'ng-change': 'order_change($externalScope.row.pk, $externalScope.purchasesorder)',
+            'placeholder': '{{{{row.purchasesorder|default:"{}"}}}}'.format(_("Press * or start typing")),
+            'ng-placeholder': '(row.purchasesorder || \'{}\')'.format(_("Press * or start typing")),
+        }))
+        fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign', [], {}))
+        fields.append((DynamicInput, 'product_final', 3, 'CDNX_products_productfinalsean13_foreign', [], {}))
+        fields.append((DynamicInput, 'product_unique', 3,  'CDNX_products_productuniquescode_foreign', ['product_final'], {}))
+        form = DistributionLineForm()
+        for (widget, key, minchars, url, autofill, newattrs) in fields:
+            wattrs = form.fields[key].widget.attrs
+            wattrs.update(newattrs)
+            form.fields[key].widget = widget(wattrs)
+            form.fields[key].widget.form_name = form.form_name
+            form.fields[key].widget.field_name = key
+            form.fields[key].widget.autofill_deepness = minchars
+            form.fields[key].widget.autofill_url = url
+            form.fields[key].widget.autofill = autofill
+
+        # Prepare context
+        self.client_context = {
+            'ipk': self.ipk,
+            'final_focus': True,
+            'unique_focus': False,
+            'unique_disabled': True,
+            'caducity_focus': True,
+            'caducity_disabled': True,
+            'errors': {
+                'zone': None,
+                'quantity': None,
+                'product': None,
+                'unique': None,
+                'caducity': None,
+            },
+            'ws': {
+                'ean13_fullinfo': self.ws_ean13_fullinfo,
+                'unique_fullinfo': self.ws_unique_fullinfo,
+                'submit': self.ws_submit,
+                'inventoryinline_purchasesorder': self.ws_inventoryinline_purchasesorder,
+            },
+            'form_order': form.fields['purchasesorder'].widget.render('purchasesorder', None, {
+                'ng-class': '{"bg-danger": data.meta.context.errors.order}',
+            }),
+            'form_order_row': form.fields['purchasesorder'].widget.render('purchasesorder', None, {
+                'ng-class': '{"bg-danger": data.meta.context.errors.order_row}',
+            }),
+            'form_zone': form.fields['box'].widget.render('box', None, {
+                'ng-class': '{"bg-danger": data.meta.context.errors.zone}',
+            }),
+            'form_quantity': form.fields['quantity'].widget.render('quantity', None, {
+                'ng-init': 'quantity=1.0',
+                'ng-class': '{"bg-danger": data.meta.context.errors.quantity}',
+            }),
+            'form_product': form.fields['product_final'].widget.render('product_final', None, {
+                'codenerix-on-enter': 'product_changed(this)',
+                'codenerix-on-tab': 'product_changed(this)',
+                'ng-disabled': '!(box>0 && quantity>0)',
+                'codenerix-focus': 'data.meta.context.final_focus',
+                'ng-class': '{"bg-danger": final_error || data.meta.context.errors.product}',
+                'autofocus': '',
+            }),
+            'form_unique': form.fields['product_unique'].widget.render('unique', None, {
+                'codenerix-on-enter': 'unique_changed()',
+                'codenerix-on-tab': 'unique_changed()',
+                'codenerix-focus': 'data.meta.context.unique_focus',
+                'ng-disabled': 'data.meta.context.unique_disabled',
+                'ng-class': '{"bg-danger": data.meta.context.errors.unique || unique_error}',
+            })+" <span class='fa fa-exclamation-triangle text-danger' ng-show='unique_error' alt='{{unique_error}}' title='{{unique_error}}'></span>",
+            'form_caducity': form.fields['caducity'].widget.render('caducity', None, {
+                'codenerix-on-enter': 'submit_scenario()',
+                'codenerix-on-tab': 'submit_scenario()',
+                'codenerix-focus': 'data.meta.context.caducity_focus',
+                'ng-disabled': 'data.meta.context.caducity_disabled',
+                'ng-class': '{"bg-danger": data.meta.context.errors.caducity}',
+                'placeholder': 'dd/mm/aaaa',
+            }),
+        }
+        return super(DistributionLineWork, self).dispatch(*args, **kwargs)
+
+    def __limitQ__(self, info):
+        limit = {}
+        limit['file_link'] = Q(inventory__pk=info.kwargs.get('ipk'))
+        return limit
+
+    def json_builder(self, answer, context):
+
+        # Get the list of purhasesorders for this inventory
+        qs = self.get_queryset(raw_query=True)
+        temp = list(set(qs.values_list('purchasesorder')))
+        purchasesorders = []
+        for ele in temp:
+            if ele[0] is not None:
+                purchasesorders.append(ele[0])
+
+        # List of registered products and quantity
+        registered = self.bodybuilder(context['object_list'], self.autorules())
+        # raise IOError(registered)
+
+        # Get purchases (requested products)
+        requested = PurchasesLineOrder.objects.filter(order__pk__in=purchasesorders).values("order", "product",  "product__code", "product__ean13").annotate(total=Sum("quantity"))
+        # raise IOError(requested)
+
+        # Get already purchased products
+        alreadyin = ProductUnique.objects.filter(line_albaran_purchases__line_order__order__pk__in=purchasesorders).values('product_final').annotate(total=Sum('stock_original'))
+
+        # Recalculate quantity of requested products
+        for r in requested:
+            for i in alreadyin:
+                if i['product_final'] == r['product']:
+                    r['total'] -= i['total']
+                    break
+
+        # Process registered products
+        body_registered = []
+        for g in registered:
+            # It is not a virtual line
+            g['virtual'] = False
+            # Copy quantity
+            g['missing'] = float(g['quantity'])
+            if g['purchasesorder__pk']:
+
+                for r in requested:
+                    if r['order'] and (r['product'] == int(g['product_final__pk'])) and (r['order'] == int(g['purchasesorder__pk'])):
+                        if r['total'] > g['missing']:
+                            r['total'] -= g['missing']
+                            g['missing'] = 0.0
+                        else:
+                            g['missing'] -= r['total']
+                            r['total'] = 0.0
+
+            # Add a new token
+            body_registered.append(g)
+
+        # Process unregistered products
+        body_requested = []
+        readytosubmit = True
+        for r in requested:
+            # If still left
+            if r['total'] > 0:
+                token = {
+                    'caducity': None,
+                    'purchasesorder': None,
+                    'product_unique_value': None,
+                    'product_final': '{} ({})'.format(r['product__code'], r['product__ean13']),
+                    'product_final__pk': None,
+                    'product_unique': None,
+                    'pk': None,
+                    'quantity': r['total'],
+                    'box': None,
+                    'total': None,
+                    'virtual': True,
+                }
+                readytosubmit = False
+
+                # Add a new token
+                body_requested.append(token)
+
+        # Return answer
+        answer['meta']['readytosubmit'] = readytosubmit
+        answer['table']['body'] = body_requested + body_registered
+        return answer
+
+
+class DistributionLineCreate(GenCreate):
+    model = DistributionLine
+    form_class = DistributionLineForm
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        self.__ipk = kwargs.get('ipk', None)
+        return super(DistributionLineCreate, self).dispatch(*args, **kwargs)
+
+    def form_valid(self, form):
+        if self.__ipk:
+            inventory = Distribution.objects.get(pk=self.__ipk)
+            operator = StorageOperator.objects.get(external__user=self.request.user)
+            self.request.inventory = inventory
+            form.instance.inventory = inventory
+            self.request.operator = operator
+            form.instance.operator = operator
+        return super(DistributionLineCreate, self).form_valid(form)
+
+
+class DistributionLineCreateModal(GenCreateModal, DistributionLineCreate):
+    pass
+
+
+class DistributionLineCreateWS(DistributionLineCreate):
+    json = True
+
+    def form_valid(self, form):
+        form.instance.product_unique_value = self.request.POST.get('product_unique_value', None)
+        return super(DistributionLineCreateWS, self).form_valid(form)
+
+
+class DistributionLineUpdate(GenUpdate):
+    model = DistributionLine
+    form_class = DistributionLineForm
+
+    def dispatch(self, *args, **kwargs):
+        self.ipk = kwargs.get('ipk')
+        return super(DistributionLineUpdate, self).dispatch(*args, **kwargs)
+
+
+class DistributionLineUpdateModal(GenUpdateModal, DistributionLineUpdate):
+    pass
+
+
+class DistributionLineDelete(GenDelete):
+    model = DistributionLine
+
+
+class DistributionLineDetail(GenDetail):
+    model = DistributionLine
+    groups = DistributionLineForm.__groups_details__()
+
+    def dispatch(self, *args, **kwargs):
+        self.ipk = kwargs.get('ipk')
+        return super(DistributionLineDetail, self).dispatch(*args, **kwargs)
+
+
 # Inventory Incoming Stock
 class GenInventoryInUrl(object):
     ws_entry_point = '{}/inventoryin'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
@@ -402,9 +743,9 @@ class InventoryInAlbaranar(View):
         # Check answer
         if inventory:
             # Create Albaran
-            pa = PurchasesAlbaran()
-            pa.code
-            pa.date = datetime.datetime.now()
+            # pa = PurchasesAlbaran()
+            # pa.code
+            # pa.date = datetime.datetime.now()
             # For each line in inventory
             for line in inventory.inventory_lines.all():
                 # Create Unique Product
@@ -547,6 +888,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
             }),
             'form_product': form.fields['product_final'].widget.render('product_final', None, {
                 'codenerix-on-enter': 'product_changed(this)',
+                'codenerix-on-tab': 'product_changed(this)',
                 'ng-disabled': '!(box>0 && quantity>0)',
                 'codenerix-focus': 'data.meta.context.final_focus',
                 'ng-class': '{"bg-danger": final_error || data.meta.context.errors.product}',
@@ -554,12 +896,14 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
             }),
             'form_unique': form.fields['product_unique'].widget.render('unique', None, {
                 'codenerix-on-enter': 'unique_changed()',
+                'codenerix-on-tab': 'unique_changed()',
                 'codenerix-focus': 'data.meta.context.unique_focus',
                 'ng-disabled': 'data.meta.context.unique_disabled',
                 'ng-class': '{"bg-danger": data.meta.context.errors.unique || unique_error}',
             })+" <span class='fa fa-exclamation-triangle text-danger' ng-show='unique_error' alt='{{unique_error}}' title='{{unique_error}}'></span>",
             'form_caducity': form.fields['caducity'].widget.render('caducity', None, {
                 'codenerix-on-enter': 'submit_scenario()',
+                'codenerix-on-tab': 'submit_scenario()',
                 'codenerix-focus': 'data.meta.context.caducity_focus',
                 'ng-disabled': 'data.meta.context.caducity_disabled',
                 'ng-class': '{"bg-danger": data.meta.context.errors.caducity}',
@@ -962,6 +1306,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
             }),
             'form_product': form.fields['product_final'].widget.render('product_final', None, {
                 'codenerix-on-enter': 'product_changed(this)',
+                'codenerix-on-tab': 'product_changed(this)',
                 'ng-disabled': '!(box>0 && quantity>0)',
                 'codenerix-focus': 'data.meta.context.final_focus',
                 'ng-class': '{"bg-danger": final_error || data.meta.context.errors.product}',
@@ -969,6 +1314,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
             }),
             'form_unique': form.fields['product_unique'].widget.render('unique', None, {
                 'codenerix-on-enter': 'unique_changed()',
+                'codenerix-on-tab': 'unique_changed()',
                 'codenerix-focus': 'data.meta.context.unique_focus',
                 'ng-disabled': 'data.meta.context.unique_disabled',
                 'ng-class': '{"bg-danger": data.meta.context.errors.unique || unique_error}',

@@ -23,6 +23,9 @@ from django.conf.urls import url
 from codenerix_storages.views_stockcontrol import InventoryList, InventoryCreate, InventoryCreateModal, InventoryUpdate, InventoryUpdateModal, InventoryDelete, InventoryDetail, InventorySetStock
 from codenerix_storages.views_stockcontrol import InventoryLineList, InventoryLineWork, InventoryLineCreate, InventoryLineCreateWS, InventoryLineCreateModal, InventoryLineUpdate, InventoryLineUpdateModal, InventoryLineDelete, InventoryLineDetail, InventoryLineEAN13Fullinfo, InventoryLineUniqueFullinfo
 
+from codenerix_storages.views_stockcontrol import DistributionList, DistributionCreate, DistributionCreateModal, DistributionDelete
+from codenerix_storages.views_stockcontrol import DistributionLineList, DistributionLineWork, DistributionLineCreate, DistributionLineCreateWS, DistributionLineCreateModal, DistributionLineUpdate, DistributionLineUpdateModal, DistributionLineDelete, DistributionLineDetail
+
 from codenerix_storages.views_stockcontrol import InventoryInList, InventoryInCreate, InventoryInCreateModal, InventoryInDelete, InventoryInAlbaranar
 from codenerix_storages.views_stockcontrol import InventoryInLineList, InventoryInLineWork, InventoryInLineCreate, InventoryInLineCreateWS, InventoryInLineCreateModal, InventoryInLineUpdate, InventoryInLineUpdateModal, InventoryInLineDelete, InventoryInLineDetail, InventoryInLineEAN13Fullinfo, InventoryInLineUniqueFullinfo, InventoryInLinePurhcaseOrder
 
@@ -51,6 +54,26 @@ urlpatterns = [
     url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/delete$', InventoryLineDelete.as_view(), name='CDNX_storages_inventoryline_delete'),
     url(r'^inventorylineean13/(?P<ean13>[a-zA-Z0-9+-_/]+)/fullinfo$', InventoryLineEAN13Fullinfo.as_view(), name='CDNX_storages_inventoryline_ean13_fullinfo'),
     url(r'^inventorylineunique/(?P<unique>[a-zA-Z0-9+-_/]+)/fullinfo$', InventoryLineUniqueFullinfo.as_view(), name='CDNX_storages_inventoryline_unique_fullinfo'),
+
+    url(r'^distribution$', DistributionList.as_view(), name='CDNX_storages_distribution_list'),
+    url(r'^distribution/add$', DistributionCreate.as_view(), name='CDNX_storages_distribution_add'),
+    url(r'^distribution/addmodal$', DistributionCreateModal.as_view(), name='CDNX_storages_distribution_addmodal'),
+    # url(r'^distribution/(?P<pk>\w+)$', DistributionDetail.as_view(), name='CDNX_storages_distribution_details'),
+    # url(r'^distribution/(?P<pk>\w+)/edit$', DistributionUpdate.as_view(), name='CDNX_storages_distribution_edit'),
+    # url(r'^distribution/(?P<pk>\w+)/editmodal$', DistributionUpdateModal.as_view(), name='CDNX_storages_distribution_editmodal'),
+    url(r'^distribution/(?P<pk>\w+)/delete$', DistributionDelete.as_view(), name='CDNX_storages_distribution_delete'),
+
+    url(r'^distributionline/(?P<ipk>\w+)$', DistributionLineList.as_view(), name='CDNX_storages_distributionline_list'),
+    url(r'^distributionline/(?P<ipk>\w+)/work$', DistributionLineWork.as_view(), name='CDNX_storages_distributionline_work'),
+    url(r'^distributionline/(?P<ipk>\w+)/work/(?P<pk>\w+)/delete$', DistributionLineDelete.as_view(), name='CDNX_storages_distributionline_work_delete'),
+    url(r'^distributionline/(?P<ipk>\w+)/add$', DistributionLineCreate.as_view(), name='CDNX_storages_distributionline_add'),
+    url(r'^distributionline/(?P<ipk>\w+)/addws$', DistributionLineCreateWS.as_view(), name='CDNX_storages_distributionline_addws'),
+    url(r'^distributionline/(?P<ipk>\w+)/addmodal$', DistributionLineCreateModal.as_view(), name='CDNX_storages_distributionline_addmodal'),
+    url(r'^distributionline/(?P<ipk>\w+)/(?P<pk>\w+)$', DistributionLineDetail.as_view(), name='CDNX_storages_distributionline_details'),
+    url(r'^distributionline/(?P<ipk>\w+)/(?P<pk>\w+)/edit$', DistributionLineUpdate.as_view(), name='CDNX_storages_distributionline_edit'),
+    url(r'^distributionline/(?P<ipk>\w+)/(?P<pk>\w+)/editmodal$', DistributionLineUpdateModal.as_view(), name='CDNX_storages_distributionline_editmodal'),
+    url(r'^distributionline/(?P<ipk>\w+)/(?P<pk>\w+)/delete$', DistributionLineDelete.as_view(), name='CDNX_storages_distributionline_delete'),
+
 
     url(r'^inventoryin$', InventoryInList.as_view(), name='CDNX_storages_inventoryin_list'),
     url(r'^inventoryin/add$', InventoryInCreate.as_view(), name='CDNX_storages_inventoryin_add'),

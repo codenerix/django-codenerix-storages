@@ -21,7 +21,7 @@
 # from django.utils.translation import ugettext_lazy as _
 
 from codenerix.forms import GenModelForm
-from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine
+from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine
 
 
 class InventoryForm(GenModelForm):
@@ -53,6 +53,46 @@ class InventoryLineForm(GenModelForm):
     class Meta:
         model = InventoryLine
         exclude = ['inventory', 'operator']
+
+    def __groups__(self):
+        g = []
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = []
+        return g
+
+
+class DistributionForm(GenModelForm):
+
+    class Meta:
+        model = Distribution
+        exclude = ['end']
+
+    def __groups__(self):
+        g = []
+        # (
+        #     _('Details'), 12,
+        #     ['name', 6],
+        # ),
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = []
+        # (
+        #    _('Details'), 12,
+        #    ['name', 6],
+        # ),
+        return g
+
+
+class DistributionLineForm(GenModelForm):
+
+    class Meta:
+        model = DistributionLine
+        exclude = ['distribution']
 
     def __groups__(self):
         g = []
