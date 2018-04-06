@@ -1270,7 +1270,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
         fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign', [], {}))
         fields.append((DynamicInput, 'product_final', 3, 'CDNX_products_productfinalsean13_foreign', [], {}))
         fields.append((DynamicInput, 'product_unique', 3,  'CDNX_products_productuniquescode_foreign', ['product_final'], {}))
-        form = InventoryInLineForm()
+        form = InventoryOutLineForm()
         for (widget, key, minchars, url, autofill, newattrs) in fields:
             wattrs = form.fields[key].widget.attrs
             wattrs.update(newattrs)
