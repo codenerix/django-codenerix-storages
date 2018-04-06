@@ -28,6 +28,7 @@ from django.http import HttpResponse
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.forms.utils import ErrorList
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail
 from codenerix.widgets import DynamicInput, DynamicSelect
@@ -1403,12 +1404,30 @@ class InventoryOutLineCreate(GenInventoryOutLineUrl, GenCreate):
 
     def form_valid(self, form):
         if self.__ipk:
-            inventory = InventoryOut.objects.get(pk=self.__ipk)
-            operator = StorageOperator.objects.get(external__user=self.request.user)
-            self.request.inventory = inventory
-            form.instance.inventory = inventory
-            self.request.operator = operator
-            form.instance.operator = operator
+            unique_products = ProductUnique.objects.filter(
+                product_final=form.instance.product_final,
+                value=form.instance.product_unique_value
+            )
+            if unique_products.exists() is False:
+                # product unique not exixsts
+                errors = form._errors.setdefault("value", ErrorList())
+                errors.append(_('Product unique not exists'))
+                return super(InventoryOutLineCreate, self).form_invalid(form)
+            else:
+                unique_product = unique_products.filter(stock_locked__lt=form.instance.quantity).first()
+                if unique_product is None:
+                    # quantity error
+                    errors = form._errors.setdefault("value", ErrorList())
+                    errors.append(_('Quantity invalid'))
+                    return super(InventoryOutLineCreate, self).form_invalid(form)
+                else:
+                    raise Exception(unique_product)
+                    inventory = InventoryOut.objects.get(pk=self.__ipk)
+                    operator = StorageOperator.objects.get(external__user=self.request.user)
+                    self.request.inventory = inventory
+                    form.instance.inventory = inventory
+                    self.request.operator = operator
+                    form.instance.operator = operator
         return super(InventoryOutLineCreate, self).form_valid(form)
 
 

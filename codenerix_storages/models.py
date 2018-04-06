@@ -202,7 +202,7 @@ class StorageOperator(GenRole, CodenerixModel):
 
 
 # puente entre los datos del almacen y 'person'
-class GenStorageOperator(GenInterface, ABSTRACT_GenStorageOperator):
+class GenStorageOperator(GenInterface, ABSTRACT_GenStorageOperator):  # META: Abstract class
     storage_operator = models.OneToOneField(StorageOperator, related_name='external', verbose_name=_("Storage operator"), null=True, on_delete=models.SET_NULL, blank=True)
 
     class Meta(GenInterface.Meta, ABSTRACT_GenStorageOperator.Meta):
