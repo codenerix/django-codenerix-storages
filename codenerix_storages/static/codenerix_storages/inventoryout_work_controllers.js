@@ -170,7 +170,7 @@ angular.module('codenerixSTORAGESControllers', [])
             $http.post( url, data, {} )
             .success(function(answer, stat) {
                 angular.forEach($scope.data.meta.context.errors, function (value, key) {
-                    $scope.data.meta.context.errors[key] = null;
+                    $scope.data.meta.context.errors[key] = "";
                 });
                 if (stat==200 || stat ==202) {
                     if ((typeof(answer['head'])!='undefined') && (typeof(answer['head']['errors'])!='undefined')) {

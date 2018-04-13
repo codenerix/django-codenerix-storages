@@ -1404,30 +1404,35 @@ class InventoryOutLineCreate(GenInventoryOutLineUrl, GenCreate):
 
     def form_valid(self, form):
         if self.__ipk:
-            unique_products = ProductUnique.objects.filter(
-                product_final=form.instance.product_final,
-                value=form.instance.product_unique_value
-            )
+
+            # If products must be unique, make sure we get only the unique selected
+            filters = {'product_final': form.instance.product_final}
+            if form.instance.product_final.product.feature_special and form.instance.product_final.product.feature_special.unique:
+                filters['value'] = form.instance.product_unique_value
+            unique_products = ProductUnique.objects.filter(**filters)
+
+            # If no uniques found
             if unique_products.exists() is False:
                 # product unique not exixsts
-                errors = form._errors.setdefault("value", ErrorList())
-                errors.append(_('Product unique not exists'))
+                errors = form._errors.setdefault("unique", ErrorList())
+                errors.append(_('Product uniques not found'))
                 return super(InventoryOutLineCreate, self).form_invalid(form)
             else:
                 unique_product = unique_products.filter(stock_locked__lt=form.instance.quantity).first()
                 if unique_product is None:
                     # quantity error
-                    errors = form._errors.setdefault("value", ErrorList())
+                    errors = form._errors.setdefault("quantity", ErrorList())
                     errors.append(_('Quantity invalid'))
                     return super(InventoryOutLineCreate, self).form_invalid(form)
                 else:
-                    raise Exception(unique_product)
                     inventory = InventoryOut.objects.get(pk=self.__ipk)
                     operator = StorageOperator.objects.get(external__user=self.request.user)
                     self.request.inventory = inventory
                     form.instance.inventory = inventory
                     self.request.operator = operator
                     form.instance.operator = operator
+
+        # Return as usually
         return super(InventoryOutLineCreate, self).form_valid(form)
 
 
