@@ -198,5 +198,36 @@ angular.module('codenerixSTORAGESControllers', [])
                 }
             });
         };
+
+        $scope.setnotes = function() {
+            var url = "/" + $scope.data.meta.context.ws.inventoryout_notesmodal;
+            $scope.ws= url;
+
+            var functions = function(scope) {};
+            var callback = function(scope, answer) {
+                $scope.refresh();
+            };
+
+            $scope.cb_window = openmodal($scope, $timeout, $uibModal, 'lg', functions, callback);
+
+        };
+
+
+        $scope.setlinenotes = function(row_pk) {
+            if (row_pk) {
+                var url = $scope.data.meta.context.ws.inventoryoutline_notesmodal;
+                url = "/" + url.replace("/INVENTORYLINE_PK/", "/"+row_pk+"/");
+                $scope.ws=url;
+
+                var functions = function(scope) {};
+                var callback = function(scope, answer) {
+                    $scope.refresh();
+                };
+
+                $scope.cb_window = openmodal($scope, $timeout, $uibModal, 'lg', functions, callback);
+            }
+
+        };
+
     }
 ]);

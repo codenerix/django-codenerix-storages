@@ -20,6 +20,8 @@
 
 # from django.utils.translation import ugettext_lazy as _
 
+from django.utils.translation import ugettext as _
+
 from codenerix.forms import GenModelForm
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine
 
@@ -48,6 +50,26 @@ class InventoryForm(GenModelForm):
         return g
 
 
+class InventoryNotesForm(GenModelForm):
+
+    class Meta:
+        model = Inventory
+        fields = ['notes']
+
+    def __groups__(self):
+        g = [(
+            _('Notes'), 12,
+            ['notes', 12],
+         ),
+        ]
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = []
+        return g
+
+
 class InventoryLineForm(GenModelForm):
 
     class Meta:
@@ -56,6 +78,26 @@ class InventoryLineForm(GenModelForm):
 
     def __groups__(self):
         g = []
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = []
+        return g
+
+
+class InventoryLineNotesForm(GenModelForm):
+
+    class Meta:
+        model = InventoryLine
+        fields = ['notes']
+
+    def __groups__(self):
+        g = [(
+            _('Notes'), 12,
+            ['notes', 12],
+         ),
+        ]
         return g
 
     @staticmethod
@@ -128,6 +170,26 @@ class InventoryInForm(GenModelForm):
         return g
 
 
+class InventoryInNotesForm(GenModelForm):
+
+    class Meta:
+        model = InventoryIn
+        fields = ['notes']
+
+    def __groups__(self):
+        g = [(
+            _('Notes'), 12,
+            ['notes', 12],
+         ),
+        ]
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = []
+        return g
+
+
 class InventoryInLineForm(GenModelForm):
 
     class Meta:
@@ -136,6 +198,26 @@ class InventoryInLineForm(GenModelForm):
 
     def __groups__(self):
         g = []
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = []
+        return g
+
+
+class InventoryInLineNotesForm(GenModelForm):
+
+    class Meta:
+        model = InventoryInLine
+        fields = ['notes']
+
+    def __groups__(self):
+        g = [(
+            _('Notes'), 12,
+            ['notes', 12],
+         ),
+        ]
         return g
 
     @staticmethod
@@ -168,6 +250,26 @@ class InventoryOutForm(GenModelForm):
         return g
 
 
+class InventoryOutNotesForm(GenModelForm):
+
+    class Meta:
+        model = InventoryOut
+        fields = ['notes']
+
+    def __groups__(self):
+        g = [(
+            _('Notes'), 12,
+            ['notes', 12],
+         ),
+        ]
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = []
+        return g
+
+
 class InventoryOutLineForm(GenModelForm):
 
     class Meta:
@@ -176,6 +278,26 @@ class InventoryOutLineForm(GenModelForm):
 
     def __groups__(self):
         g = []
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = []
+        return g
+
+
+class InventoryOutLineNotesForm(GenModelForm):
+
+    class Meta:
+        model = InventoryOutLine
+        fields = ['notes']
+
+    def __groups__(self):
+        g = [(
+            _('Notes'), 12,
+            ['notes', 12],
+         ),
+        ]
         return g
 
     @staticmethod

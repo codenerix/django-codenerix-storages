@@ -38,7 +38,7 @@ from codenerix_invoicing.models_purchases import PurchasesOrder, PurchasesLineOr
 from codenerix_invoicing.models_sales import SalesLines
 from codenerix_storages.models import StorageOperator
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine
-from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryLineForm, InventoryInForm, InventoryInLineForm, InventoryOutForm, InventoryOutLineForm, DistributionForm, DistributionLineForm
+from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryNotesForm, InventoryLineForm, InventoryLineNotesForm, InventoryInForm, InventoryInNotesForm, InventoryInLineForm, InventoryInLineNotesForm, InventoryOutForm, InventoryOutNotesForm, InventoryOutLineForm, InventoryOutLineNotesForm, DistributionForm, DistributionLineForm
 
 
 # Inventory
@@ -80,6 +80,16 @@ class InventoryUpdate(GenInventoryUrl, GenUpdate):
 
 
 class InventoryUpdateModal(GenUpdateModal, InventoryUpdate):
+    pass
+
+
+class InventoryNotes(GenInventoryUrl, GenUpdate):
+    model = Inventory
+    form_class = InventoryNotesForm
+    linkdelete = False
+
+
+class InventoryNotesModal(GenUpdateModal, InventoryNotes):
     pass
 
 
@@ -132,6 +142,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         'new': _('Unique product is new!'),
         'notfound': _('Product not found!'),
         'removerecord': _('Are you sure you want to remove "<name>"?'),
+        'inventariar': _("Inventariar"),
     }
 
     def __fields__(self, info):
@@ -140,8 +151,9 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         fields.append(('quantity', _("Quantity")))
         fields.append(('product_final', _("Product")))
         fields.append(('product_unique', _("Unique")))
-        fields.append(('caducity', _("Caducity")))
         fields.append(('product_unique_value', None))
+        fields.append(('caducity', _("Caducity")))
+        fields.append(('notes', _("Notes")))
         return fields
 
     def dispatch(self, *args, **kwargs):
@@ -151,6 +163,11 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         self.ws_ean13_fullinfo = reverse('CDNX_storages_inventoryline_ean13_fullinfo', kwargs={"ean13": 'PRODUCT_FINAL_EAN13'})[1:]
         self.ws_unique_fullinfo = reverse('CDNX_storages_inventoryline_unique_fullinfo', kwargs={"unique": 'PRODUCT_FINAL_UNIQUE'})[1:]
         self.ws_submit = reverse('CDNX_storages_inventoryline_addws', kwargs={"ipk": self.ipk})[1:]
+        self.ws_inventory_notesmodal = reverse('CDNX_storages_inventory_notesmodal', kwargs={"pk": self.ipk})[1:]
+        self.ws_inventoryline_notesmodal = reverse('CDNX_storages_inventoryline_notesmodal', kwargs={"pk": 'INVENTORYLINE_PK'})[1:]
+
+        # Find provider_pk
+        inv = Inventory.objects.filter(pk=self.ipk).first()
 
         # Prepare form
         fields = []
@@ -170,6 +187,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         # Prepare context
         self.client_context = {
             'ipk': self.ipk,
+            'notes': inv.notes,
             'final_focus': True,
             'unique_focus': False,
             'unique_disabled': True,
@@ -186,6 +204,8 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
                 'ean13_fullinfo': self.ws_ean13_fullinfo,
                 'unique_fullinfo': self.ws_unique_fullinfo,
                 'submit': self.ws_submit,
+                'inventory_notesmodal': self.ws_inventory_notesmodal,
+                'inventoryline_notesmodal': self.ws_inventoryline_notesmodal,
             },
             'form_zone': form.fields['box'].widget.render('box', None, {
                 'ng-class': '{"bg-danger": data.meta.context.errors.zone}',
@@ -268,6 +288,16 @@ class InventoryLineUpdate(GenInventoryLineUrl, GenUpdate):
 
 
 class InventoryLineUpdateModal(GenUpdateModal, InventoryLineUpdate):
+    pass
+
+
+class InventoryLineNotes(GenInventoryLineUrl, GenUpdate):
+    model = InventoryLine
+    form_class = InventoryLineNotesForm
+    linkdelete = False
+
+
+class InventoryLineNotesModal(GenUpdateModal, InventoryLineNotes):
     pass
 
 
@@ -590,7 +620,7 @@ class DistributionLineWork(GenList):
 
         # Process unregistered products
         body_requested = []
-        readytosubmit = True
+        alldone = True
         for r in requested:
             # If still left
             if r['total'] > 0:
@@ -607,13 +637,13 @@ class DistributionLineWork(GenList):
                     'total': None,
                     'virtual': True,
                 }
-                readytosubmit = False
+                alldone = False
 
                 # Add a new token
                 body_requested.append(token)
 
         # Return answer
-        answer['meta']['readytosubmit'] = readytosubmit
+        answer['meta']['alldone'] = alldone
         answer['table']['body'] = body_requested + body_registered
         return answer
 
@@ -720,6 +750,16 @@ class InventoryInUpdateModal(GenUpdateModal, InventoryInUpdate):
     pass
 
 
+class InventoryInNotes(GenInventoryInUrl, GenUpdate):
+    model = InventoryIn
+    form_class = InventoryInNotesForm
+    linkdelete = False
+
+
+class InventoryInNotesModal(GenUpdateModal, InventoryInNotes):
+    pass
+
+
 class InventoryInDelete(GenInventoryInUrl, GenDelete):
     model = InventoryIn
 
@@ -812,8 +852,9 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
         fields.append(('product_final', _("Product")))
         fields.append(('product_final__pk', None))
         fields.append(('product_unique', _("Unique")))
-        fields.append(('caducity', _("Caducity")))
         fields.append(('product_unique_value', None))
+        fields.append(('caducity', _("Caducity")))
+        fields.append(('notes', _("Notes")))
         return fields
 
     def dispatch(self, *args, **kwargs):
@@ -824,6 +865,8 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
         self.ws_unique_fullinfo = reverse('CDNX_storages_inventoryinline_unique_fullinfo', kwargs={"unique": 'PRODUCT_FINAL_UNIQUE'})[1:]
         self.ws_submit = reverse('CDNX_storages_inventoryinline_addws', kwargs={"ipk": self.ipk})[1:]
         self.ws_inventoryinline_purchasesorder = reverse('CDNX_storages_inventoryinline_purchase_order', kwargs={"inventoryinline_pk": 1, "purchasesorder_pk": 1})[1:]
+        self.ws_inventoryin_notesmodal = reverse('CDNX_storages_inventoryin_notesmodal', kwargs={"pk": self.ipk})[1:]
+        self.ws_inventoryinline_notesmodal = reverse('CDNX_storages_inventoryinline_notesmodal', kwargs={"pk": 'INVENTORYLINE_PK'})[1:]
 
         # Find provider_pk
         inv = InventoryIn.objects.filter(pk=self.ipk).first()
@@ -856,6 +899,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
         # Prepare context
         self.client_context = {
             'ipk': self.ipk,
+            'notes': inv.notes,
             'final_focus': True,
             'unique_focus': False,
             'unique_disabled': True,
@@ -873,6 +917,8 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
                 'unique_fullinfo': self.ws_unique_fullinfo,
                 'submit': self.ws_submit,
                 'inventoryinline_purchasesorder': self.ws_inventoryinline_purchasesorder,
+                'inventoryin_notesmodal': self.ws_inventoryin_notesmodal,
+                'inventoryinline_notesmodal': self.ws_inventoryinline_notesmodal,
             },
             'form_order': form.fields['purchasesorder'].widget.render('purchasesorder', None, {
                 'ng-class': '{"bg-danger": data.meta.context.errors.order}',
@@ -969,7 +1015,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
 
         # Process unregistered products
         body_requested = []
-        readytosubmit = True
+        alldone = True
         for r in requested:
             # If still left
             if r['total'] > 0:
@@ -986,13 +1032,13 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
                     'total': None,
                     'virtual': True,
                 }
-                readytosubmit = False
+                alldone = False
 
                 # Add a new token
                 body_requested.append(token)
 
         # Return answer
-        answer['meta']['readytosubmit'] = readytosubmit
+        answer['meta']['alldone'] = alldone
         answer['table']['body'] = body_requested + body_registered
         return answer
 
@@ -1039,6 +1085,16 @@ class InventoryInLineUpdate(GenInventoryInLineUrl, GenUpdate):
 
 
 class InventoryInLineUpdateModal(GenUpdateModal, InventoryInLineUpdate):
+    pass
+
+
+class InventoryInLineNotes(GenInventoryInLineUrl, GenUpdate):
+    model = InventoryInLine
+    form_class = InventoryInLineNotesForm
+    linkdelete = False
+
+
+class InventoryInLineNotesModal(GenUpdateModal, InventoryInLineNotes):
     pass
 
 
@@ -1197,6 +1253,16 @@ class InventoryOutUpdateModal(GenUpdateModal, InventoryOutUpdate):
     pass
 
 
+class InventoryOutNotes(GenInventoryInUrl, GenUpdate):
+    model = InventoryOut
+    form_class = InventoryOutNotesForm
+    linkdelete = False
+
+
+class InventoryOutNotesModal(GenUpdateModal, InventoryOutNotes):
+    pass
+
+
 class InventoryOutDelete(GenInventoryOutUrl, GenDelete):
     model = InventoryOut
 
@@ -1244,7 +1310,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
         'new': _('Unique product is new!'),
         'notfound': _('Product not found!'),
         'removerecord': _('Are you sure you want to remove "<name>"?'),
-        'send': _("Enviar"),
+        'albaranar': _("Albaranar"),
     }
 
     def __fields__(self, info):
@@ -1255,6 +1321,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
         fields.append(('product_final__pk', None))
         fields.append(('product_unique', _("Unique")))
         fields.append(('product_unique_value', None))
+        fields.append(('notes', _("Notes")))
         return fields
 
     def dispatch(self, *args, **kwargs):
@@ -1264,6 +1331,11 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
         self.ws_ean13_fullinfo = reverse('CDNX_storages_inventoryoutline_ean13_fullinfo', kwargs={"ean13": 'PRODUCT_FINAL_EAN13'})[1:]
         self.ws_unique_fullinfo = reverse('CDNX_storages_inventoryoutline_unique_fullinfo', kwargs={"unique": 'PRODUCT_FINAL_UNIQUE'})[1:]
         self.ws_submit = reverse('CDNX_storages_inventoryoutline_addws', kwargs={"ipk": self.ipk})[1:]
+        self.ws_inventoryout_notesmodal = reverse('CDNX_storages_inventoryout_notesmodal', kwargs={"pk": self.ipk})[1:]
+        self.ws_inventoryoutline_notesmodal = reverse('CDNX_storages_inventoryoutline_notesmodal', kwargs={"pk": 'INVENTORYLINE_PK'})[1:]
+
+        # Find provider_pk
+        inv = InventoryOut.objects.filter(pk=self.ipk).first()
 
         # Prepare form
         fields = []
@@ -1284,6 +1356,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
         # Prepare context
         self.client_context = {
             'ipk': self.ipk,
+            'notes': inv.notes,
             'final_focus': True,
             'unique_focus': False,
             'unique_disabled': True,
@@ -1297,6 +1370,8 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
                 'ean13_fullinfo': self.ws_ean13_fullinfo,
                 'unique_fullinfo': self.ws_unique_fullinfo,
                 'submit': self.ws_submit,
+                'inventoryout_notesmodal': self.ws_inventoryout_notesmodal,
+                'inventoryoutline_notesmodal': self.ws_inventoryoutline_notesmodal,
             },
             'form_zone': form.fields['box'].widget.render('box', None, {
                 'ng-class': '{"bg-danger": data.meta.context.errors.zone}',
@@ -1458,6 +1533,16 @@ class InventoryOutLineUpdate(GenInventoryOutLineUrl, GenUpdate):
 
 
 class InventoryOutLineUpdateModal(GenUpdateModal, InventoryOutLineUpdate):
+    pass
+
+
+class InventoryOutLineNotes(GenInventoryOutLineUrl, GenUpdate):
+    model = InventoryOutLine
+    form_class = InventoryOutLineNotesForm
+    linkdelete = False
+
+
+class InventoryOutLineNotesModal(GenUpdateModal, InventoryOutLineNotes):
     pass
 
 

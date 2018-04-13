@@ -256,6 +256,7 @@ class LineIncomingAlbaran(CodenerixModel):
 # Generic classes for Inventory and Inventory Line
 class GenInventory(CodenerixModel):  # META: Abstract class
     end = models.DateTimeField(_("Ends"), blank=True, null=True, editable=False)
+    notes = models.TextField(_("Notes"), blank=True, null=True)
 
     class Meta(CodenerixModel.Meta):
         abstract = True
@@ -268,6 +269,7 @@ class GenInventoryLine(CodenerixModel):  # META: Abstract class
     product_unique_value = models.CharField(_("Product Unique Value"), max_length=PRODUCT_UNIQUE_VALUE_LENGTH, blank=True, null=True, default=None, editable=False)
     operator = models.ForeignKey(StorageOperator, on_delete=models.CASCADE, related_name='storage_%(class)s', verbose_name=_("Storage Operator"), null=False, blank=False)
     quantity = models.FloatField(_("Quantity"), null=False, blank=False, default=1.0)
+    notes = models.TextField(_("Notes"), blank=True, null=True)
 
     class Meta(CodenerixModel.Meta):
         abstract = True
@@ -280,11 +282,12 @@ class Inventory(GenInventory):
         fields = []
         fields.append(('created', _('Starts')))
         fields.append(('end', _('Ends')))
+        fields.append(('notes', _('Notes')))
         fields.append((None, _('Actions')))
         return fields
 
     def __str__(self):
-        return u"{}::{}".format(self.provider, self.created)
+        return u"{}".format(self.created)
 
     def __unicode__(self):
         return self.__str__()
@@ -303,6 +306,7 @@ class InventoryLine(GenInventoryLine):
         fields.append(('operator', _("Operator")))
         fields.append(('quantity', _("Quantity")))
         fields.append(('caducity', _("Caducity")))
+        fields.append(('notes', _("Notes")))
         return fields
 
     def __unicode__(self):
@@ -336,6 +340,7 @@ class InventoryIn(GenInventory):
         fields.append(('provider', _('Provider')))
         fields.append(('created', _('Starts')))
         fields.append(('end', _('Ends')))
+        fields.append(('notes', _('Notes')))
         fields.append((None, _('Actions')))
         return fields
 
@@ -363,6 +368,7 @@ class InventoryInLine(GenInventoryLine):
         fields.append(('operator', _("Operator")))
         fields.append(('quantity', _("Quantity")))
         fields.append(('caducity', _("Caducity")))
+        fields.append(('notes', _("Notes")))
         return fields
 
     def __unicode__(self):
@@ -384,6 +390,7 @@ class InventoryOut(GenInventory):
         fields.append(('albaran', _('Albaran')))
         fields.append(('created', _('Starts')))
         fields.append(('end', _('Ends')))
+        fields.append(('notes', _('Notes')))
         fields.append((None, _('Actions')))
         return fields
 
@@ -405,6 +412,7 @@ class InventoryOutLine(GenInventoryLine):
         fields.append(('product_unique_value', _("Unique Value")))
         fields.append(('operator', _("Operator")))
         fields.append(('quantity', _("Quantity")))
+        fields.append(('notes', _("Notes")))
         return fields
 
     def __unicode__(self):

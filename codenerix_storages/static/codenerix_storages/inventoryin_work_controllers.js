@@ -247,32 +247,61 @@ angular.module('codenerixSTORAGESControllers', [])
             }
         };
 
-        $scope.albaranar = function(tempurl) {
-            if ($scope.data.meta.readytosubmit) {
-                // Prepare URL
-                var url = tempurl+'/../albaranar';
-                url = url.replace("inventoryinline", "inventoryin")
+        $scope.setnotes = function() {
+            var url = "/" + $scope.data.meta.context.ws.inventoryin_notesmodal;
+            $scope.ws= url;
 
-                // Post request
-                $http.get( url, {}, {} )
-                .success(function(answer, stat) {
-                    if (stat==200 || stat ==202) {
-                        console.log("OK");
-                    } else {
-                        // Error happened, show an alert$
-                        console.log("ERROR "+stat+": "+answer);
-                        console.log(answer);
-                        alert("ERROR "+stat+": "+answer);
-                    }
-                })
-                .error(function(data, status, headers, config) {
-                    if (cnf_debug){
-                        alert(data);
-                    } else {
-                        alert(cnf_debug_txt)
-                    }
-                });
+            var functions = function(scope) {};
+            var callback = function(scope, answer) {
+                $scope.refresh();
+            };
+
+            $scope.cb_window = openmodal($scope, $timeout, $uibModal, 'lg', functions, callback);
+
+        };
+
+
+        $scope.setlinenotes = function(row_pk) {
+            if (row_pk) {
+                var url = $scope.data.meta.context.ws.inventoryinline_notesmodal;
+                url = "/" + url.replace("/INVENTORYLINE_PK/", "/"+row_pk+"/");
+                $scope.ws=url;
+
+                var functions = function(scope) {};
+                var callback = function(scope, answer) {
+                    $scope.refresh();
+                };
+
+                $scope.cb_window = openmodal($scope, $timeout, $uibModal, 'lg', functions, callback);
             }
+
+        };
+
+        $scope.albaranar = function(tempurl) {
+
+            // Prepare URL
+            var url = tempurl+'/../albaranar';
+            url = url.replace("inventoryinline", "inventoryin")
+
+            // Post request
+            $http.get( url, {}, {} )
+            .success(function(answer, stat) {
+                if (stat==200 || stat ==202) {
+                    console.log("OK");
+                } else {
+                    // Error happened, show an alert$
+                    console.log("ERROR "+stat+": "+answer);
+                    console.log(answer);
+                    alert("ERROR "+stat+": "+answer);
+                }
+            })
+            .error(function(data, status, headers, config) {
+                if (cnf_debug){
+                    alert(data);
+                } else {
+                    alert(cnf_debug_txt)
+                }
+            });
         };
     }
 ]);

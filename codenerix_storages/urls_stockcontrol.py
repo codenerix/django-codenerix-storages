@@ -20,17 +20,17 @@
 
 from django.conf.urls import url
 
-from codenerix_storages.views_stockcontrol import InventoryList, InventoryCreate, InventoryCreateModal, InventoryUpdate, InventoryUpdateModal, InventoryDelete, InventoryDetail, InventorySetStock
-from codenerix_storages.views_stockcontrol import InventoryLineList, InventoryLineWork, InventoryLineCreate, InventoryLineCreateWS, InventoryLineCreateModal, InventoryLineUpdate, InventoryLineUpdateModal, InventoryLineDelete, InventoryLineDetail, InventoryLineEAN13Fullinfo, InventoryLineUniqueFullinfo
+from codenerix_storages.views_stockcontrol import InventoryList, InventoryCreate, InventoryCreateModal, InventoryUpdate, InventoryUpdateModal, InventoryDelete, InventoryDetail, InventorySetStock, InventoryNotesModal
+from codenerix_storages.views_stockcontrol import InventoryLineList, InventoryLineWork, InventoryLineCreate, InventoryLineCreateWS, InventoryLineCreateModal, InventoryLineUpdate, InventoryLineUpdateModal, InventoryLineDelete, InventoryLineDetail, InventoryLineEAN13Fullinfo, InventoryLineUniqueFullinfo, InventoryLineNotesModal
 
 from codenerix_storages.views_stockcontrol import DistributionList, DistributionCreate, DistributionCreateModal, DistributionDelete
 from codenerix_storages.views_stockcontrol import DistributionLineList, DistributionLineWork, DistributionLineCreate, DistributionLineCreateWS, DistributionLineCreateModal, DistributionLineUpdate, DistributionLineUpdateModal, DistributionLineDelete, DistributionLineDetail
 
-from codenerix_storages.views_stockcontrol import InventoryInList, InventoryInCreate, InventoryInCreateModal, InventoryInDelete, InventoryInAlbaranar
-from codenerix_storages.views_stockcontrol import InventoryInLineList, InventoryInLineWork, InventoryInLineCreate, InventoryInLineCreateWS, InventoryInLineCreateModal, InventoryInLineUpdate, InventoryInLineUpdateModal, InventoryInLineDelete, InventoryInLineDetail, InventoryInLineEAN13Fullinfo, InventoryInLineUniqueFullinfo, InventoryInLinePurhcaseOrder
+from codenerix_storages.views_stockcontrol import InventoryInList, InventoryInCreate, InventoryInCreateModal, InventoryInDelete, InventoryInAlbaranar, InventoryInNotesModal
+from codenerix_storages.views_stockcontrol import InventoryInLineList, InventoryInLineWork, InventoryInLineCreate, InventoryInLineCreateWS, InventoryInLineCreateModal, InventoryInLineUpdate, InventoryInLineUpdateModal, InventoryInLineDelete, InventoryInLineDetail, InventoryInLineEAN13Fullinfo, InventoryInLineUniqueFullinfo, InventoryInLinePurhcaseOrder, InventoryInLineNotesModal
 
-from codenerix_storages.views_stockcontrol import InventoryOutList, InventoryOutCreate, InventoryOutCreateModal, InventoryOutDelete, InventoryOutAlbaranar
-from codenerix_storages.views_stockcontrol import InventoryOutLineList, InventoryOutLineWork, InventoryOutLineCreate, InventoryOutLineCreateWS, InventoryOutLineCreateModal, InventoryOutLineUpdate, InventoryOutLineUpdateModal, InventoryOutLineDelete, InventoryOutLineDetail, InventoryOutLineEAN13Fullinfo, InventoryOutLineUniqueFullinfo
+from codenerix_storages.views_stockcontrol import InventoryOutList, InventoryOutCreate, InventoryOutCreateModal, InventoryOutDelete, InventoryOutAlbaranar, InventoryOutNotesModal
+from codenerix_storages.views_stockcontrol import InventoryOutLineList, InventoryOutLineWork, InventoryOutLineCreate, InventoryOutLineCreateWS, InventoryOutLineCreateModal, InventoryOutLineUpdate, InventoryOutLineUpdateModal, InventoryOutLineDelete, InventoryOutLineDetail, InventoryOutLineEAN13Fullinfo, InventoryOutLineUniqueFullinfo, InventoryOutLineNotesModal
 
 urlpatterns = [
     url(r'^inventory$', InventoryList.as_view(), name='CDNX_storages_inventory_list'),
@@ -41,6 +41,7 @@ urlpatterns = [
     url(r'^inventory/(?P<pk>\w+)/editmodal$', InventoryUpdateModal.as_view(), name='CDNX_storages_inventory_editmodal'),
     url(r'^inventory/(?P<pk>\w+)/delete$', InventoryDelete.as_view(), name='CDNX_storages_inventory_delete'),
     url(r'^inventory/(?P<pk>\w+)/setstock$', InventorySetStock.as_view(), name='CDNX_storages_inventory_setstock'),
+    url(r'^inventory/(?P<pk>\w+)/notesmodal$', InventoryNotesModal.as_view(), name='CDNX_storages_inventory_notesmodal'),
 
     url(r'^inventoryline/(?P<ipk>\w+)$', InventoryLineList.as_view(), name='CDNX_storages_inventoryline_list'),
     url(r'^inventoryline/(?P<ipk>\w+)/work$', InventoryLineWork.as_view(), name='CDNX_storages_inventoryline_work'),
@@ -48,6 +49,7 @@ urlpatterns = [
     url(r'^inventoryline/(?P<ipk>\w+)/add$', InventoryLineCreate.as_view(), name='CDNX_storages_inventoryline_add'),
     url(r'^inventoryline/(?P<ipk>\w+)/addws$', InventoryLineCreateWS.as_view(), name='CDNX_storages_inventoryline_addws'),
     url(r'^inventoryline/(?P<ipk>\w+)/addmodal$', InventoryLineCreateModal.as_view(), name='CDNX_storages_inventoryline_addmodal'),
+    url(r'^inventoryline/(?P<pk>\w+)/notesmodal$', InventoryLineNotesModal.as_view(), name='CDNX_storages_inventoryline_notesmodal'),
     url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)$', InventoryLineDetail.as_view(), name='CDNX_storages_inventoryline_details'),
     url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/edit$', InventoryLineUpdate.as_view(), name='CDNX_storages_inventoryline_edit'),
     url(r'^inventoryline/(?P<ipk>\w+)/(?P<pk>\w+)/editmodal$', InventoryLineUpdateModal.as_view(), name='CDNX_storages_inventoryline_editmodal'),
@@ -80,6 +82,7 @@ urlpatterns = [
     url(r'^inventoryin/addmodal$', InventoryInCreateModal.as_view(), name='CDNX_storages_inventoryin_addmodal'),
     url(r'^inventoryin/(?P<pk>\w+)/delete$', InventoryInDelete.as_view(), name='CDNX_storages_inventoryin_delete'),
     url(r'^inventoryin/(?P<pk>\w+)/albaranar$', InventoryInAlbaranar.as_view(), name='CDNX_storages_inventoryin_albaranar'),
+    url(r'^inventoryin/(?P<pk>\w+)/notesmodal$', InventoryInNotesModal.as_view(), name='CDNX_storages_inventoryin_notesmodal'),
     # url(r'^inventoryin/(?P<pk>\w+)$', InventoryInDetail.as_view(), name='CDNX_storages_inventoryin_details'),
     # url(r'^inventoryin/(?P<pk>\w+)/edit$', InventoryInUpdate.as_view(), name='CDNX_storages_inventoryin_edit'),
     # url(r'^inventoryin/(?P<pk>\w+)/editmodal$', InventoryInUpdateModal.as_view(), name='CDNX_storages_inventoryin_editmodal'),
@@ -90,6 +93,7 @@ urlpatterns = [
     url(r'^inventoryinline/(?P<ipk>\w+)/add$', InventoryInLineCreate.as_view(), name='CDNX_storages_inventoryinline_add'),
     url(r'^inventoryinline/(?P<ipk>\w+)/addws$', InventoryInLineCreateWS.as_view(), name='CDNX_storages_inventoryinline_addws'),
     url(r'^inventoryinline/(?P<ipk>\w+)/addmodal$', InventoryInLineCreateModal.as_view(), name='CDNX_storages_inventoryinline_addmodal'),
+    url(r'^inventoryinline/(?P<pk>\w+)/notesmodal$', InventoryInLineNotesModal.as_view(), name='CDNX_storages_inventoryinline_notesmodal'),
     url(r'^inventoryinline/(?P<ipk>\w+)/(?P<pk>\w+)$', InventoryInLineDetail.as_view(), name='CDNX_storages_inventoryinline_details'),
     url(r'^inventoryinline/(?P<ipk>\w+)/(?P<pk>\w+)/edit$', InventoryInLineUpdate.as_view(), name='CDNX_storages_inventoryinline_edit'),
     url(r'^inventoryinline/(?P<ipk>\w+)/(?P<pk>\w+)/editmodal$', InventoryInLineUpdateModal.as_view(), name='CDNX_storages_inventoryinline_editmodal'),
@@ -102,7 +106,8 @@ urlpatterns = [
     url(r'^inventoryout/add$', InventoryOutCreate.as_view(), name='CDNX_storages_inventoryout_add'),
     url(r'^inventoryout/addmodal$', InventoryOutCreateModal.as_view(), name='CDNX_storages_inventoryout_addmodal'),
     url(r'^inventoryout/(?P<pk>\w+)/delete$', InventoryOutDelete.as_view(), name='CDNX_storages_inventoryout_delete'),
-    url(r'^inventoryout/(?P<pk>\w+)/albaranar$', InventoryOutAlbaranar.as_view(), name='CDNX_storages_inventoryout_albaranar'),
+    url(r'^inventoryout/(?P<pk>\w+)/albaranar', InventoryOutAlbaranar.as_view(), name='CDNX_storages_inventoryout_albaranar'),
+    url(r'^inventoryout/(?P<pk>\w+)/notesmodal$', InventoryOutNotesModal.as_view(), name='CDNX_storages_inventoryout_notesmodal'),
     # url(r'^inventoryout/(?P<pk>\w+)$', InventoryOutDetail.as_view(), name='CDNX_storages_inventoryout_details'),
     # url(r'^inventoryout/(?P<pk>\w+)/edit$', InventoryOutUpdate.as_view(), name='CDNX_storages_inventoryout_edit'),
     # url(r'^inventoryout/(?P<pk>\w+)/editmodal$', InventoryOutUpdateModal.as_view(), name='CDNX_storages_inventoryout_editmodal'),
@@ -113,6 +118,7 @@ urlpatterns = [
     url(r'^inventoryoutline/(?P<ipk>\w+)/add$', InventoryOutLineCreate.as_view(), name='CDNX_storages_inventoryoutline_add'),
     url(r'^inventoryoutline/(?P<ipk>\w+)/addws$', InventoryOutLineCreateWS.as_view(), name='CDNX_storages_inventoryoutline_addws'),
     url(r'^inventoryoutline/(?P<ipk>\w+)/addmodal$', InventoryOutLineCreateModal.as_view(), name='CDNX_storages_inventoryoutline_addmodal'),
+    url(r'^inventoryoutline/(?P<pk>\w+)/notesmodal$', InventoryOutLineNotesModal.as_view(), name='CDNX_storages_inventoryoutline_notesmodal'),
     url(r'^inventoryoutline/(?P<ipk>\w+)/(?P<pk>\w+)$', InventoryOutLineDetail.as_view(), name='CDNX_storages_inventoryoutline_details'),
     url(r'^inventoryoutline/(?P<ipk>\w+)/(?P<pk>\w+)/edit$', InventoryOutLineUpdate.as_view(), name='CDNX_storages_inventoryoutline_edit'),
     url(r'^inventoryoutline/(?P<ipk>\w+)/(?P<pk>\w+)/editmodal$', InventoryOutLineUpdateModal.as_view(), name='CDNX_storages_inventoryoutline_editmodal'),

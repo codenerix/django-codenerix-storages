@@ -1,10 +1,18 @@
 <div class="row clearfix block-center">
     <div class="text-left" style="padding-top: 20px; pading-bottom: -20px;">
         <button
-            ng-disabled="!data.meta.readytosubmit"
-            ng-class="{'btn-danger': !data.meta.readytosubmit, 'btn-info': data.meta.readytosubmit}"
+            ng-class="{'btn-danger': !data.meta.alldone, 'btn-info': data.meta.alldone}"
             ng-click="albaranar(data.meta.request.path_info)"
             class="btn btn-sm status ng-binding ng-scope">{{data.meta.gentranslate.albaranar}}</button>
+        <button
+            class='btn btn-sm status ng-binding ng-scope'
+            ng-class="{'btn-warning': data.meta.context.notes, 'btn-success': !data.meta.context.notes}"
+            ng-click="setnotes()"
+            popover-placement="right" uib-popover="{{data.meta.context.notes}}" popover-trigger="mouseenter">
+            <span
+                class="fa"
+                ng-class="{'fa-exclamation-triangle': data.meta.context.notes, 'fa-edit': !data.meta.context.notes}"></span>
+        </button>
     </div>
     <div class="col-md-12 column">
         <ng-include src="data.meta.ngincludes.table"></ng-include>
