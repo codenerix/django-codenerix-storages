@@ -354,7 +354,7 @@ class InventoryIn(GenInventory):
 
 class InventoryInLine(GenInventoryLine):
     purchasesorder = models.ForeignKey(PurchasesOrder, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Order"), null=True, blank=True)
-    purchaseslinealbaran = models.ForeignKey(PurchasesLineAlbaran, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Line Albaran"), null=True, blank=True)
+    purchaseslinealbaran = models.ManyToManyField(PurchasesLineAlbaran, related_name='inventory_lines', verbose_name=_("Line Albaran"))
     inventory = models.ForeignKey(InventoryIn, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory"), null=False, blank=False)
     caducity = models.DateField(_("Caducity"), blank=True, null=True, default=None)
 

@@ -20,7 +20,8 @@
 
 import json
 
-from django.db.models import Q, Sum
+from django.db import transaction
+from django.db.models import Q, Sum, F
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.urls import reverse
@@ -29,12 +30,13 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.forms.utils import ErrorList
+from django.utils import timezone
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail
 from codenerix.widgets import DynamicInput, DynamicSelect
 
 from codenerix_products.models import ProductFinal, ProductUnique
-from codenerix_invoicing.models_purchases import PurchasesOrder, PurchasesLineOrder
+from codenerix_invoicing.models_purchases import PurchasesOrder, PurchasesLineOrder, PurchasesAlbaran, PurchasesLineAlbaran
 from codenerix_invoicing.models_sales import SalesLines
 from codenerix_storages.models import StorageOperator
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine
@@ -786,17 +788,76 @@ class InventoryInAlbaranar(View):
         # Check answer
         if inventory:
             # Create Albaran
-            # pa = PurchasesAlbaran()
-            # pa.code
-            # pa.date = datetime.datetime.now()
+            pa = PurchasesAlbaran()
+            pa.code = 'AUTO'
+            pa.date = timezone.now()
+            pa.provider = inventory.provider
+            pa.save()
             # For each line in inventory
             for line in inventory.inventory_lines.all():
-                # Create Unique Product
-                # Set Stock
-                # Save in Albaran
-                pass
-            answer['return']="Uppps!!!";
-            answer['return']="OK";
+                # Find total matched products
+                if line.purchaseslinealbaran.exists():
+                    total_products_matched = line.purchaseslinealbaran.values("quantity").annotate(total=Sum("quantity")).first().get('total')
+                else:
+                    total_products_matched = 0
+
+                # While there are elements in inventory that we must match somewhere
+                while line.quantity > total_products_matched:
+
+                    # Every block is transactional
+                    with transaction.atomic():
+
+                        # Total products left to match
+                        total_products_to_match = line.quantity - total_products_matched
+                        # Locate a line order to link to
+                        lo = PurchasesLineOrder.objects.filter(order=line.purchasesorder, product=line.product_final).annotate(total_albaran=Sum("line_albaran_purchases__quantity")).filter(quantity__gt=F("total_albaran")).first()
+                        if lo:
+                            # We got a lineorder which hasn't be totally linked
+                            price = lo.price
+                            tax = lo.tax
+                            description = lo.description
+                            quantity = min(lo.quantity-lo.total_albaran, total_products_to_match)
+                        else:
+                            # No lineorder found, this is an extra product
+                            price = line.product_final.calculate_price()['price_base']
+                            tax = line.product_final.product.tax.tax
+                            description = str(line.product_final)
+                            quantity = total_products_to_match
+                        # Locate or create product unique
+                        if line.product_unique:
+                            pu = line.product_unique
+                        else:
+                            pu = ProductUnique()
+                            pu.product_final = line.product_final
+                            pu.box = line.box
+                            pu.value = line.product_unique_value
+                            pu.stock_real = quantity
+                            pu.save()
+                        # Create Unique Product
+                        pal = PurchasesLineAlbaran()
+                        pal.albaran = pa
+                        pal.line_order = lo
+                        pal.validator_user = self.request.user
+                        pal.quantity = quantity
+                        pal.price = price
+                        pal.tax = tax
+                        pal.description = description
+                        pal.save()
+                        pal.product_unique.add(pu)
+                        pal.save()
+                        # Save inventory line
+                        line.purchaseslinealbaran.add(pal)
+                        line.save()
+
+                    # Find total matched products
+                    total_products_matched = line.purchaseslinealbaran.values("quantity").annotate(total=Sum("quantity")).first().get("total")
+
+            # End inventory
+            inventory.processed = True
+            inventory.end = timezone.now()
+            inventory.save()
+            # Return answer
+            answer['return'] = "OK"
         else:
             answer['error'] = True
             answer['errortxt'] = _("Incoming Inventory not found!")
