@@ -1,18 +1,24 @@
 <div class="row clearfix block-center">
-    <div class="text-left" style="padding-top: 20px; pading-bottom: -20px;">
-        <button
-            ng-class="{'btn-danger': !data.meta.alldone, 'btn-info': data.meta.alldone}"
-            ng-click="albaranar(data.meta.request.path_info)"
-            class="btn btn-sm status ng-binding ng-scope">{{data.meta.gentranslate.albaranar}}</button>
+    <div class="text-right" style="padding-top: 20px; pading-bottom: -20px; margin-right: 15px;">
         <button
             class='btn btn-sm status ng-binding ng-scope'
-            ng-class="{'btn-warning': data.meta.context.notes, 'btn-success': !data.meta.context.notes}"
+            ng-class="{'btn-warning': data.meta.context.notes, 'btn-default': !data.meta.context.notes}"
             ng-click="setnotes()"
             popover-placement="right" uib-popover="{{data.meta.context.notes}}" popover-trigger="mouseenter">
             <span
                 class="fa"
                 ng-class="{'fa-exclamation-triangle': data.meta.context.notes, 'fa-edit': !data.meta.context.notes}"></span>
         </button>
+        <button
+            class='btn btn-sm btn-default status ng-binding ng-scope'
+            ng-click="refresh()">
+            <span class="fa fa-refresh"></span>
+        </button>
+        <button
+            ng-class="{'btn-danger': !data.meta.alldone, 'btn-info': data.meta.alldone}"
+            codenerix-really-click="albaranar(data.meta.request.path_info)"
+            codenerix-really-active="!data.meta.alldone"
+            class="btn btn-sm status ng-binding ng-scope">{{data.meta.gentranslate.albaranar}}</button>
     </div>
     <div class="col-md-12 column">
         <ng-include src="data.meta.ngincludes.table"></ng-include>
