@@ -24,8 +24,8 @@
 // Angular codenerix Controllers
 angular.module('codenerixSTORAGESControllers', [])
 
-.controller('CDNXSTORAGESInventoryWorkCtrl', ['$scope', '$rootScope', '$timeout', '$location', '$uibModal', '$templateCache', '$http', '$state', 'Register', 'ListMemory',
-    function($scope, $rootScope, $timeout, $location, $uibModal, $templateCache, $http, $state, Register, ListMemory) {
+.controller('CDNXSTORAGESInventoryWorkCtrl', ['$scope', '$rootScope', '$timeout', '$location', '$uibModal', '$templateCache', '$http', '$state', '$window', 'Register', 'ListMemory',
+    function($scope, $rootScope, $timeout, $location, $uibModal, $templateCache, $http, $state, $window, Register, ListMemory) {
         if (ws_entry_point==undefined) { ws_entry_point=""; }
         multilist($scope, $rootScope, $timeout, $location, $uibModal, $templateCache, $http, $state, Register, ListMemory, 0, "/"+ws_entry_point);
 
@@ -283,25 +283,37 @@ angular.module('codenerixSTORAGESControllers', [])
             var url = tempurl+'/../albaranar';
             url = url.replace("inventoryinline", "inventoryin")
 
-            // Post request
-            $http.get( url, {}, {} )
-            .success(function(answer, stat) {
-                if (stat==200 || stat ==202) {
-                    console.log("OK");
-                } else {
-                    // Error happened, show an alert$
-                    console.log("ERROR "+stat+": "+answer);
-                    console.log(answer);
-                    alert("ERROR "+stat+": "+answer);
-                }
-            })
-            .error(function(data, status, headers, config) {
-                if (cnf_debug){
-                    alert(data);
-                } else {
-                    alert(cnf_debug_txt)
-                }
-            });
+            var functions = function(scope) {};
+            var callback = function(scope, answer) {
+                $window.location.href = "/"+$scope.data.meta.context.ws.url_inventoryin;
+            };
+            var callback_cancel = function(scope, answer) {
+                $scope.refresh();
+            };
+
+            function action(quickmodal_ok, quickmodal_error) {
+                $http.get( url, {}, {} )
+                .success(function(answer, stat) {
+                    if (answer.return != 'OK'){
+                        quickmodal_error(answer.return);
+                    } else {
+                        quickmodal_ok(answer);
+                    }
+                })
+                .error(function(data, status, headers, config) {
+                    if (cnf_debug){
+                        if (data) {
+                            quickmodal_error(data);
+                        } else {
+                            quickmodal_error(cnf_debug_txt);
+                        }
+                    } else {
+                        quickmodal_error(cnf_debug_txt);
+                    }
+                });
+            }
+
+            quickmodal($scope, $timeout, $uibModal, 'sm', action, functions, callback, callback_cancel);
         };
     }
 ]);

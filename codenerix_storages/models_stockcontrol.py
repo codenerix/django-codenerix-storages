@@ -257,6 +257,7 @@ class LineIncomingAlbaran(CodenerixModel):
 class GenInventory(CodenerixModel):  # META: Abstract class
     end = models.DateTimeField(_("Ends"), blank=True, null=True, editable=False)
     notes = models.TextField(_("Notes"), blank=True, null=True)
+    processed = models.BooleanField(_("Processed"), blank=False, null=False, default=False, editable=False)
 
     class Meta(CodenerixModel.Meta):
         abstract = True

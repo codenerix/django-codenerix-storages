@@ -165,6 +165,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         self.ws_submit = reverse('CDNX_storages_inventoryline_addws', kwargs={"ipk": self.ipk})[1:]
         self.ws_inventory_notesmodal = reverse('CDNX_storages_inventory_notesmodal', kwargs={"pk": self.ipk})[1:]
         self.ws_inventoryline_notesmodal = reverse('CDNX_storages_inventoryline_notesmodal', kwargs={"pk": 'INVENTORYLINE_PK'})[1:]
+        self.url_inventory = reverse('CDNX_storages_inventory_list')[1:]
 
         # Find provider_pk
         inv = Inventory.objects.filter(pk=self.ipk).first()
@@ -206,6 +207,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
                 'submit': self.ws_submit,
                 'inventory_notesmodal': self.ws_inventory_notesmodal,
                 'inventoryline_notesmodal': self.ws_inventoryline_notesmodal,
+                'url_inventory': self.url_inventory,
             },
             'form_zone': form.fields['box'].widget.render('box', None, {
                 'ng-class': '{"bg-danger": data.meta.context.errors.zone}',
@@ -776,7 +778,7 @@ class InventoryInAlbaranar(View):
 
         # Get Inventory PK
         pk = kwargs.get('pk', None)
-        inventory = InventoryIn.objects.filters(pk=pk).first()
+        inventory = InventoryIn.objects.filter(pk=pk).first()
 
         # Prepare answer
         answer = {}
@@ -793,6 +795,8 @@ class InventoryInAlbaranar(View):
                 # Set Stock
                 # Save in Albaran
                 pass
+            answer['return']="Uppps!!!";
+            answer['return']="OK";
         else:
             answer['error'] = True
             answer['errortxt'] = _("Incoming Inventory not found!")
@@ -867,6 +871,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
         self.ws_inventoryinline_purchasesorder = reverse('CDNX_storages_inventoryinline_purchase_order', kwargs={"inventoryinline_pk": 1, "purchasesorder_pk": 1})[1:]
         self.ws_inventoryin_notesmodal = reverse('CDNX_storages_inventoryin_notesmodal', kwargs={"pk": self.ipk})[1:]
         self.ws_inventoryinline_notesmodal = reverse('CDNX_storages_inventoryinline_notesmodal', kwargs={"pk": 'INVENTORYLINE_PK'})[1:]
+        self.url_inventoryin = reverse('CDNX_storages_inventoryin_list')[1:]
 
         # Find provider_pk
         inv = InventoryIn.objects.filter(pk=self.ipk).first()
@@ -919,6 +924,7 @@ class InventoryInLineWork(GenInventoryInLineUrl, GenList):
                 'inventoryinline_purchasesorder': self.ws_inventoryinline_purchasesorder,
                 'inventoryin_notesmodal': self.ws_inventoryin_notesmodal,
                 'inventoryinline_notesmodal': self.ws_inventoryinline_notesmodal,
+                'url_inventoryin': self.url_inventoryin,
             },
             'form_order': form.fields['purchasesorder'].widget.render('purchasesorder', None, {
                 'ng-class': '{"bg-danger": data.meta.context.errors.order}',
@@ -1333,6 +1339,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
         self.ws_submit = reverse('CDNX_storages_inventoryoutline_addws', kwargs={"ipk": self.ipk})[1:]
         self.ws_inventoryout_notesmodal = reverse('CDNX_storages_inventoryout_notesmodal', kwargs={"pk": self.ipk})[1:]
         self.ws_inventoryoutline_notesmodal = reverse('CDNX_storages_inventoryoutline_notesmodal', kwargs={"pk": 'INVENTORYLINE_PK'})[1:]
+        self.url_inventoryout = reverse('CDNX_storages_inventoryout_list')[1:]
 
         # Find provider_pk
         inv = InventoryOut.objects.filter(pk=self.ipk).first()
@@ -1372,6 +1379,7 @@ class InventoryOutLineWork(GenInventoryOutLineUrl, GenList):
                 'submit': self.ws_submit,
                 'inventoryout_notesmodal': self.ws_inventoryout_notesmodal,
                 'inventoryoutline_notesmodal': self.ws_inventoryoutline_notesmodal,
+                'url_inventoryout': self.url_inventoryout,
             },
             'form_zone': form.fields['box'].widget.render('box', None, {
                 'ng-class': '{"bg-danger": data.meta.context.errors.zone}',
