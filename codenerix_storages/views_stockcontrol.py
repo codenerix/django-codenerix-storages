@@ -818,6 +818,7 @@ class InventoryInAlbaranar(View):
                             description = lo.description
                             quantity = min(lo.quantity-lo.total_albaran, total_products_to_match)
                         else:
+                            lo = PurchasesLineOrder.objects.filter(order=line.purchasesorder, product=line.product_final, line_albaran_purchases__isnull=True).first()
                             # No lineorder found, this is an extra product
                             price = line.product_final.calculate_price()['price_base']
                             tax = line.product_final.product.tax.tax
