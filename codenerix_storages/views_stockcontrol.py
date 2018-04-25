@@ -32,6 +32,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.forms.utils import ErrorList
 from django.utils import timezone
+from django.template.loader import get_template
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail
 from codenerix.widgets import DynamicInput, DynamicSelect
@@ -195,7 +196,7 @@ class InventoryLineList(GenInventoryLineUrl, GenList):
 class InventoryLineWork(GenInventoryLineUrl, GenList):
     model = InventoryLine
     extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryLine'), _('InventoryLine')]}
-    default_ordering = "product_final" # Must be PRODUCT_FINAL so the Sum() will work properly
+    default_ordering = "product_final"  # Must be PRODUCT_FINAL so the Sum() will work properly
     static_partial_header = 'codenerix_storages/inventory_work_header.html'
     static_partial_row = 'codenerix_storages/inventory_work_row'
     static_app_row = 'codenerix_storages/inventory_work_app.js'
@@ -242,6 +243,36 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         # Find provider_pk
         inv = Inventory.objects.filter(pk=self.ipk).first()
 
+        # Simulate Inventory
+
+        sim1 = []
+        sim1.append([_("Product final"), _("Quantity")])
+        sim1.append([_('P1'),'1'])
+        sim1.append([_('P2'),'2'])
+        sim1.append([_('P3'),'2'])
+        sim1.append([_('P4'),'5'])
+        sim2 = []
+        sim2.append([_("Product final"), _("Quantity")])
+        sim2.append([_('P3'),'2'])
+        sim2.append([_('P4'),'5'])
+        sim3 = []
+        sim3.append([_("Product final"), _("Quantity")])
+        sim3.append([_('P1'),'1'])
+        sim3.append([_('P3'),'2'])
+        sim3.append([_('P4'),'5'])
+
+
+        body = []
+        body.append({'title': _('New'), 'total': 1, 'style': 'success', 'data': sim1})
+        body.append({'title': _('Lost'), 'total': 2, 'style': 'danger', 'data': sim2})
+        body.append({'title': _('Relocated'), 'total': 2, 'style': 'warning', 'data': sim3})
+
+        # Render simulation
+        context = {}
+        context['body'] = body
+        template = get_template('codenerix_storages/inventory.html')
+        simulation = template.render(context)
+
         # Prepare form
         fields = []
         fields.append((DynamicSelect, 'box', 3, 'CDNX_storages_storageboxs_foreign', []))
@@ -259,6 +290,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
 
         # Prepare context
         self.client_context = {
+            'simulation': simulation,
             'ipk': self.ipk,
             'notes': inv.notes,
             'final_focus': True,
@@ -339,7 +371,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
                 product_unique=F('product_unique__value'),
             ).annotate(
                 quantity=F('total'),
-                total_notes=Sum(Length(Substr('notes',1,1))),
+                total_notes=Sum(Length(Substr('notes', 1, 1))),
             )
         return queryset
 

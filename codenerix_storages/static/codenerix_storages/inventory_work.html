@@ -39,6 +39,7 @@
                         ng-class="{'btn-danger': !data.meta.alldone, 'btn-info': data.meta.alldone}"
                         codenerix-really-click="setinventory(data.meta.request.path_info)"
                         codenerix-really-active="!data.meta.alldone"
+                        codenerix-really-message="{{data.meta.context.simulation}}"
                         class="btn btn-sm status ng-binding ng-scope">{{data.meta.gentranslate.inventariar}}</button>
                 </div>
             </div>
