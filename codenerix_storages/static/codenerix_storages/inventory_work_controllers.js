@@ -36,6 +36,7 @@ angular.module('codenerixSTORAGESControllers', [])
         $scope.final_error = false;
         $scope.unique_new = false;
         $scope.inscope = null;
+        $scope.query.extended = false;
 
         $scope.clean_up = function () {
             // We are done here
@@ -59,6 +60,12 @@ angular.module('codenerixSTORAGESControllers', [])
             };
             $scope.refresh();
         };
+
+        $scope.removerow = function(id, msg, args) {
+            if ($scope.query.extended) {
+                $scope.removerecord(id, msg, args);
+            }
+        }
 
         $scope.product_changed = function (inscope) {
             // Save inscope
@@ -211,6 +218,45 @@ angular.module('codenerixSTORAGESControllers', [])
                     alert(cnf_debug_txt)
                 }
             });
+        };
+
+        $scope.doinventory = function(tempurl) {
+
+            // Prepare URL
+            var url = tempurl+'/../doinventory';
+            url = url.replace("inventoryline", "inventory")
+
+            var functions = function(scope) {};
+            var callback = function(scope, answer) {
+                $window.location.href = "/"+$scope.data.meta.context.ws.url_inventoryin;
+            };
+            var callback_cancel = function(scope, answer) {
+                $scope.refresh();
+            };
+
+            function action(quickmodal_ok, quickmodal_error) {
+                $http.get( url, {}, {} )
+                .success(function(answer, stat) {
+                    if (answer.return != 'OK'){
+                        quickmodal_error(answer.return);
+                    } else {
+                        quickmodal_ok(answer);
+                    }
+                })
+                .error(function(data, status, headers, config) {
+                    if (cnf_debug){
+                        if (data) {
+                            quickmodal_error(data);
+                        } else {
+                            quickmodal_error(cnf_debug_txt);
+                        }
+                    } else {
+                        quickmodal_error(cnf_debug_txt);
+                    }
+                });
+            }
+
+            quickmodal($scope, $timeout, $uibModal, 'sm', action, functions, callback, callback_cancel);
         };
 
         $scope.setnotes = function() {

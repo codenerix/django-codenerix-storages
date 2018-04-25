@@ -21,7 +21,8 @@
 import json
 
 from django.db import transaction
-from django.db.models import Q, Sum, F
+from django.db.models import Q, F, Sum, Value
+from django.db.models.functions import Substr, Length, Concat
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.urls import reverse
@@ -41,6 +42,7 @@ from codenerix_invoicing.models_sales import SalesLines
 from codenerix_storages.models import StorageOperator
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine
 from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryNotesForm, InventoryLineForm, InventoryLineNotesForm, InventoryInForm, InventoryInNotesForm, InventoryInLineForm, InventoryInLineNotesForm, InventoryOutForm, InventoryOutNotesForm, InventoryOutLineForm, InventoryOutLineNotesForm, DistributionForm, DistributionLineForm
+from codenerix_extensions.helpers import get_language_database
 
 
 # Inventory
@@ -104,9 +106,70 @@ class InventoryDetail(GenInventoryUrl, GenDetail):
     groups = InventoryForm.__groups_details__()
 
 
-class InventorySetStock(GenInventoryUrl, GenDetail):
-    model = Inventory
-    groups = InventoryForm.__groups_details__()
+class InventorySetStock(View):
+
+    @method_decorator(login_required)
+    def get(self, *args, **kwargs):
+
+        # Get Inventory PK
+        pk = kwargs.get('pk', None)
+        inventory = Inventory.objects.filter(pk=pk).first()
+
+        # Prepare answer
+        answer = {}
+
+        # Check answer
+        if inventory:
+            # Every block is transactional
+            with transaction.atomic():
+
+                # For each line in inventory
+                for line in inventory.inventory_lines.all():
+
+                    # This is an extra product
+                    price = line.product_final.calculate_price()['price_base']
+                    tax = line.product_final.product.tax.tax
+                    description = str(line.product_final)
+                    # quantity = total_products_to_match
+                    # Locate or create product unique
+                    if line.product_unique:
+                        pu = line.product_unique
+                    else:
+                        pu = ProductUnique()
+                        pu.product_final = line.product_final
+                        pu.box = line.box
+                        pu.value = line.product_unique_value
+                        # pu.stock_real = quantity
+                        pu.save()
+                    # Create Unique Product
+                    pal = PurchasesLineAlbaran()
+                    # pal.albaran = pa
+                    pal.line_order = None
+                    pal.validator_user = self.request.user
+                    # pal.quantity = quantity
+                    pal.price = price
+                    pal.tax = tax
+                    pal.description = description
+                    pal.save()
+                    pal.product_unique.add(pu)
+                    pal.save()
+                    # Save inventory line
+                    line.purchaseslinealbaran.add(pal)
+                    line.save()
+
+            # End inventory
+            inventory.processed = True
+            inventory.end = timezone.now()
+            inventory.save()
+            # Return answer
+            answer['return'] = "OK"
+        else:
+            answer['error'] = True
+            answer['errortxt'] = _("Incoming Inventory not found!")
+
+        # Return answer
+        json_answer = json.dumps(answer)
+        return HttpResponse(json_answer, content_type='application/json')
 
 
 # InventoryLine
@@ -132,27 +195,34 @@ class InventoryLineList(GenInventoryLineUrl, GenList):
 class InventoryLineWork(GenInventoryLineUrl, GenList):
     model = InventoryLine
     extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryLine'), _('InventoryLine')]}
-    defaultordering = "-created"
+    default_ordering = "product_final" # Must be PRODUCT_FINAL so the Sum() will work properly
     static_partial_header = 'codenerix_storages/inventory_work_header.html'
     static_partial_row = 'codenerix_storages/inventory_work_row'
     static_app_row = 'codenerix_storages/inventory_work_app.js'
     static_controllers_row = 'codenerix_storages/inventory_work_controllers.js'
     linkedit = False
     linkadd = False
-    default_ordering = '-created'
     gentrans = {
         'new': _('Unique product is new!'),
         'notfound': _('Product not found!'),
         'removerecord': _('Are you sure you want to remove "<name>"?'),
         'inventariar': _("Inventariar"),
+        'compact': _("Compact"),
+        'extended': _("Extended"),
     }
 
     def __fields__(self, info):
         fields = []
-        fields.append(('box', _("Box")))
-        fields.append(('quantity', _("Quantity")))
-        fields.append(('product_final', _("Product")))
-        fields.append(('product_unique', _("Unique")))
+        if not info.jsonquery.get("extended", False):
+            fields.append(('box__name', _("Box")))
+            fields.append(('total', _("Quantity")))
+            fields.append(('product_final__code', _("Product")))
+            fields.append(('product_unique__value', _("Unique")))
+        else:
+            fields.append(('box', _("Box")))
+            fields.append(('quantity', _("Quantity")))
+            fields.append(('product_final', _("Product")))
+            fields.append(('product_unique', _("Unique")))
         fields.append(('product_unique_value', None))
         fields.append(('caducity', _("Caducity")))
         fields.append(('notes', _("Notes")))
@@ -248,6 +318,30 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         limit = {}
         limit['file_link'] = Q(inventory__pk=info.kwargs.get('ipk'))
         return limit
+
+    def custom_queryset(self, queryset, info):
+        lang = get_language_database()
+        if not info.jsonquery.get("extended", False):
+            queryset = queryset.values(
+                "box__name",
+                "product_final__{}__name".format(lang),
+                "product_unique__value",
+                "caducity"
+            ).annotate(
+                total=Sum('quantity'),
+                box=F('box__name'),
+                product_final=Concat(
+                    F('product_final__{}__name'.format(lang)),
+                    Value(" ("),
+                    F('product_final__ean13'),
+                    Value(")")
+                ),
+                product_unique=F('product_unique__value'),
+            ).annotate(
+                quantity=F('total'),
+                total_notes=Sum(Length(Substr('notes',1,1))),
+            )
+        return queryset
 
 
 class InventoryLineCreate(GenInventoryLineUrl, GenCreate):

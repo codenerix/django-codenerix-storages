@@ -1,24 +1,48 @@
 <div class="row clearfix block-center">
-    <div class="text-right" style="padding-top: 20px; pading-bottom: -20px; margin-right: 15px;">
-        <button
-            class='btn btn-sm status ng-binding ng-scope'
-            ng-class="{'btn-warning': data.meta.context.notes, 'btn-default': !data.meta.context.notes}"
-            ng-click="setnotes()"
-            popover-placement="right" uib-popover="{{data.meta.context.notes}}" popover-trigger="mouseenter">
-            <span
-                class="fa"
-                ng-class="{'fa-exclamation-triangle': data.meta.context.notes, 'fa-edit': !data.meta.context.notes}"></span>
-        </button>
-        <button
-            class='btn btn-sm btn-default status ng-binding ng-scope'
-            ng-click="refresh()">
-            <span class="fa fa-refresh"></span>
-        </button>
-        <button
-            ng-class="{'btn-danger': !data.meta.alldone, 'btn-info': data.meta.alldone}"
-            codenerix-really-click="albaranar(data.meta.request.path_info)"
-            codenerix-really-active="!data.meta.alldone"
-            class="btn btn-sm status ng-binding ng-scope">{{data.meta.gentranslate.inventariar}}</button>
+    <div class="col-md-3 pull-right form-inline panelfilters panelfilters-top" role="form">
+        <div class="panel-body">
+            <div class="input-group input-group-sm block-right">
+                <div class="input-group-btn">
+                    <input
+                        bs-switch
+                        ng-model="query.extended"
+                        type="checkbox"
+                        switch-label-width="2px"
+                        switch-on-color="warning"
+                        switch-off-color="primary"
+                        switch-on-text="{{data.meta.gentranslate.extended}}"
+                        switch-off-text="{{data.meta.gentranslate.compact}}"
+                        switch-change="refresh()"
+                        ng-true-value="true"
+                        ng-false-value="false">
+                </div>
+                <div class="input-group-btn">
+                    <button
+                        class='btn btn-sm status ng-binding ng-scope'
+                        ng-class="{'btn-warning': data.meta.context.notes, 'btn-default': !data.meta.context.notes}"
+                        ng-click="setnotes()"
+                        popover-placement="right" uib-popover="{{data.meta.context.notes}}" popover-trigger="mouseenter">
+                        <span
+                            class="fa"
+                            ng-class="{'fa-exclamation-triangle': data.meta.context.notes, 'fa-edit': !data.meta.context.notes}"></span>
+                    </button>
+                </div>
+                <div class="input-group-btn">
+                    <button
+                        class='btn btn-sm btn-default status ng-binding ng-scope'
+                        ng-click="refresh()">
+                        <span class="fa fa-refresh"></span>
+                    </button>
+                </div>
+                <div class="input-group-btn">
+                    <button
+                        ng-class="{'btn-danger': !data.meta.alldone, 'btn-info': data.meta.alldone}"
+                        codenerix-really-click="setinventory(data.meta.request.path_info)"
+                        codenerix-really-active="!data.meta.alldone"
+                        class="btn btn-sm status ng-binding ng-scope">{{data.meta.gentranslate.inventariar}}</button>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="col-md-12 column">
         <ng-include src="data.meta.ngincludes.table"></ng-include>
