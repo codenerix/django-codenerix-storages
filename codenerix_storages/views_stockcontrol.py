@@ -40,7 +40,7 @@ from codenerix.widgets import DynamicInput, DynamicSelect
 from codenerix_products.models import ProductFinal, ProductUnique
 from codenerix_invoicing.models_purchases import PurchasesOrder, PurchasesLineOrder, PurchasesAlbaran, PurchasesLineAlbaran
 from codenerix_invoicing.models_sales import SalesLines
-from codenerix_storages.models import StorageOperator
+from codenerix_storages.models import StorageOperator, StorageBox
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine
 from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryNotesForm, InventoryLineForm, InventoryLineNotesForm, InventoryInForm, InventoryInNotesForm, InventoryInLineForm, InventoryInLineNotesForm, InventoryOutForm, InventoryOutNotesForm, InventoryOutLineForm, InventoryOutLineNotesForm, DistributionForm, DistributionLineForm
 from codenerix_extensions.helpers import get_language_database
@@ -230,9 +230,12 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         return fields
 
     def dispatch(self, *args, **kwargs):
-        # Get constants
         self.ipk = kwargs.get('ipk')
         self.ws_entry_point = reverse('CDNX_storages_inventoryline_work', kwargs={"ipk": self.ipk})[1:]
+        return super(InventoryLineWork, self).dispatch(*args, **kwargs)
+
+    def set_context_json(self, jsonquery):
+        # Get constants
         self.ws_ean13_fullinfo = reverse('CDNX_storages_inventoryline_ean13_fullinfo', kwargs={"ean13": 'PRODUCT_FINAL_EAN13'})[1:]
         self.ws_unique_fullinfo = reverse('CDNX_storages_inventoryline_unique_fullinfo', kwargs={"unique": 'PRODUCT_FINAL_UNIQUE'})[1:]
         self.ws_submit = reverse('CDNX_storages_inventoryline_addws', kwargs={"ipk": self.ipk})[1:]
@@ -242,36 +245,6 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
 
         # Find provider_pk
         inv = Inventory.objects.filter(pk=self.ipk).first()
-
-        # Simulate Inventory
-
-        sim1 = []
-        sim1.append([_("Product final"), _("Quantity")])
-        sim1.append([_('P1'),'1'])
-        sim1.append([_('P2'),'2'])
-        sim1.append([_('P3'),'2'])
-        sim1.append([_('P4'),'5'])
-        sim2 = []
-        sim2.append([_("Product final"), _("Quantity")])
-        sim2.append([_('P3'),'2'])
-        sim2.append([_('P4'),'5'])
-        sim3 = []
-        sim3.append([_("Product final"), _("Quantity")])
-        sim3.append([_('P1'),'1'])
-        sim3.append([_('P3'),'2'])
-        sim3.append([_('P4'),'5'])
-
-
-        body = []
-        body.append({'title': _('New'), 'total': 1, 'style': 'success', 'data': sim1})
-        body.append({'title': _('Lost'), 'total': 2, 'style': 'danger', 'data': sim2})
-        body.append({'title': _('Relocated'), 'total': 2, 'style': 'warning', 'data': sim3})
-
-        # Render simulation
-        context = {}
-        context['body'] = body
-        template = get_template('codenerix_storages/inventory.html')
-        simulation = template.render(context)
 
         # Prepare form
         fields = []
@@ -290,7 +263,6 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
 
         # Prepare context
         self.client_context = {
-            'simulation': simulation,
             'ipk': self.ipk,
             'notes': inv.notes,
             'final_focus': True,
@@ -344,7 +316,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
                 'placeholder': 'dd/mm/aaaa',
             }),
         }
-        return super(InventoryLineWork, self).dispatch(*args, **kwargs)
+        return super(InventoryLineWork, self).set_context_json(jsonquery)
 
     def __limitQ__(self, info):
         limit = {}
@@ -353,26 +325,186 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
 
     def custom_queryset(self, queryset, info):
         lang = get_language_database()
+
+        # Return extended or compact result
         if not info.jsonquery.get("extended", False):
-            queryset = queryset.values(
+            queryset = queryset.all().values(
                 "box__name",
                 "product_final__{}__name".format(lang),
                 "product_unique__value",
                 "caducity"
             ).annotate(
                 total=Sum('quantity'),
+                box_id=F('box__id'),
                 box=F('box__name'),
+                product_final_id=F('product_final__id'),
                 product_final=Concat(
                     F('product_final__{}__name'.format(lang)),
                     Value(" ("),
                     F('product_final__ean13'),
                     Value(")")
                 ),
+                product_unique_id=F('product_unique__id'),
                 product_unique=F('product_unique__value'),
             ).annotate(
                 quantity=F('total'),
                 total_notes=Sum(Length(Substr('notes', 1, 1))),
             )
+
+        # Prepare options
+        new = []
+        new.append((_("Box"), _("Product final"), _("Product unique"), _("Caducity"), _("Quantity")))
+        lost = []
+        lost.append((_("Box"), _("Product final"), _("Product unique"), _("Caducity"), _("Quantity")))
+
+        # Prepare a compact queryset
+        compact = ProductUnique.objects.values(
+            "box__id",
+            "product_final__id",
+            "value",
+            "caducity"
+        ).annotate(
+            box=F('box__id'),
+            product_final=F('product_final__id'),
+            product_unique=F('value'),
+            total=Sum('stock_real'),
+        )
+        # Add filter for location
+
+        # Simulate Inventory
+        total_new = 0.0
+        total_lost = 0.0
+        for line in compact:
+            # Box
+            box_id = line.get('box')
+            box = StorageBox.objects.get(pk=box_id)
+
+            # Product final
+            product_final_id = line.get('product_final')
+            product_final = ProductFinal.objects.get(pk=product_final_id)
+
+            # Product unique
+            product_unique_id = line.get('product_unique', None)
+            if product_unique_id is None:
+                product_unique = None
+            else:
+                product_unique = ProductUnique.objects.get(pk=product_unique_id)
+
+            # Caducity
+            caducity_value = line.get('caducity', None)
+            if caducity_value is None:
+                caducity = None
+            else:
+                caducity = line['caducity']
+
+            # Total
+            total_storage = line['total']
+
+            # Calculate the total products in this storage/zone
+            inv = InventoryLine.objects.filter(inventory__pk=self.ipk, product_final=product_final)
+            if product_unique is None:
+                inv = inv.filter(product_unique__isnull=True)
+            else:
+                inv = inv.filter(product_unique=product_unique)
+            if caducity is None:
+                inv = inv.filter(caducity__isnull=True)
+            else:
+                inv = inv.filter(caducity=caducity)
+
+            # Unify result
+            total_inv = inv.values(
+                "box__id",
+                "product_final__id",
+                "product_unique__id",
+                "caducity"
+            ).annotate(
+                box=F('box__id'),
+                product_final=F('product_final__id'),
+                product_unique=F('product_unique__id'),
+            ).aggregate(
+                total=Sum('quantity')
+            ).get('total')
+
+            if total_inv is None:
+                total_inv = 0.0
+
+            # Find if there are more or less than it should be
+            dif = total_inv - total_storage
+            if dif > 0:
+                new.append((
+                    str(box),
+                    str(product_final),
+                    product_unique and str(product_unique) or None,
+                    caducity and str(caducity) or None,
+                    dif
+                ))
+                total_new += dif
+            elif dif < 0:
+                lost.append((
+                    str(box),
+                    str(product_final),
+                    product_unique and str(product_unique) or None,
+                    caducity and str(caducity) or None,
+                    abs(dif)
+                ))
+                total_lost += abs(dif)
+
+        inv = InventoryLine.objects.filter(
+            inventory__pk=self.ipk,
+            product_final__products_unique__isnull=True
+        ).values(
+            "box__name",
+            "product_final__{}__name".format(lang),
+            "product_unique__value",
+            "caducity"
+        ).annotate(
+            total=Sum('quantity'),
+            box_id=F('box__id'),
+            box=F('box__name'),
+            product_final_id=F('product_final__id'),
+            product_final=Concat(
+                F('product_final__{}__name'.format(lang)),
+                Value(" ("),
+                F('product_final__ean13'),
+                Value(")")
+            ),
+            product_unique_id=F('product_unique__id'),
+            product_unique=F('product_unique__value'),
+        )
+        for line in inv:
+            # Get details
+            box = line['box']
+            product_final = line['product_final']
+            product_unique = line['product_unique']
+            caducity = line['caducity']
+            total = line['total']
+
+            # Find if there are more or less than it should be
+            new.append((
+                str(box),
+                str(product_final),
+                product_unique and str(product_unique) or None,
+                caducity and str(caducity) or None,
+                total
+            ))
+            total_new += total
+
+        # Make body
+        body = []
+        body.append({'title': _('New'), 'total': total_new, 'style': 'success', 'data': new})
+        body.append({'title': _('Lost'), 'total': total_lost, 'style': 'danger', 'data': lost})
+
+        # Render simulation
+        context = {}
+        context['body'] = body
+        template = get_template('codenerix_storages/inventory.html')
+        simulation = template.render(context)
+
+        # Set new context
+        self.client_context['simulation_header'] = body
+        self.client_context['simulation'] = simulation
+
+        # Return final queryset
         return queryset
 
 
@@ -923,7 +1055,7 @@ class InventoryInAlbaranar(View):
             for line in inventory.inventory_lines.all():
                 # Find total matched products
                 if line.purchaseslinealbaran.exists():
-                    total_products_matched = line.purchaseslinealbaran.values("quantity").annotate(total=Sum("quantity")).first().get('total')
+                    total_products_matched = line.purchaseslinealbaran.aggregate(total=Sum("quantity"))['total']
                 else:
                     total_products_matched = 0
 
@@ -935,8 +1067,17 @@ class InventoryInAlbaranar(View):
 
                         # Total products left to match
                         total_products_to_match = line.quantity - total_products_matched
+
                         # Locate a line order to link to
-                        lo = PurchasesLineOrder.objects.filter(order=line.purchasesorder, product=line.product_final).annotate(total_albaran=Sum("line_albaran_purchases__quantity")).filter(quantity__gt=F("total_albaran")).first()
+                        lo = PurchasesLineOrder.objects.filter(
+                            order=line.purchasesorder,
+                            product=line.product_final
+                        ).annotate(
+                            total_albaran=Sum("line_albaran_purchases__quantity")
+                        ).filter(
+                            quantity__gt=F("total_albaran")
+                        ).first()
+
                         if lo:
                             # We got a lineorder which hasn't be totally linked
                             price = lo.price
@@ -944,12 +1085,17 @@ class InventoryInAlbaranar(View):
                             description = lo.description
                             quantity = min(lo.quantity-lo.total_albaran, total_products_to_match)
                         else:
-                            lo = PurchasesLineOrder.objects.filter(order=line.purchasesorder, product=line.product_final, line_albaran_purchases__isnull=True).first()
+                            lo = PurchasesLineOrder.objects.filter(
+                                order=line.purchasesorder,
+                                product=line.product_final,
+                                line_albaran_purchases__isnull=True
+                            ).first()
                             # No lineorder found, this is an extra product
                             price = line.product_final.calculate_price()['price_base']
                             tax = line.product_final.product.tax.tax
                             description = str(line.product_final)
                             quantity = total_products_to_match
+
                         # Locate or create product unique
                         if line.product_unique:
                             pu = line.product_unique
@@ -958,8 +1104,10 @@ class InventoryInAlbaranar(View):
                             pu.product_final = line.product_final
                             pu.box = line.box
                             pu.value = line.product_unique_value
-                            pu.stock_real = quantity
+                            pu.stock_original = quantity
+                            pu.caducity = line.caducity
                             pu.save()
+
                         # Create Unique Product
                         pal = PurchasesLineAlbaran()
                         pal.albaran = pa
@@ -977,7 +1125,7 @@ class InventoryInAlbaranar(View):
                         line.save()
 
                     # Find total matched products
-                    total_products_matched = line.purchaseslinealbaran.values("quantity").annotate(total=Sum("quantity")).first().get("total")
+                    total_products_matched = line.purchaseslinealbaran.aggregate(total=Sum("quantity"))['total']
 
             # End inventory
             inventory.processed = True

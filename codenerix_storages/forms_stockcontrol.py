@@ -30,7 +30,7 @@ class InventoryForm(GenModelForm):
 
     class Meta:
         model = Inventory
-        exclude = ['end']
+        exclude = ['end', 'notes']
 
     def __groups__(self):
         g = []
@@ -194,7 +194,7 @@ class InventoryInLineForm(GenModelForm):
 
     class Meta:
         model = InventoryInLine
-        exclude = ['inventory', 'operator']
+        exclude = ['inventory', 'operator','purchaseslinealbaran']
 
     def __groups__(self):
         g = []

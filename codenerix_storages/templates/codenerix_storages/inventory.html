@@ -1,10 +1,11 @@
+{% load codenerix_common %}
 {% load i18n %}
 <div class="text-center">
     <h3>{% trans "Inventory" %}</h3>
     <uib-tabset active="activeJustified" justified="true">
         {% for tab in body %}
             <uib-tab index="{{forloop.counter0}}" class='bg-{{tab.style}}'>
-                <uib-tab-heading>{{tab.title}} <span class='badge'>{{tab.total}}</span></uib-tab-heading>
+                <uib-tab-heading class='text-{{tab.style}}'><strong>{{tab.title}}</strong>&nbsp; &nbsp;<span class='badge'>{{tab.total|cdnx_beauty}}</span></uib-tab-heading>
                 <table class="table table-condensed table-hover">
                     {% if tab.data.0 %}
                         <thead>
@@ -17,7 +18,7 @@
                         {% for row in tab.data|slice:"1:" %}
                             <tr>
                                 {% for cell in row %}
-                                    <td>{{cell}}</td>
+                                    <td align='left'>{{cell|cdnx_beauty}}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
@@ -26,5 +27,7 @@
             </uib-tab>
         {% endfor %}
     </uib-tabset>
+    <br/>
+    <hr>
     <h4>{% trans "Do you confirm to set this inventory in the storage/zone?" %}</h4>
 </div>

@@ -1,6 +1,11 @@
 <div class="row clearfix block-center">
-    <div class="col-md-3 pull-right form-inline panelfilters panelfilters-top" role="form">
-        <div class="panel-body">
+    <div class="col-md-12 pull-right form-inline panelfilters panelfilters-top" role="form" style="margin-top: -60px;">
+        <div class="panel-body pull-right">
+            <div class="input-group input-group-sm block-right">
+                <div class="input-group-btn" ng-repeat="sim in data.meta.context.simulation_header">
+                    <button class='btn btn-{{sim.style}}'>{{sim.title}} <span class='badge'>{{sim.total}}</span></button>
+                </div>
+            </div>
             <div class="input-group input-group-sm block-right">
                 <div class="input-group-btn">
                     <input

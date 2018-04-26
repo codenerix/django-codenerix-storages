@@ -32,7 +32,7 @@ from codenerix_products.models import ProductFinal, ProductUnique, PRODUCT_UNIQU
 from codenerix_invoicing.models_purchases import Provider, PurchasesOrder, PurchasesLineAlbaran
 from codenerix_invoicing.models_sales import SalesAlbaran
 
-from .models import Storage, StorageBox, StorageOperator
+from .models import Storage, StorageBox, StorageOperator, StorageZone
 
 
 class GenCode(CodenerixModel):  # META: Abstract class
@@ -109,9 +109,6 @@ class RequestStock(GenCode):
     def __str__(self):
         return u"{} -> {}".format(self.storage_source, self.storage_destination)
 
-    def __unicode__(self):
-        return self.__str__()
-
     def lock_delete(self):
         if self.line_request_stock.exists():
             return _("Cannot delete request stock model, relationship between request stock model and lines")
@@ -139,9 +136,6 @@ class LineRequestStock(CodenerixModel):
     def __str__(self):
         return u"{} ({})".format(self.product_final, self.quantity)
 
-    def __unicode__(self):
-        return self.__str__()
-
 
 class OutgoingAlbaran(GenCode):
     request_stock = models.ForeignKey(RequestStock, on_delete=models.CASCADE, related_name='outgoing_albarans', verbose_name=_("Request stock"), null=False, blank=False)
@@ -161,9 +155,6 @@ class OutgoingAlbaran(GenCode):
 
     def __str__(self):
         return u"{} ({})".format(self.outgoing_date, self.request_stock)
-
-    def __unicode__(self):
-        return self.__str__()
 
     def lock_delete(self):
         if self.line_outgoing_albarans.exists():
@@ -197,9 +188,6 @@ class LineOutgoingAlbaran(CodenerixModel):
     def __str__(self):
         return u"{} ({})".format(self.outgoing_albaran, self.product_unique)
 
-    def __unicode__(self):
-        return self.__str__()
-
 
 class IncomingAlbaran(GenCode):
     outgoing_albaran = models.ForeignKey(OutgoingAlbaran, related_name='incoming_albarans', verbose_name=_("Outgoing Albaran"), null=False, blank=False, on_delete=models.CASCADE)
@@ -215,9 +203,6 @@ class IncomingAlbaran(GenCode):
 
     def __str__(self):
         return u"{} ({})".format(self.outgoing_albaran, self.reception_user)
-
-    def __unicode__(self):
-        return self.__str__()
 
     def lock_delete(self):
         if self.line_incoming_albarans.exists():
@@ -249,9 +234,6 @@ class LineIncomingAlbaran(CodenerixModel):
     def __str__(self):
         return u"{} ({})".format(self.product_unique, self.quantity)
 
-    def __unicode__(self):
-        return self.__str__()
-
 
 # Generic classes for Inventory and Inventory Line
 class GenInventory(CodenerixModel):  # META: Abstract class
@@ -272,15 +254,22 @@ class GenInventoryLine(CodenerixModel):  # META: Abstract class
     quantity = models.FloatField(_("Quantity"), null=False, blank=False, default=1.0)
     notes = models.TextField(_("Notes"), blank=True, null=True)
 
+    def __str__(self):
+        return "{}::{}-{}-{}-{}".format(self.box, self.product_final, self.product_unique, self.product_unique_value, self.quantity)
+
     class Meta(CodenerixModel.Meta):
         abstract = True
 
 
 # Inventory
 class Inventory(GenInventory):
+    storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name='inventorys', verbose_name=_("Storage"), null=False, blank=False)
+    zone = models.ForeignKey(StorageZone, on_delete=models.CASCADE, related_name='inventorys', verbose_name=_("Zone"), null=True, blank=True)
 
     def __fields__(self, info):
         fields = []
+        fields.append(('storage', _('Storage')))
+        fields.append(('zone', _('Zone')))
         fields.append(('created', _('Starts')))
         fields.append(('end', _('Ends')))
         fields.append(('notes', _('Notes')))
@@ -288,10 +277,10 @@ class Inventory(GenInventory):
         return fields
 
     def __str__(self):
-        return u"{}".format(self.created)
-
-    def __unicode__(self):
-        return self.__str__()
+        if self.zone:
+            return u"{} - {}:{}".format(self.created, self.storage, self.zone)
+        else:
+            return u"{} - {}".format(self.created, self.storage)
 
 
 class InventoryLine(GenInventoryLine):
@@ -309,9 +298,6 @@ class InventoryLine(GenInventoryLine):
         fields.append(('caducity', _("Caducity")))
         fields.append(('notes', _("Notes")))
         return fields
-
-    def __unicode__(self):
-        return self.__str__()
 
     def __limitQ__(self, info):
         limit = {}
@@ -348,9 +334,6 @@ class InventoryIn(GenInventory):
     def __str__(self):
         return u"{}::{}".format(self.provider, self.created)
 
-    def __unicode__(self):
-        return self.__str__()
-
 
 class InventoryInLine(GenInventoryLine):
     purchasesorder = models.ForeignKey(PurchasesOrder, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Order"), null=True, blank=True)
@@ -371,9 +354,6 @@ class InventoryInLine(GenInventoryLine):
         fields.append(('caducity', _("Caducity")))
         fields.append(('notes', _("Notes")))
         return fields
-
-    def __unicode__(self):
-        return self.__str__()
 
     def __limitQ__(self, info):
         limit = {}
@@ -398,9 +378,6 @@ class InventoryOut(GenInventory):
     def __str__(self):
         return u"{}::{}".format(self.albaran, self.created)
 
-    def __unicode__(self):
-        return self.__str__()
-
 
 class InventoryOutLine(GenInventoryLine):
     inventory = models.ForeignKey(InventoryOut, on_delete=models.CASCADE, related_name='inventory_lines', verbose_name=_("Inventory line"), null=False, blank=False)
@@ -415,9 +392,6 @@ class InventoryOutLine(GenInventoryLine):
         fields.append(('quantity', _("Quantity")))
         fields.append(('notes', _("Notes")))
         return fields
-
-    def __unicode__(self):
-        return self.__str__()
 
     def __limitQ__(self, info):
         limit = {}
