@@ -24,8 +24,8 @@
 // Angular codenerix Controllers
 angular.module('codenerixSTORAGESControllers', [])
 
-.controller('CDNXSTORAGESInventoryWorkCtrl', ['$scope', '$rootScope', '$timeout', '$location', '$uibModal', '$templateCache', '$http', '$state', 'Register', 'ListMemory',
-    function($scope, $rootScope, $timeout, $location, $uibModal, $templateCache, $http, $state, Register, ListMemory) {
+.controller('CDNXSTORAGESInventoryWorkCtrl', ['$scope', '$rootScope', '$timeout', '$location', '$uibModal', '$templateCache', '$http', '$state', '$window', 'Register', 'ListMemory',
+    function($scope, $rootScope, $timeout, $location, $uibModal, $templateCache, $http, $state, $window, Register, ListMemory) {
         if (ws_entry_point==undefined) { ws_entry_point=""; }
         multilist($scope, $rootScope, $timeout, $location, $uibModal, $templateCache, $http, $state, Register, ListMemory, 0, "/"+ws_entry_point);
 
@@ -228,7 +228,7 @@ angular.module('codenerixSTORAGESControllers', [])
 
             var functions = function(scope) {};
             var callback = function(scope, answer) {
-                $window.location.href = "/"+$scope.data.meta.context.ws.url_inventoryin;
+                $window.location.href = "/"+$scope.data.meta.context.ws.url_inventory;
             };
             var callback_cancel = function(scope, answer) {
                 $scope.refresh();

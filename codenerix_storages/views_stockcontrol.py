@@ -129,7 +129,12 @@ class InventorySetStock(View):
             with transaction.atomic():
 
                 # Prepare a compact queryset
-                compact = ProductUnique.objects.values(
+                compact = ProductUnique.objects
+                if inventory.zone:
+                    compact = compact.filter(box__box_structure__zone=inventory.zone)
+                else:
+                    compact = compact.filter(box__box_structure__zone__storage=inventory.storage)
+                compact = compact.values(
                     "box__id",
                     "product_final__id",
                     "value",
@@ -450,6 +455,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
 
     def custom_queryset(self, queryset, info):
         lang = get_language_database()
+        inventory = Inventory.objects.filter(pk=self.ipk).first()
 
         # Return extended or compact result
         if not info.jsonquery.get("extended", False):
@@ -483,7 +489,12 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         lost.append((_("Box"), _("Product final"), _("Product unique"), _("Caducity"), _("Quantity"), _("Locked")))
 
         # Prepare a compact queryset
-        compact = ProductUnique.objects.values(
+        compact = ProductUnique.objects
+        if inventory.zone:
+            compact = compact.filter(box__box_structure__zone=inventory.zone)
+        else:
+            compact = compact.filter(box__box_structure__zone__storage=inventory.storage)
+        compact = compact.values(
             "box__id",
             "product_final__id",
             "value",
@@ -495,8 +506,6 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
             total_real=Sum('stock_real'),
             total_locked=Sum('stock_locked')
         )
-
-        # Add filter for location
 
         # Simulate Inventory
         total_new = 0.0
