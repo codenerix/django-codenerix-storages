@@ -2,32 +2,42 @@
 {% load i18n %}
 <div class="text-center">
     <h3>{% trans "Inventory" %}</h3>
-    <uib-tabset active="activeJustified" justified="true">
-        {% for tab in body %}
-            <uib-tab index="{{forloop.counter0}}" class='bg-{{tab.style}}'>
-                <uib-tab-heading class='text-{{tab.style}}'><strong>{{tab.title}}</strong>&nbsp; &nbsp;<span class='badge'>{{tab.total|cdnx_beauty}}</span></uib-tab-heading>
-                <table class="table table-condensed table-hover">
-                    {% if tab.data.0 %}
-                        <thead>
-                            {% for column in tab.data.0 %}
-                            <th>{{column}}</th>
-                            {% endfor %}
-                        </thead>
-                    {% endif %}
-                    <tbody>
-                        {% for row in tab.data|slice:"1:" %}
-                            <tr>
-                                {% for cell in row %}
-                                    <td align='left'>{{cell|cdnx_beauty}}</td>
+    {% if body %}
+        <uib-tabset active="activeJustified" justified="true">
+            {% for tab in body %}
+                <uib-tab index="{{forloop.counter0}}" class='bg-{{tab.style}}'>
+                    <uib-tab-heading class='text-{{tab.style}}'><strong>{{tab.title}}</strong>&nbsp; &nbsp;<span class='badge'>{{tab.total|cdnx_beauty}}</span></uib-tab-heading>
+                    <table class="table table-condensed table-hover">
+                        {% if tab.data.0 %}
+                            <thead>
+                                {% for column in tab.data.0 %}
+                                <th>{{column}}</th>
                                 {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </uib-tab>
-        {% endfor %}
-    </uib-tabset>
+                            </thead>
+                        {% endif %}
+                        <tbody>
+                            {% for row in tab.data|slice:"1:" %}
+                                <tr>
+                                    {% for cell in row %}
+                                        <td align='left'>{{cell|cdnx_beauty}}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </uib-tab>
+            {% endfor %}
+        </uib-tabset>
+    {% else %}
+        <h3><strong>{% trans "All is OK!" %}</strong></h3>
+    {% endif %}
     <br/>
     <hr>
-    <h4>{% trans "Do you confirm to set this inventory in the storage/zone?" %}</h4>
+    <h4>
+        {% if locked_inventory %}
+            <span class='text-danger'><strong>{% trans "There are locked products that are LOST!" %}</strong></span>
+        {% else %}
+            {% trans "Do you confirm to set this inventory in the storage/zone?" %}
+        {% endif %}
+    </h4>
 </div>

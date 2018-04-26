@@ -113,60 +113,184 @@ class InventorySetStock(View):
     def get(self, *args, **kwargs):
 
         # Get Inventory PK
-        pk = kwargs.get('pk', None)
-        inventory = Inventory.objects.filter(pk=pk).first()
+        self.ipk = kwargs.get('pk', None)
+        inventory = Inventory.objects.filter(pk=self.ipk).first()
 
         # Prepare answer
         answer = {}
 
         # Check answer
         if inventory:
+
+            # Get language
+            lang = get_language_database()
+
             # Every block is transactional
             with transaction.atomic():
 
-                # For each line in inventory
-                for line in inventory.inventory_lines.all():
+                # Prepare a compact queryset
+                compact = ProductUnique.objects.values(
+                    "box__id",
+                    "product_final__id",
+                    "value",
+                    "caducity"
+                ).annotate(
+                    box=F('box__id'),
+                    product_final=F('product_final__id'),
+                    product_unique=F('value'),
+                    total=Sum('stock_real'),
+                )
+                # Add filter for location
 
-                    # This is an extra product
-                    price = line.product_final.calculate_price()['price_base']
-                    tax = line.product_final.product.tax.tax
-                    description = str(line.product_final)
-                    # quantity = total_products_to_match
-                    # Locate or create product unique
-                    if line.product_unique:
-                        pu = line.product_unique
+                # Simulate Inventory
+                for line in compact:
+                    # Box
+                    box_id = line.get('box')
+                    box = StorageBox.objects.get(pk=box_id)
+
+                    # Product final
+                    product_final_id = line.get('product_final')
+                    product_final = ProductFinal.objects.get(pk=product_final_id)
+
+                    # Product unique
+                    product_unique_value = line.get('product_unique', None)
+                    if product_unique_value is None:
+                        product_unique = None
                     else:
-                        pu = ProductUnique()
-                        pu.product_final = line.product_final
-                        pu.box = line.box
-                        pu.value = line.product_unique_value
-                        # pu.stock_real = quantity
-                        pu.save()
-                    # Create Unique Product
-                    pal = PurchasesLineAlbaran()
-                    # pal.albaran = pa
-                    pal.line_order = None
-                    pal.validator_user = self.request.user
-                    # pal.quantity = quantity
-                    pal.price = price
-                    pal.tax = tax
-                    pal.description = description
-                    pal.save()
-                    pal.product_unique.add(pu)
-                    pal.save()
-                    # Save inventory line
-                    line.purchaseslinealbaran.add(pal)
-                    line.save()
+                        product_unique = product_unique_value
 
-            # End inventory
-            inventory.processed = True
-            inventory.end = timezone.now()
-            inventory.save()
+                    # Caducity
+                    caducity_value = line.get('caducity', None)
+                    if caducity_value is None:
+                        caducity = None
+                    else:
+                        caducity = caducity_value
+
+                    # Total
+                    total_storage = line['total']
+
+                    # Calculate the total products in this storage/zone
+                    inv = InventoryLine.objects.filter(inventory__pk=self.ipk, product_final=product_final)
+                    if product_unique is None:
+                        inv = inv.filter(product_unique__isnull=True)
+                    else:
+                        inv = inv.filter(product_unique__value=product_unique)
+                    if caducity is None:
+                        inv = inv.filter(caducity__isnull=True)
+                    else:
+                        inv = inv.filter(caducity=caducity)
+
+                    # Unify result
+                    total_inv = inv.values(
+                        "box__id",
+                        "product_final__id",
+                        "product_unique__id",
+                        "caducity"
+                    ).annotate(
+                        box=F('box__id'),
+                        product_final=F('product_final__id'),
+                        product_unique=F('product_unique__id'),
+                    ).aggregate(
+                        total=Sum('quantity')
+                    ).get('total')
+
+                    if total_inv is None:
+                        total_inv = 0.0
+
+                    # Find if there are more or less than it should be
+                    dif = total_inv - total_storage
+                    if dif > 0:
+                        # Add new products
+                        pu = ProductUnique()
+                        pu.box = box
+                        pu.product_final = product_final
+                        pu.value = product_unique
+                        pu.caducity = caducity
+                        pu.stock_original = dif
+                        pu.save()
+                    elif dif < 0:
+                        # Find extra producs
+                        pus = ProductUnique.objects.filter(
+                            box=box,
+                            product_final=product_final,
+                            value=product_unique,
+                            caducity=caducity,
+                        )
+                        # Remove extra products until quantity is normalized
+                        dif = abs(dif)
+                        for pu in pus:
+                            # Calculate free products
+                            free = pu.stock_real-pu.stock_locked
+                            if free:
+                                # There are free products here
+                                if free <= dif:
+                                    dif -= free
+                                    if pu.stock_locked==0:
+                                        # No more products here, delete please!
+                                        pu.delete()
+                                    else:
+                                        # We will remove the free ones
+                                        pu.stock_original -= free
+                                        pu.save()
+                                else:
+                                    # We have enought products here to make free
+                                    pu.stock_real -= dif
+                                    pu.save()
+
+                        # If we should delete some products but can not anymore
+                        if dif:
+                            raise IOError("Not enought produts to be deleted!")
+
+                # Add the rest of extra products
+                inv = InventoryLine.objects.filter(
+                    inventory__pk=self.ipk,
+                    product_final__products_unique__isnull=True
+                ).values(
+                    "box__name",
+                    "product_final__{}__name".format(lang),
+                    "product_unique__value",
+                    "caducity"
+                ).annotate(
+                    total=Sum('quantity'),
+                    box_id=F('box__id'),
+                    box=F('box__name'),
+                    product_final_id=F('product_final__id'),
+                    product_final=Concat(
+                        F('product_final__{}__name'.format(lang)),
+                        Value(" ("),
+                        F('product_final__ean13'),
+                        Value(")")
+                    ),
+                    product_unique_id=F('product_unique__id'),
+                    product_unique=F('product_unique__value'),
+                )
+                for line in inv:
+                    # Get details
+                    box = StorageBox.objects.get(pk=line['box_id'])
+                    product_final = ProductFinal.objects.get(pk=line['product_final_id'])
+                    product_unique = line['product_unique']
+                    caducity = line['caducity']
+                    total = line['total']
+
+                    # Add new products
+                    pu = ProductUnique()
+                    pu.box = box
+                    pu.product_final = product_final
+                    pu.value = product_unique
+                    pu.caducity = caducity
+                    pu.stock_original = total
+                    pu.save()
+
+                # End inventory
+                inventory.processed = True
+                inventory.end = timezone.now()
+                inventory.save()
+
             # Return answer
             answer['return'] = "OK"
         else:
             answer['error'] = True
-            answer['errortxt'] = _("Incoming Inventory not found!")
+            answer['errortxt'] = _("Inventory not found!")
 
         # Return answer
         json_answer = json.dumps(answer)
@@ -353,9 +477,9 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
 
         # Prepare options
         new = []
-        new.append((_("Box"), _("Product final"), _("Product unique"), _("Caducity"), _("Quantity")))
+        new.append((_("Box"), _("Product final"), _("Product unique"), _("Caducity"), _("Quantity"), _("Locked")))
         lost = []
-        lost.append((_("Box"), _("Product final"), _("Product unique"), _("Caducity"), _("Quantity")))
+        lost.append((_("Box"), _("Product final"), _("Product unique"), _("Caducity"), _("Quantity"), _("Locked")))
 
         # Prepare a compact queryset
         compact = ProductUnique.objects.values(
@@ -367,13 +491,16 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
             box=F('box__id'),
             product_final=F('product_final__id'),
             product_unique=F('value'),
-            total=Sum('stock_real'),
+            total_real=Sum('stock_real'),
+            total_locked=Sum('stock_locked')
         )
+
         # Add filter for location
 
         # Simulate Inventory
         total_new = 0.0
         total_lost = 0.0
+        locked_inventory = 0
         for line in compact:
             # Box
             box_id = line.get('box')
@@ -384,28 +511,29 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
             product_final = ProductFinal.objects.get(pk=product_final_id)
 
             # Product unique
-            product_unique_id = line.get('product_unique', None)
-            if product_unique_id is None:
+            product_unique_value = line.get('product_unique', None)
+            if product_unique_value is None:
                 product_unique = None
             else:
-                product_unique = ProductUnique.objects.get(pk=product_unique_id)
+                product_unique = product_unique_value
 
             # Caducity
             caducity_value = line.get('caducity', None)
             if caducity_value is None:
                 caducity = None
             else:
-                caducity = line['caducity']
+                caducity = caducity_value
 
             # Total
-            total_storage = line['total']
+            total_storage = line['total_real']
+            total_locked = line['total_locked']
 
             # Calculate the total products in this storage/zone
             inv = InventoryLine.objects.filter(inventory__pk=self.ipk, product_final=product_final)
             if product_unique is None:
                 inv = inv.filter(product_unique__isnull=True)
             else:
-                inv = inv.filter(product_unique=product_unique)
+                inv = inv.filter(product_unique__value=product_unique)
             if caducity is None:
                 inv = inv.filter(caducity__isnull=True)
             else:
@@ -430,22 +558,32 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
 
             # Find if there are more or less than it should be
             dif = total_inv - total_storage
+            locked = total_inv - total_locked
+            if locked<0:
+                locked = abs(locked)
+                locked_inventory += locked
+            else:
+                locked = None
             if dif > 0:
+                # We have more products than we should
                 new.append((
                     str(box),
                     str(product_final),
                     product_unique and str(product_unique) or None,
                     caducity and str(caducity) or None,
-                    dif
+                    dif,
+                    locked
                 ))
                 total_new += dif
             elif dif < 0:
+                # We have less products than we should
                 lost.append((
                     str(box),
                     str(product_final),
                     product_unique and str(product_unique) or None,
                     caducity and str(caducity) or None,
-                    abs(dif)
+                    abs(dif),
+                    locked
                 ))
                 total_lost += abs(dif)
 
@@ -485,24 +623,38 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
                 str(product_final),
                 product_unique and str(product_unique) or None,
                 caducity and str(caducity) or None,
-                total
+                total,
+                None
             ))
             total_new += total
 
         # Make body
         body = []
-        body.append({'title': _('New'), 'total': total_new, 'style': 'success', 'data': new})
-        body.append({'title': _('Lost'), 'total': total_lost, 'style': 'danger', 'data': lost})
+        if total_new:
+            body.append({'title': _('New'), 'total': total_new, 'style': 'success', 'data': new})
+        if total_lost:
+            body.append({'title': _('Lost'), 'total': total_lost, 'style': 'danger', 'data': lost})
 
         # Render simulation
         context = {}
         context['body'] = body
+        context['locked_inventory'] = locked_inventory
         template = get_template('codenerix_storages/inventory.html')
         simulation = template.render(context)
 
+        # Add locked to header
+        header = []
+        if total_new:
+            header.append({'title': _('New'), 'total': total_new, 'style': 'success'})
+        if total_lost:
+            header.append({'title': _('Lost'), 'total': total_lost, 'style': 'warning'})
+        if locked_inventory:
+            header.append({'title': _('Locked'), 'total': locked_inventory, 'style': 'danger'})
+
         # Set new context
-        self.client_context['simulation_header'] = body
+        self.client_context['simulation_header'] = header
         self.client_context['simulation'] = simulation
+        self.client_context['locked_inventory'] = locked_inventory
 
         # Return final queryset
         return queryset

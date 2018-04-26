@@ -220,10 +220,10 @@ angular.module('codenerixSTORAGESControllers', [])
             });
         };
 
-        $scope.doinventory = function(tempurl) {
+        $scope.setinventory = function(tempurl) {
 
             // Prepare URL
-            var url = tempurl+'/../doinventory';
+            var url = tempurl+'/../setstock';
             url = url.replace("inventoryline", "inventory")
 
             var functions = function(scope) {};
