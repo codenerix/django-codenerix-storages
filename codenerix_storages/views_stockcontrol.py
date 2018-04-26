@@ -236,6 +236,7 @@ class InventorySetStock(View):
                                     # We have enought products here to make free
                                     pu.stock_real -= dif
                                     pu.save()
+                                    dif = 0
 
                         # If we should delete some products but can not anymore
                         if dif:
@@ -630,10 +631,10 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
 
         # Make body
         body = []
-        if total_new:
-            body.append({'title': _('New'), 'total': total_new, 'style': 'success', 'data': new})
         if total_lost:
             body.append({'title': _('Lost'), 'total': total_lost, 'style': 'danger', 'data': lost})
+        if total_new:
+            body.append({'title': _('New'), 'total': total_new, 'style': 'success', 'data': new})
 
         # Render simulation
         context = {}
@@ -644,12 +645,12 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
 
         # Add locked to header
         header = []
+        if total_lost:
+            header.append({'title': _('Lost'), 'total': total_lost, 'style': 'danger'})
+        if locked_inventory:
+            header.append({'title': _('Locked'), 'total': locked_inventory, 'style': 'warning'})
         if total_new:
             header.append({'title': _('New'), 'total': total_new, 'style': 'success'})
-        if total_lost:
-            header.append({'title': _('Lost'), 'total': total_lost, 'style': 'warning'})
-        if locked_inventory:
-            header.append({'title': _('Locked'), 'total': locked_inventory, 'style': 'danger'})
 
         # Set new context
         self.client_context['simulation_header'] = header
