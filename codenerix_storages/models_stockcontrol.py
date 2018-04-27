@@ -241,6 +241,18 @@ class GenInventory(CodenerixModel):  # META: Abstract class
     notes = models.TextField(_("Notes"), blank=True, null=True)
     processed = models.BooleanField(_("Processed"), blank=False, null=False, default=False, editable=False)
 
+    def lock_update(self):
+        if self.processed:
+            return _("This Inventory has been already processed, can not be updated")
+        else:
+            return None
+
+    def lock_delete(self):
+        if self.processed:
+            return _("This Inventory has been already processed, can not be deleted")
+        else:
+            return None
+
     class Meta(CodenerixModel.Meta):
         abstract = True
 
@@ -256,6 +268,18 @@ class GenInventoryLine(CodenerixModel):  # META: Abstract class
 
     def __str__(self):
         return "{}::{}-{}-{}-{}".format(self.box, self.product_final, self.product_unique, self.product_unique_value, self.quantity)
+
+    def lock_update(self):
+        if self.inventory.processed:
+            return _("This Inventory has been already processed, can not be updated")
+        else:
+            return None
+
+    def lock_delete(self):
+        if self.inventory.processed:
+            return _("This Inventory has been already processed, can not be deleted")
+        else:
+            return None
 
     class Meta(CodenerixModel.Meta):
         abstract = True
@@ -273,6 +297,7 @@ class Inventory(GenInventory):
         fields.append(('created', _('Starts')))
         fields.append(('end', _('Ends')))
         fields.append(('notes', _('Notes')))
+        fields.append(('processed', None))
         fields.append((None, _('Actions')))
         return fields
 

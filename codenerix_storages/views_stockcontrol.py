@@ -312,6 +312,8 @@ class InventoryLineList(GenInventoryLineUrl, GenList):
     model = InventoryLine
     extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryLine'), _('InventoryLine')]}
     defaultordering = "-created"
+    linkadd = False
+    linkedit = False
 
     def dispatch(self, *args, **kwargs):
         self.ws_entry_point = reverse('CDNX_storages_inventoryline_list', kwargs={"ipk": kwargs.get('ipk')})[1:]
@@ -394,6 +396,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         # Prepare context
         self.client_context = {
             'ipk': self.ipk,
+            'processed': inv.processed,
             'notes': inv.notes,
             'final_focus': True,
             'unique_focus': False,
@@ -649,6 +652,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
         context = {}
         context['body'] = body
         context['locked_inventory'] = locked_inventory
+        context['processed'] = inventory.processed
         template = get_template('codenerix_storages/inventory.html')
         simulation = template.render(context)
 
@@ -1313,6 +1317,8 @@ class InventoryInLineList(GenInventoryInLineUrl, GenList):
     model = InventoryInLine
     extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryInLine'), _('InventoryInLine')]}
     defaultordering = "-created"
+    linkadd = False
+    linkedit = False
 
     def dispatch(self, *args, **kwargs):
         self.ws_entry_point = reverse('CDNX_storages_inventoryinline_list', kwargs={"ipk": kwargs.get('ipk')})[1:]
@@ -1790,6 +1796,8 @@ class InventoryOutLineList(GenInventoryOutLineUrl, GenList):
     model = InventoryOutLine
     extra_context = {'menu': ['storage', 'storage'], 'bread': [_('InventoryOutLine'), _('InventoryOutLine')]}
     defaultordering = "-created"
+    linkadd = False
+    linkedit = False
 
     def dispatch(self, *args, **kwargs):
         self.ws_entry_point = reverse('CDNX_storages_inventoryoutline_list', kwargs={"ipk": kwargs.get('ipk')})[1:]

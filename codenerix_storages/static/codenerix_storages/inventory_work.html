@@ -1,7 +1,9 @@
 <div class="row clearfix block-center">
     <div class="col-md-12 pull-right form-inline panelfilters panelfilters-top" role="form" style="margin-top: -60px;">
         <div class="panel-body pull-right">
-            <div class="input-group input-group-sm block-right">
+            <div
+                ng-if="!data.meta.context.processed"
+                class="input-group input-group-sm block-right">
                 <div class="input-group-btn" ng-repeat="sim in data.meta.context.simulation_header">
                     <button class='btn btn-{{sim.style}}'>{{sim.title}} <span class='badge'>{{sim.total}}</span></button>
                 </div>
@@ -39,7 +41,9 @@
                         <span class="fa fa-refresh"></span>
                     </button>
                 </div>
-                <div class="input-group-btn">
+                <div
+                    ng-if="!data.meta.context.processed"
+                    class="input-group-btn">
                     <button
                         ng-class="{'btn-danger': !data.meta.alldone, 'btn-info': data.meta.alldone}"
                         codenerix-really-click="setinventory(data.meta.request.path_info)"
