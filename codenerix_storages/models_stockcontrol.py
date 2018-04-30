@@ -270,13 +270,15 @@ class GenInventoryLine(CodenerixModel):  # META: Abstract class
         return "{}::{}-{}-{}-{}".format(self.box, self.product_final, self.product_unique, self.product_unique_value, self.quantity)
 
     def lock_update(self):
-        if self.inventory.processed:
+        inventory = getattr(self, 'inventory', None)
+        if inventory and inventory.processed:
             return _("This Inventory has been already processed, can not be updated")
         else:
             return None
 
     def lock_delete(self):
-        if self.inventory.processed:
+        inventory = getattr(self, 'inventory', None)
+        if inventory and inventory.processed:
             return _("This Inventory has been already processed, can not be deleted")
         else:
             return None
