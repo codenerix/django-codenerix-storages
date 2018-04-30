@@ -7,17 +7,9 @@
 <td ng-click="gotourl(data.meta.context.url_doinventory.replace('__IPK__', row.pk)); $event.stopPropagation()">{{row.end|codenerix}}</td>
 <td ng-click="gotourl(data.meta.context.url_doinventory.replace('__IPK__', row.pk)); $event.stopPropagation()">
     <a
-        ng-href="{{data.meta.context.url_doinventory.replace('__IPK__', row.pk)}}"
-        ng-click="$event.stopPropagation()"
-        class="btn btn-sm status btn-default ng-binding ng-scope">{{data.meta.gentranslate.doinventory}}</a>
-    <a
         ng-href="{{data.meta.context.url_getreport.replace('__IPK__', row.pk)}}"
         ng-click="$event.stopPropagation()"
         class="btn btn-sm status btn-default ng-binding ng-scope">{{data.meta.gentranslate.getreport}}</a>
-    <a
-        ng-href="{{data.meta.context.url_getreport.replace('__IPK__', row.pk)}}"
-        ng-click="$event.stopPropagation()"
-        class="btn btn-sm status btn-default ng-binding ng-scope">Regularizacion de stock</a>
 </td>
 
 <td class="text-center" ng-click="$event.stopPropagation()" ng-show="data.table.head.extra_fields.field_delete">

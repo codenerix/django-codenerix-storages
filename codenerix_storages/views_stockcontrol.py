@@ -1993,7 +1993,6 @@ class InventoryOutLineCreate(GenInventoryOutLineUrl, GenCreate):
 
     def form_valid(self, form):
         if self.__ipk:
-
             # If products must be unique, make sure we get only the unique selected
             filters = {'product_final': form.instance.product_final}
             if form.instance.product_final.product.feature_special and form.instance.product_final.product.feature_special.unique:
