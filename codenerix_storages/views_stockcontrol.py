@@ -1837,19 +1837,19 @@ class InventoryOutAlbaranar(View):
                         for pu in pus:
 
                             # Find out our ProductUnique
-                            if pu.stock_locked==left:
+                            if pu.stock_locked == left:
                                 # We have exact match
                                 fpu = pu
                                 # We took everything we need, we are done
                                 left = 0
-                            elif pu.stock_locked>left:
+                            elif pu.stock_locked > left:
                                 # Split
                                 fpu = pu.duplicate(left, locked=True)
                                 # We took everything we need, we are done
                                 left = 0
-                            elif pu.stock_locked<left:
+                            elif pu.stock_locked < left:
                                 # Check if we have to split
-                                if pu.stock_real>pu.stock_locked:
+                                if pu.stock_real > pu.stock_locked:
                                     # There are free products, we have to split
                                     fpu = pu.duplicate(pu.stock_locked, locked=True)
                                 else:
@@ -1857,6 +1857,10 @@ class InventoryOutAlbaranar(View):
                                     fpu = pu
                                 # We didn't get everything we need, keep going
                                 left -= fpu.stock_locked
+
+                            # Remove all stock from them
+                            fpu.stock_real = 0
+                            fpu.stock_locked = 0
 
                             # Link it
                             loa.product_unique = fpu
