@@ -1873,6 +1873,11 @@ class InventoryOutAlbaranar(View):
                                 # We have finished
                                 break
 
+                # If we have left products to link
+                if left:
+                    # We couldn't do the job, there are not enought products
+                    raise IOError("Not enought locked products in the storage!")
+
                 # End inventory
                 inventory.processed = True
                 inventory.end = timezone.now()
