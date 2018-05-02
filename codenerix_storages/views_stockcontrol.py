@@ -41,7 +41,7 @@ from codenerix_products.models import ProductFinal, ProductUnique
 from codenerix_invoicing.models_purchases import PurchasesOrder, PurchasesLineOrder, PurchasesAlbaran, PurchasesLineAlbaran
 from codenerix_invoicing.models_sales import SalesLines
 from codenerix_storages.models import StorageOperator, StorageBox
-from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine
+from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine, OutgoingAlbaran, LineOutgoingAlbaran
 from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryNotesForm, InventoryLineForm, InventoryLineNotesForm, InventoryInForm, InventoryInNotesForm, InventoryInLineForm, InventoryInLineNotesForm, InventoryOutForm, InventoryOutNotesForm, InventoryOutLineForm, InventoryOutLineNotesForm, DistributionForm, DistributionLineForm
 from codenerix_extensions.helpers import get_language_database
 
@@ -230,7 +230,7 @@ class InventorySetStock(View):
                                 # There are free products here
                                 if free <= dif:
                                     dif -= free
-                                    if pu.stock_locked==0:
+                                    if pu.stock_locked == 0:
                                         # No more products here, delete please!
                                         pu.delete()
                                     else:
@@ -572,7 +572,7 @@ class InventoryLineWork(GenInventoryLineUrl, GenList):
             # Find if there are more or less than it should be
             dif = total_inv - total_storage
             locked = total_inv - total_locked
-            if locked<0:
+            if locked < 0:
                 locked = abs(locked)
                 locked_inventory += locked
             else:
@@ -1297,6 +1297,7 @@ class InventoryInAlbaranar(View):
             inventory.processed = True
             inventory.end = timezone.now()
             inventory.save()
+
             # Return answer
             answer['return'] = "OK"
         else:
@@ -1782,9 +1783,106 @@ class InventoryOutDetail(GenInventoryOutUrl, GenDetail):
     groups = InventoryOutForm.__groups_details__()
 
 
-class InventoryOutAlbaranar(GenInventoryOutUrl, GenDetail):
-    model = InventoryOut
-    groups = InventoryOutForm.__groups_details__()
+class InventoryOutAlbaranar(View):
+
+    @method_decorator(login_required)
+    def get(self, *args, **kwargs):
+
+        # Get Inventory PK
+        pk = kwargs.get('pk', None)
+        inventory = InventoryOut.objects.filter(pk=pk).first()
+
+        # Prepare answer
+        answer = {}
+
+        # Check answer
+        if inventory:
+
+            # Every block is transactional
+            with transaction.atomic():
+
+                # Create Albaran
+                oa = OutgoingAlbaran()
+                oa.inventory = inventory
+                oa.prepare_user = self.request.user
+                oa.prepare_date = timezone.now()
+                oa.save()
+
+                # For each line in inventory
+                for line in inventory.inventory_lines.all():
+                    # New line
+                    loa = LineOutgoingAlbaran()
+                    loa.outgoing_albaran = oa
+                    # Locate the product unique (from product final or with product unique if defined)
+                    if line.product_unique:
+                        # Check if it is the same unique from the Albaran
+                        pu = line.product_unique
+                        # If it is not the same (exchange them)
+                        # ProductUnique.objects.filter(product_final=line.product_final)
+                        raise IOError(pu)
+                        # Count down from Product Uniques
+                        # ...
+                        # Link it
+                        loa.product_unique = pu
+                        # Save the line
+                        loa.save()
+                    else:
+                        # Locate a product_unique from product final
+                        pus = ProductUnique.objects.filter(
+                            product_final=line.product_final,
+                            stock_locked__gt=0
+                        )
+                        # For each one found
+                        left = line.quantity
+                        for pu in pus:
+
+                            # Find out our ProductUnique
+                            if pu.stock_locked==left:
+                                # We have exact match
+                                fpu = pu
+                                # We took everything we need, we are done
+                                left = 0
+                            elif pu.stock_locked>left:
+                                # Split
+                                fpu = pu.duplicate(left, locked=True)
+                                # We took everything we need, we are done
+                                left = 0
+                            elif pu.stock_locked<left:
+                                # Check if we have to split
+                                if pu.stock_real>pu.stock_locked:
+                                    # There are free products, we have to split
+                                    fpu = pu.duplicate(pu.stock_locked, locked=True)
+                                else:
+                                    # We are taking everything from here
+                                    fpu = pu
+                                # We didn't get everything we need, keep going
+                                left -= fpu.stock_locked
+
+                            # Link it
+                            loa.product_unique = fpu
+
+                            # Save the line
+                            loa.save()
+
+                            # If we do not have left products to link
+                            if not left:
+                                # We have finished
+                                break
+
+                # End inventory
+                inventory.processed = True
+                inventory.end = timezone.now()
+                inventory.save()
+
+            # Return answer
+            answer['return'] = "OK"
+        else:
+            answer['error'] = True
+            answer['errortxt'] = _("Outgoing Inventory not found!")
+
+        # Return answer
+        json_answer = json.dumps(answer)
+        return HttpResponse(json_answer, content_type='application/json')
 
 
 # Inventory Outoging Stock Line

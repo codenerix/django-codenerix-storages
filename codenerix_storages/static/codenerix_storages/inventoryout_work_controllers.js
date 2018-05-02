@@ -229,5 +229,44 @@ angular.module('codenerixSTORAGESControllers', [])
 
         };
 
+        $scope.albaranar = function(tempurl) {
+
+            // Prepare URL
+            var url = tempurl+'/../albaranar';
+            url = url.replace("inventoryoutline", "inventoryout")
+
+            var functions = function(scope) {};
+            var callback = function(scope, answer) {
+                $window.location.href = "/"+$scope.data.meta.context.ws.url_inventoryin;
+            };
+            var callback_cancel = function(scope, answer) {
+                $scope.refresh();
+            };
+
+            function action(quickmodal_ok, quickmodal_error) {
+                $http.get( url, {}, {} )
+                .success(function(answer, stat) {
+                    if (answer.return != 'OK'){
+                        quickmodal_error(answer.return);
+                    } else {
+                        quickmodal_ok(answer);
+                    }
+                })
+                .error(function(data, status, headers, config) {
+                    if (cnf_debug){
+                        if (data) {
+                            quickmodal_error(data);
+                        } else {
+                            quickmodal_error(cnf_debug_txt);
+                        }
+                    } else {
+                        quickmodal_error(cnf_debug_txt);
+                    }
+                });
+            }
+
+            quickmodal($scope, $timeout, $uibModal, 'sm', action, functions, callback, callback_cancel);
+        };
+
     }
 ]);
