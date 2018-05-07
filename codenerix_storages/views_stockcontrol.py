@@ -34,12 +34,12 @@ from django.forms.utils import ErrorList
 from django.utils import timezone
 from django.template.loader import get_template
 
-from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail
+from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenForeignKey
 from codenerix.widgets import DynamicInput, DynamicSelect
 
 from codenerix_products.models import ProductFinal, ProductUnique
 from codenerix_invoicing.models_purchases import PurchasesOrder, PurchasesLineOrder, PurchasesAlbaran, PurchasesLineAlbaran
-from codenerix_invoicing.models_sales import SalesLines
+from codenerix_invoicing.models_sales import SalesLines, SalesAlbaran
 from codenerix_storages.models import StorageOperator, StorageBox
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine, OutgoingAlbaran, LineOutgoingAlbaran
 from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryNotesForm, InventoryLineForm, InventoryLineNotesForm, InventoryInForm, InventoryInNotesForm, InventoryInLineForm, InventoryInLineNotesForm, InventoryOutForm, InventoryOutNotesForm, InventoryOutLineForm, InventoryOutLineNotesForm, DistributionForm, DistributionLineForm
@@ -1781,6 +1781,14 @@ class InventoryOutDelete(GenInventoryOutUrl, GenDelete):
 class InventoryOutDetail(GenInventoryOutUrl, GenDetail):
     model = InventoryOut
     groups = InventoryOutForm.__groups_details__()
+
+
+class InventoryOutAlbaranForeign(GenForeignKey):
+    model = SalesAlbaran
+    label = "{code}"
+
+    def get_foreign(self, queryset, search, filter):
+        return queryset.filter(send=True, inventorys__isnull=True).all()
 
 
 class InventoryOutAlbaranar(View):

@@ -29,7 +29,7 @@ from codenerix_storages.views_stockcontrol import DistributionLineList, Distribu
 from codenerix_storages.views_stockcontrol import InventoryInList, InventoryInCreate, InventoryInCreateModal, InventoryInDelete, InventoryInAlbaranar, InventoryInNotesModal
 from codenerix_storages.views_stockcontrol import InventoryInLineList, InventoryInLineWork, InventoryInLineCreate, InventoryInLineCreateWS, InventoryInLineCreateModal, InventoryInLineUpdate, InventoryInLineUpdateModal, InventoryInLineDelete, InventoryInLineDetail, InventoryInLineEAN13Fullinfo, InventoryInLineUniqueFullinfo, InventoryInLinePurhcaseOrder, InventoryInLineNotesModal
 
-from codenerix_storages.views_stockcontrol import InventoryOutList, InventoryOutCreate, InventoryOutCreateModal, InventoryOutDelete, InventoryOutAlbaranar, InventoryOutNotesModal
+from codenerix_storages.views_stockcontrol import InventoryOutList, InventoryOutCreate, InventoryOutCreateModal, InventoryOutDelete, InventoryOutAlbaranForeign, InventoryOutAlbaranar, InventoryOutNotesModal
 from codenerix_storages.views_stockcontrol import InventoryOutLineList, InventoryOutLineWork, InventoryOutLineCreate, InventoryOutLineCreateWS, InventoryOutLineCreateModal, InventoryOutLineUpdate, InventoryOutLineUpdateModal, InventoryOutLineDelete, InventoryOutLineDetail, InventoryOutLineEAN13Fullinfo, InventoryOutLineUniqueFullinfo, InventoryOutLineNotesModal
 
 urlpatterns = [
@@ -105,6 +105,7 @@ urlpatterns = [
     url(r'^inventoryout$', InventoryOutList.as_view(), name='CDNX_storages_inventoryout_list'),
     url(r'^inventoryout/add$', InventoryOutCreate.as_view(), name='CDNX_storages_inventoryout_add'),
     url(r'^inventoryout/addmodal$', InventoryOutCreateModal.as_view(), name='CDNX_storages_inventoryout_addmodal'),
+    url(r'^inventoryout/albaran/(?P<search>[\w\W]+|\*)$', InventoryOutAlbaranForeign.as_view(), name='CDNX_storages_inventoryout_albaran_foreign'),
     url(r'^inventoryout/(?P<pk>\w+)/delete$', InventoryOutDelete.as_view(), name='CDNX_storages_inventoryout_delete'),
     url(r'^inventoryout/(?P<pk>\w+)/albaranar', InventoryOutAlbaranar.as_view(), name='CDNX_storages_inventoryout_albaranar'),
     url(r'^inventoryout/(?P<pk>\w+)/notesmodal$', InventoryOutNotesModal.as_view(), name='CDNX_storages_inventoryout_notesmodal'),

@@ -194,7 +194,7 @@ class InventoryInLineForm(GenModelForm):
 
     class Meta:
         model = InventoryInLine
-        exclude = ['inventory', 'operator','purchaseslinealbaran']
+        exclude = ['inventory', 'operator', 'purchaseslinealbaran']
 
     def __groups__(self):
         g = []
@@ -231,13 +231,18 @@ class InventoryOutForm(GenModelForm):
     class Meta:
         model = InventoryOut
         exclude = ['end']
+        autofill = {
+            'albaran': ['select', 3, 'CDNX_storages_inventoryout_albaran_foreign'],
+        }
 
     def __groups__(self):
-        g = []
-        # (
-        #     _('Details'), 12,
-        #     ['name', 6],
-        # ),
+        g = [
+         (
+             _('InventoryOut'), 12,
+             ['albaran', 12],
+             ['notes', 12],
+         ),
+        ]
         return g
 
     @staticmethod
