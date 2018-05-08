@@ -18,7 +18,7 @@ setup(
     license='Apache License Version 2.0',
     description='Codenerix Storages is a module that enables CODENERIX to set storages on serveral platforms in a general manner.',
     long_description=README,
-    url='https://github.com/centrologic/django-codenerix-storages',
+    url='https://github.com/codenerix/django-codenerix-storages',
     author=", ".join(codenerix_storages.__authors__),
     keywords=['django', 'codenerix', 'management', 'erp', 'crm', 'storages'],
     platforms=['OS Independent'],
