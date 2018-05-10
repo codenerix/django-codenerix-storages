@@ -26,6 +26,7 @@ from codenerix.widgets import MultiStaticSelect
 from codenerix_extensions.helpers import get_external_model
 from codenerix_storages.models import Storage, StorageZone
 from codenerix_storages.models import StorageBox, StorageBoxStructure, StorageBoxKind, StorageOperator
+from codenerix_geodata.urls import url
 
 
 class StorageForm(GenModelForm):
@@ -164,7 +165,9 @@ class StorageBoxForm(GenModelForm):
 
 
 class StorageBoxFormUpdate(GenModelForm):
+
     class Meta:
+
         model = StorageBox
         exclude = []
 
@@ -185,6 +188,12 @@ class StorageBoxStructureForm(GenModelForm):
     class Meta:
         model = StorageBoxStructure
         exclude = []
+        autofill = {
+            'regions': ['select', 3, "CDNX_ext_location_regions_foreign"],
+            'countrys': ['select', 3, "CDNX_ext_location_country_foreign"],
+            'provinces': ['select', 3, "CDNX_ext_location_provinces_foreign"],
+            'citys': ['select', 3, "CDNX_ext_location_citys_foreign"],
+        }
 
     def __groups__(self):
         return [
