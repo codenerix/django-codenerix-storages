@@ -26,8 +26,6 @@ from codenerix.widgets import MultiStaticSelect
 from codenerix_extensions.helpers import get_external_model
 from codenerix_storages.models import Storage, StorageZone
 from codenerix_storages.models import StorageBox, StorageBoxStructure, StorageBoxKind, StorageOperator
-from codenerix_geodata.urls import url
-
 
 class StorageForm(GenModelForm):
 
@@ -165,9 +163,7 @@ class StorageBoxForm(GenModelForm):
 
 
 class StorageBoxFormUpdate(GenModelForm):
-
     class Meta:
-
         model = StorageBox
         exclude = []
 
