@@ -234,7 +234,8 @@ class StorageBoxDetailModal(GenDetailModal, StorageBoxDetail):
 
 class StorageBoxForeign(GenForeignKey):
     model = StorageBox
-    label = "{name}"
+#    label = "{name}"
+    label = '{<LANGUAGE_CODE>__name}'
 
     def get_foreign(self, queryset, search, filter):
         return queryset.all()
