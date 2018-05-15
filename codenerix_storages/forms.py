@@ -33,6 +33,12 @@ class StorageForm(GenModelForm):
     class Meta:
         model = Storage
         exclude = []
+        autofill = {
+            'region': ['select', 3, "CDNX_ext_location_regions_foreign"],
+            'country': ['select', 3, "CDNX_ext_location_country_foreign"],
+            'province': ['select', 3, "CDNX_ext_location_provinces_foreign"],
+            'city': ['select', 3, "CDNX_ext_location_citys_foreign"],
+            }
 
     def __groups__(self):
         g = [
