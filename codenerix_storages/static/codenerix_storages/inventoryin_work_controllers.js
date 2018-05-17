@@ -116,6 +116,7 @@ angular.module('codenerixSTORAGESControllers', [])
                             // Check for unique
                             if (answer.unique) {
                                 $scope.data.meta.context.unique_focus = true;
+                                $scope.data.meta.context.must_be_unique = answer.must_be_unique;
                             } else {
                                 if (answer.caducable) {
                                     $scope.data.meta.context.caducity_focus = true;

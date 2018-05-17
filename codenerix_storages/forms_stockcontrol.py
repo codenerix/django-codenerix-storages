@@ -20,6 +20,7 @@
 
 # from django.utils.translation import ugettext_lazy as _
 
+from django import forms
 from django.utils.translation import ugettext as _
 
 from codenerix.forms import GenModelForm
@@ -204,6 +205,23 @@ class InventoryInLineForm(GenModelForm):
     def __groups_details__():
         g = []
         return g
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get('quantity', None)
+        if not quantity or quantity <= 0:
+            raise forms.ValidationError("You didn't specify any quantity!")
+        return quantity
+
+    def clean(self):
+        cleaned_data = super().clean()
+        pf = cleaned_data.get("product_final", None)
+        if pf:
+            fe = pf.product.feature_special
+            if fe:
+                must_be_unique = bool(fe.unique)
+                quantity = cleaned_data.get("quantity", None)
+                if must_be_unique and quantity and quantity > 1:
+                    self.add_error('quantity', _("This product must be unique, you can not add several products with the same unique code"))
 
 
 class InventoryInLineNotesForm(GenModelForm):

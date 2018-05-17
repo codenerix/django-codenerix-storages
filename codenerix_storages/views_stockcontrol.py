@@ -1565,12 +1565,25 @@ class InventoryInLineCreate(GenInventoryInLineUrl, GenCreate):
 
     def form_valid(self, form):
         if self.__ipk:
+            # Set IPK fields
             inventory = InventoryIn.objects.get(pk=self.__ipk)
             operator = StorageOperator.objects.get(external__user=self.request.user)
             self.request.inventory = inventory
             form.instance.inventory = inventory
             self.request.operator = operator
             form.instance.operator = operator
+
+            # Check unique products
+            fe = form.instance.product_final.product.feature_special
+            if fe:
+               must_be_unique = bool(fe.unique)
+               if must_be_unique:
+                    repeated = inventory.inventory_lines.filter(product_unique_value=form.instance.product_unique_value).first()
+                    if repeated:
+                        form.add_error('quantity', _("This product is already registered"))
+                        return self.form_invalid(form)
+
+        # Return result
         return super(InventoryInLineCreate, self).form_valid(form)
 
 
@@ -1637,16 +1650,19 @@ class InventoryInLineEAN13Fullinfo(View):
         if ean13:
             pf = ProductFinal.objects.filter(ean13=ean13).first()
             if pf:
-                fe = answer['unique'] = pf.product.feature_special
+                fe = pf.product.feature_special
                 if fe:
-                    unique = bool(fe.unique)
+                    unique = True
+                    must_be_unique = bool(fe.unique)
                 else:
                     unique = False
+                    must_be_unique = False
 
                 # Prepare answer
                 answer['pk'] = pf.pk
                 answer['caducable'] = pf.product.caducable
                 answer['unique'] = unique
+                answer['must_be_unique'] = must_be_unique
 
         # Return answer
         json_answer = json.dumps(answer)
@@ -1817,7 +1833,7 @@ class InventoryOutAlbaranar(View):
                 oa.save()
 
                 # For each line in inventory
-                for line in inventory.inventory_lines.all():
+                for line in inventory.inventory_lines.order_by("").all():
                     # New line
                     loa = LineOutgoingAlbaran()
                     loa.outgoing_albaran = oa
