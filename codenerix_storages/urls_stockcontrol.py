@@ -22,7 +22,6 @@ from django.conf.urls import url
 
 from codenerix_storages.views_stockcontrol import InventoryList, InventoryCreate, InventoryCreateModal, InventoryUpdate, InventoryUpdateModal, InventoryDelete, InventoryDetail, InventorySetStock, InventoryNotesModal
 from codenerix_storages.views_stockcontrol import InventoryLineList, InventoryLineWork, InventoryLineCreate, InventoryLineCreateWS, InventoryLineCreateModal, InventoryLineUpdate, InventoryLineUpdateModal, InventoryLineDelete, InventoryLineDetail, InventoryLineEAN13Fullinfo, InventoryLineUniqueFullinfo, InventoryLineNotesModal
-
 from codenerix_storages.views_stockcontrol import DistributionList, DistributionCreate, DistributionCreateModal, DistributionDelete
 from codenerix_storages.views_stockcontrol import DistributionLineList, DistributionLineWork, DistributionLineCreate, DistributionLineCreateWS, DistributionLineCreateModal, DistributionLineUpdate, DistributionLineUpdateModal, DistributionLineDelete, DistributionLineDetail
 
@@ -31,6 +30,9 @@ from codenerix_storages.views_stockcontrol import InventoryInLineList, Inventory
 
 from codenerix_storages.views_stockcontrol import InventoryOutList, InventoryOutCreate, InventoryOutCreateModal, InventoryOutDelete, InventoryOutAlbaranForeign, InventoryOutAlbaranar, InventoryOutNotesModal
 from codenerix_storages.views_stockcontrol import InventoryOutLineList, InventoryOutLineWork, InventoryOutLineCreate, InventoryOutLineCreateWS, InventoryOutLineCreateModal, InventoryOutLineUpdate, InventoryOutLineUpdateModal, InventoryOutLineDelete, InventoryOutLineDetail, InventoryOutLineEAN13Fullinfo, InventoryOutLineUniqueFullinfo, InventoryOutLineNotesModal
+
+from codenerix_storages.views_stockcontrol import OutgoingAlbaranList, OutgoingAlbaranCreate, OutgoingAlbaranCreateModal, OutgoingAlbaranDetail, OutgoingAlbaranUpdate, OutgoingAlbaranUpdateModal, OutgoingAlbaranDelete
+from codenerix_storages.views_stockcontrol import OutgoingAlbaranLineList, OutgoingAlbaranLineCreate, OutgoingAlbaranLineCreateModal, OutgoingAlbaranLineUpdate, OutgoingAlbaranLineUpdateModal, OutgoingAlbaranLineDelete
 
 urlpatterns = [
     url(r'^inventory$', InventoryList.as_view(), name='CDNX_storages_inventory_list'),
@@ -126,4 +128,20 @@ urlpatterns = [
     url(r'^inventoryoutline/(?P<ipk>\w+)/(?P<pk>\w+)/delete$', InventoryOutLineDelete.as_view(), name='CDNX_storages_inventoryoutline_delete'),
     url(r'^inventoryoutlineean13/(?P<ean13>[a-zA-Z0-9+-_/]+)/fullinfo$', InventoryOutLineEAN13Fullinfo.as_view(), name='CDNX_storages_inventoryoutline_ean13_fullinfo'),
     url(r'^inventoryoutlineunique/(?P<unique>[a-zA-Z0-9+-_/]+)/fullinfo$', InventoryOutLineUniqueFullinfo.as_view(), name='CDNX_storages_inventoryoutline_unique_fullinfo'),
+
+    url(r'^outgoingalbaran$', OutgoingAlbaranList.as_view(), name='CDNX_storages_outgoingalbaran_list'),
+    url(r'^outgoingalbaran/add$', OutgoingAlbaranCreate.as_view(), name='CDNX_storages_outgoingalbaran_add'),
+    url(r'^outgoingalbaran/addmodal$', OutgoingAlbaranCreateModal.as_view(), name='CDNX_storages_outgoingalbaran_addmodal'),
+    url(r'^outgoingalbaran/(?P<pk>\w+)$', OutgoingAlbaranDetail.as_view(), name='CDNX_storages_outgoingalbaran_details'),
+    url(r'^outgoingalbaran/(?P<pk>\w+)/edit$', OutgoingAlbaranUpdate.as_view(), name='CDNX_storages_outgoingalbaran_edit'),
+    url(r'^outgoingalbaran/(?P<pk>\w+)/editmodal$', OutgoingAlbaranUpdateModal.as_view(), name='CDNX_storages_outgoingalbaran_editmodal'),
+    url(r'^outgoingalbaran/(?P<pk>\w+)/delete$', OutgoingAlbaranDelete.as_view(), name='CDNX_storages_outgoingalbaran_delete'),
+
+    url(r'^outgoingalbaranline/(?P<ipk>\w+)$', OutgoingAlbaranLineList.as_view(), name='CDNX_storages_outgoingalbaranline_list'),
+    #url(r'^outgoingalbaranline/(?P<ipk>\w+)/add$', OutgoingAlbaranLineCreate.as_view(), name='CDNX_storages_outgoingalbaranline_add'),
+    #url(r'^outgoingalbaranline/(?P<ipk>\w+)/addmodal$', OutgoingAlbaranLineCreateModal.as_view(), name='CDNX_storages_outgoingalbaranline_addmodal'),
+    #url(r'^outgoingalbaranline/(?P<ipk>\w+)/(?P<pk>\w+)$', OutgoingAlbaranLineDetail.as_view(), name='CDNX_storages_outgoingalbaranline_details'),
+    #url(r'^outgoingalbaranline/(?P<ipk>\w+)/(?P<pk>\w+)/edit$', OutgoingAlbaranLineUpdate.as_view(), name='CDNX_storages_outgoingalbaranline_edit'),
+    #url(r'^outgoingalbaranline/(?P<ipk>\w+)/(?P<pk>\w+)/editmodal$', OutgoingAlbaranLineUpdateModal.as_view(), name='CDNX_storages_outgoingalbaranline_editmodal'),
+    #url(r'^outgoingalbaranline/(?P<ipk>\w+)/(?P<pk>\w+)/delete$', OutgoingAlbaranLineDelete.as_view(), name='CDNX_storages_outgoingalbaranline_delete'),
 ]
