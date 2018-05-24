@@ -2250,6 +2250,16 @@ class OutgoingAlbaranList(GenOutgoingAlbaranListUrl, GenList):
         'menu': ['storage', 'outgoingalbaran'],
         'bread': [_('Storage'), _('Outgoing Albaran')],
     }
+    gentrans = {
+        'getreport': _("Get report"),
+        'dooutgoingalbaran': _("Do outgoingalbaran"),
+    }
+
+    def dispatch(self, *args, **kwargs):
+        self.client_context = {
+            'url_dooutgoingalbaran': reverse('CDNX_storages_outgoingalbaranline_list', kwargs={"ipk": "__IPK__"}),
+        }
+        return super(OutgoingAlbaranList, self).dispatch(*args, **kwargs)
 
 
 class OutgoingAlbaranCreate(GenCreate):
@@ -2282,14 +2292,41 @@ class OutgoingAlbaranDetail(GenOutgoingAlbaranListUrl, GenDetail):
     model = OutgoingAlbaran
     groups = OutgoingAlbaranForm.__groups_details__()
 
+    tabs = [
+        {
+            'id': 'LineOutgoingAlbaran',
+            'name': _(u'Albaran saliente'),
+            'ws': 'CDNX_storages_outgoingalbaranline_list',
+            'rows': 'base',
+        }
+    ]
+    exclude_fields = []
+
 
 class OutgoingAlbaranDetailModal(GenDetailModal, OutgoingAlbaranDetail):
     pass
 
 
-class OutgoingAlbaranLineList(GenList):
+class OutgoingAlbaranForeign(GenForeignKey):
+    model = OutgoingAlbaran
+    label = "{code}"
+
+    def get_foreign(self, queryset, search, filter):
+        return queryset.filter(send=True, outgoingalbarans__isnull=True).all()
+
+
+class GenOutgoingAlbaranListLineUrl(object):
+    ws_entry_point = '{}/outgoingalbaranline'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
+
+
+class OutgoingAlbaranLineList(GenOutgoingAlbaranListLineUrl, GenList):
     model = LineOutgoingAlbaran
 
+    def dispatch(self, *args, **kwargs):
+        self.ws_entry_point = reverse('CDNX_storages_outgoingalbaranline_list', kwargs={"ipk": kwargs.get('ipk')})[1:]
+        return super(OutgoingAlbaranLineList, self).dispatch(*args, **kwargs)
+    
+    
     def __limitQ__(self, info):
         limit = {}
         pk = info.kwargs.get('pk', None)
@@ -2297,11 +2334,7 @@ class OutgoingAlbaranLineList(GenList):
         return limit
 
 
-class OutgoingAlbaranLineCreate(GenCreateModal, GenOutgoingAlbaranListUrl):
-    pass
-
-
-class OutgoingAlbaranLineCreateModal(GenCreateModal):
+class OutgoingAlbaranLineCreate(GenCreate, GenOutgoingAlbaranListLineUrl):
     model = LineOutgoingAlbaran
     form_class = LineOutgoingAlbaranForm
 
@@ -2316,14 +2349,14 @@ class OutgoingAlbaranLineCreateModal(GenCreateModal):
             self.request.outgoing_albaran = data
             form.instance.outgoing_albaran = data
 
-        return super(OutgoingAlbaranLineCreateModal, self).form_valid(form, forms)
+        return super(OutgoingAlbaranLineCreate, self).form_valid(form, forms)
 
 
-class OutgoingAlbaranLineUpdate(GenOutgoingAlbaranListUrl, GenUpdate):
+class OutgoingAlbaranLineCreateModal(GenCreateModal, OutgoingAlbaranLineCreate):
     pass
 
 
-class OutgoingAlbaranLineUpdateModal(GenUpdateModal, OutgoingAlbaranLineUpdate):
+class OutgoingAlbaranLineUpdate(GenOutgoingAlbaranListLineUrl, GenUpdate):
     model = LineOutgoingAlbaran
     form_class = LineOutgoingAlbaranForm
 
@@ -2338,20 +2371,12 @@ class OutgoingAlbaranLineUpdateModal(GenUpdateModal, OutgoingAlbaranLineUpdate):
             self.request.outgoing_albaran = data
             form.instance.outgoing_albaran = data
 
-        return super(OutgoingAlbaranLineUpdateModal, self).form_valid(form, forms)
+        return super(OutgoingAlbaranLineUpdate, self).form_valid(form, forms)
 
 
-class OutgoingAlbaranLineDelete(GenOutgoingAlbaranListUrl, GenDelete):
+class OutgoingAlbaranLineUpdateModal(GenUpdateModal, OutgoingAlbaranLineUpdate):
+    pass
+
+
+class OutgoingAlbaranLineDelete(GenOutgoingAlbaranListLineUrl, GenDelete):
     model = LineOutgoingAlbaran
-
-
-class OutgoingAlbaranLineDetail(GenDetail):
-    model = LineOutgoingAlbaran
-    groups = LineOutgoingAlbaranForm.__groups_details__()
-
-
-
-
-
-
-
