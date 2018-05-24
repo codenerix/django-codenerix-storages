@@ -28,9 +28,5 @@ angular.module('codenerixSTORAGESControllers', [])
     function($scope, $rootScope, $timeout, $location, $uibModal, $templateCache, $http, $state, Register, ListMemory) {
         if (ws_entry_point==undefined) { ws_entry_point=""; }
         multilist($scope, $rootScope, $timeout, $location, $uibModal, $templateCache, $http, $state, Register, ListMemory, 0, "/"+ws_entry_point);
-
-        $scope.gotourl = function (url) {
-            window.location.href = url;
-        };
     }
 ]);
