@@ -197,6 +197,9 @@ angular.module('codenerixSTORAGESControllers', [])
                     if ((typeof(answer['head'])!='undefined') && (typeof(answer['head']['errors'])!='undefined')) {
                         angular.forEach(answer['head']['errors'], function (value, key) {
                             angular.forEach(value, function(error) {
+                                if ($scope.data.meta.context.errors[key] == undefined)  {
+                                    $scope.data.meta.context.errors[key] = '';
+                                }
                                 $scope.data.meta.context.errors[key] += value+".";
                             });
                         });
