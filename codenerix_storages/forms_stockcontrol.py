@@ -24,7 +24,7 @@ from django import forms
 from django.utils.translation import ugettext as _
 
 from codenerix.forms import GenModelForm
-from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine, OutgoingAlbaran
+from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine, OutgoingAlbaran, LineOutgoingAlbaran
 
 
 class InventoryForm(GenModelForm):
@@ -350,19 +350,9 @@ class OutgoingAlbaranForm(GenModelForm):
 
     @staticmethod
     def __groups_details__():
-        g = []
-        return g
-
-
-class LineOutgoingAlbaranForm(GenModelForm):
-
-    class Meta:
-        model = OutgoingAlbaran
-        exclude = []
-
-    def __groups__(self):
         g = [(
             _('Details'), 12,
+            ['inventory', 2],
             ['request_stock', 2],
             ['prepare_user' , 2],
             ['prepare_date', 2],
@@ -372,15 +362,30 @@ class LineOutgoingAlbaranForm(GenModelForm):
         ]
         return g
 
+
+class LineOutgoingAlbaranForm(GenModelForm):
+
+    class Meta:
+        model = LineOutgoingAlbaran
+        exclude = []
+
+    def __groups__(self):
+        g = [(
+            _('Details'), 12,
+            ['outgoing_albaran', 4],
+            ['product_unique' , 4],
+            ['validator_user', 4],
+        ),
+        ]
+        return g
+
     @staticmethod
     def __groups_details__():
         g = [(
             _('Details'), 12,
-            ['request_stock', 2],
-            ['prepare_user' , 2],
-            ['prepare_date', 2],
-            ['outgoing_date', 2],
-            ['estimated_date', 2],
+            ['outgoing_albaran', 4],
+            ['product_unique' , 4],
+            ['validator_user', 4],
         ),
         ]
         return g
