@@ -310,7 +310,7 @@ class OutgoingAlbaran(CodenerixModel):
 
 class LineOutgoingAlbaran(CodenerixModel):
     outgoing_albaran = models.ForeignKey(OutgoingAlbaran, related_name='line_outgoing_albarans', verbose_name=_("Outgoing Albaran"), null=False, blank=False, on_delete=models.CASCADE)
-    product_unique = models.ForeignKey(ProductUnique, related_name='line_outgoing_albarans', verbose_name=_("Outgoing Albaran"), null=False, blank=False, on_delete=models.CASCADE)
+    product_unique = models.ForeignKey(ProductUnique, related_name='line_outgoing_albarans', verbose_name=_("Product Unique"), null=False, blank=False, on_delete=models.CASCADE)
     # prepare_user = models.ForeignKey(User, related_name='line_outgoing_albarans_prepare', verbose_name=_("Prepare user"), blank=False, null=False, on_delete=models.CASCADE)
     validator_user = models.ForeignKey(User, related_name='line_outgoing_albarans_validator', verbose_name=_("Validator user"), blank=False, null=False, on_delete=models.CASCADE)
     # box = 1
@@ -318,7 +318,7 @@ class LineOutgoingAlbaran(CodenerixModel):
     def __fields__(self, info):
         fields = []
         fields.append(('outgoing_albaran', _("Outgoing Albaran")))
-        fields.append(('product_unique', _("Outgoing Albaran")))
+        fields.append(('product_unique', _("Product Unique")))
         fields.append(('prepare_user', _("Prepare user")))
         fields.append(('validator_user', _("Validator user")))
         # box = 1

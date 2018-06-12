@@ -34,7 +34,7 @@ from django.forms.utils import ErrorList
 from django.utils import timezone
 from django.template.loader import get_template
 
-from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenForeignKey
+from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal, GenForeignKey
 from codenerix.widgets import DynamicInput, DynamicSelect
 
 from codenerix_products.models import ProductFinal, ProductUnique
@@ -42,7 +42,7 @@ from codenerix_invoicing.models_purchases import PurchasesOrder, PurchasesLineOr
 from codenerix_invoicing.models_sales import SalesLines, SalesAlbaran
 from codenerix_storages.models import StorageOperator, StorageBox
 from codenerix_storages.models_stockcontrol import Inventory, InventoryLine, InventoryIn, InventoryInLine, InventoryOut, InventoryOutLine, Distribution, DistributionLine, OutgoingAlbaran, LineOutgoingAlbaran
-from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryNotesForm, InventoryLineForm, InventoryLineNotesForm, InventoryInForm, InventoryInNotesForm, InventoryInLineForm, InventoryInLineNotesForm, InventoryOutForm, InventoryOutNotesForm, InventoryOutLineForm, InventoryOutLineNotesForm, DistributionForm, DistributionLineForm
+from codenerix_storages.forms_stockcontrol import InventoryForm, InventoryNotesForm, InventoryLineForm, InventoryLineNotesForm, InventoryInForm, InventoryInNotesForm, InventoryInLineForm, InventoryInLineNotesForm, InventoryOutForm, InventoryOutNotesForm, InventoryOutLineForm, InventoryOutLineNotesForm, DistributionForm, DistributionLineForm, OutgoingAlbaranForm, LineOutgoingAlbaranForm
 from codenerix_extensions.helpers import get_language_database
 
 
@@ -2254,3 +2254,145 @@ class InventoryOutLineUniqueFullinfo(View):
         # Return answer
         json_answer = json.dumps(answer)
         return HttpResponse(json_answer, content_type='application/json')
+
+
+class GenOutgoingAlbaranListUrl(object):
+    ws_entry_point = '{}/outgoingalbaran'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
+
+
+class OutgoingAlbaranList(GenOutgoingAlbaranListUrl, GenList):
+    model = OutgoingAlbaran
+    extra_context = {
+        'menu': ['storage', 'outgoingalbaran'],
+        'bread': [_('Storage'), _('Outgoing Albaran')],
+    }
+    gentrans = {
+        'getreport': _("Get report"),
+        'dooutgoingalbaran': _("Do outgoingalbaran"),
+    }
+
+    def dispatch(self, *args, **kwargs):
+        self.client_context = {
+            'url_dooutgoingalbaran': reverse('CDNX_storages_outgoingalbaranline_list', kwargs={"ipk": "__IPK__"}),
+        }
+        return super(OutgoingAlbaranList, self).dispatch(*args, **kwargs)
+
+
+class OutgoingAlbaranCreate(GenCreate):
+    model = OutgoingAlbaran
+    form_class = OutgoingAlbaranForm
+    show_details = True
+    hide_foreignkey_button = True
+
+
+class OutgoingAlbaranCreateModal(GenCreateModal, OutgoingAlbaranCreate):
+    pass
+
+
+class OutgoingAlbaranUpdate(GenUpdate):
+    model = OutgoingAlbaran
+    form_class = OutgoingAlbaranForm
+    show_details = True
+    hide_foreignkey_button = True
+
+
+class OutgoingAlbaranUpdateModal(GenUpdateModal, OutgoingAlbaranUpdate):
+    pass
+
+
+class OutgoingAlbaranDelete(GenDelete):
+    model = OutgoingAlbaran
+
+
+class OutgoingAlbaranDetail(GenOutgoingAlbaranListUrl, GenDetail):
+    model = OutgoingAlbaran
+    groups = OutgoingAlbaranForm.__groups_details__()
+
+    tabs = [
+        {
+            'id': 'LineOutgoingAlbaran',
+            'name': _(u'Albaran saliente'),
+            'ws': 'CDNX_storages_outgoingalbaranline_list',
+            'rows': 'base',
+        }
+    ]
+    exclude_fields = []
+
+
+class OutgoingAlbaranDetailModal(GenDetailModal, OutgoingAlbaranDetail):
+    pass
+
+
+class OutgoingAlbaranForeign(GenForeignKey):
+    model = OutgoingAlbaran
+    label = "{code}"
+
+    def get_foreign(self, queryset, search, filter):
+        return queryset.filter(send=True, outgoingalbarans__isnull=True).all()
+
+
+class GenOutgoingAlbaranListLineUrl(object):
+    ws_entry_point = '{}/outgoingalbaranline'.format(settings.CDNX_STORAGES_URL_STOCKCONTROL)
+
+
+class OutgoingAlbaranLineList(GenOutgoingAlbaranListLineUrl, GenList):
+    model = LineOutgoingAlbaran
+
+    def dispatch(self, *args, **kwargs):
+        self.ws_entry_point = reverse('CDNX_storages_outgoingalbaranline_list', kwargs={"ipk": kwargs.get('ipk')})[1:]
+        return super(OutgoingAlbaranLineList, self).dispatch(*args, **kwargs)
+    
+    
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['file_link'] = Q(outgoing_albaran__pk=info.kwargs.get('ipk'))
+        return limit
+
+
+class OutgoingAlbaranLineCreate(GenCreate, GenOutgoingAlbaranListLineUrl):
+    model = LineOutgoingAlbaran
+    form_class = LineOutgoingAlbaranForm
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        self.__field_pk = kwargs.get('tpk', None)
+        return super(OutgoingAlbaranLineCreateModal, self).dispatch(*args, **kwargs)
+
+    def form_valid(self, form):
+        if self.__field_pk:
+            data = OutgoingAlbaran.objects.get(pk=self.__field_pk)
+            self.request.outgoing_albaran = data
+            form.instance.outgoing_albaran = data
+
+        return super(OutgoingAlbaranLineCreate, self).form_valid(form, forms)
+
+
+class OutgoingAlbaranLineCreateModal(GenCreateModal, OutgoingAlbaranLineCreate):
+    pass
+
+
+class OutgoingAlbaranLineUpdate(GenOutgoingAlbaranListLineUrl, GenUpdate):
+    model = LineOutgoingAlbaran
+    form_class = LineOutgoingAlbaranForm
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        self.__field_pk = kwargs.get('tpk', None)
+        return super(OutgoingAlbaranLineUpdateModal, self).dispatch(*args, **kwargs)
+
+    def form_valid(self, form):
+        if self.__field_pk:
+            data = OutgoingAlbaran.objects.get(pk=self.__field_pk)
+            self.request.outgoing_albaran = data
+            form.instance.outgoing_albaran = data
+
+        return super(OutgoingAlbaranLineUpdate, self).form_valid(form, forms)
+
+
+class OutgoingAlbaranLineUpdateModal(GenUpdateModal, OutgoingAlbaranLineUpdate):
+    pass
+
+
+class OutgoingAlbaranLineDelete(GenOutgoingAlbaranListLineUrl, GenDelete):
+    model = LineOutgoingAlbaran
