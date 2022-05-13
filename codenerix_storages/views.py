@@ -21,11 +21,11 @@
 import hashlib
 
 from django.db.models import Q
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
 from django.forms.utils import ErrorList
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.conf import settings
 
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
