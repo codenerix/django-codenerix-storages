@@ -8,9 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-12 11:06+0100\n"
+"POT-Creation-Date: 2022-05-17 15:46+0200\n"
 "PO-Revision-Date: 2018-02-09 14:11-0015\n"
-"Last-Translator: b'Juan Miguel 7110eda4d09e062aa5e4a390b0a572 <juanmi@juanmitaboada.com>'\n"
+"Last-Translator: b'Juan Miguel 7110eda4d09e062aa5e4a390b0a572 "
+"<juanmi@juanmitaboada.com>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -18,157 +19,815 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Translated-Using: django-rosetta 0.7.13\n"
 
-#: codenerix_storages/forms.py:44 codenerix_storages/forms.py:54
-#: codenerix_storages/forms.py:77 codenerix_storages/forms.py:86
-#: codenerix_storages/forms.py:100 codenerix_storages/forms.py:110
-#: codenerix_storages/forms.py:125 codenerix_storages/forms.py:134
-#: codenerix_storages/forms.py:200 codenerix_storages/forms.py:211
-#: codenerix_storages/forms.py:227 codenerix_storages/forms.py:238
-#: codenerix_storages/forms.py:254 codenerix_storages/forms.py:265
-#: codenerix_storages/forms.py:281 codenerix_storages/forms.py:296
+#: codenerix_storages/forms.py:46 codenerix_storages/forms.py:67
+#: codenerix_storages/forms.py:93 codenerix_storages/forms.py:105
+#: codenerix_storages/forms.py:122 codenerix_storages/forms.py:133
+#: codenerix_storages/forms.py:150 codenerix_storages/forms.py:162
+#: codenerix_storages/forms.py:180 codenerix_storages/forms.py:198
+#: codenerix_storages/forms.py:214 codenerix_storages/forms.py:236
+#: codenerix_storages/forms.py:250 codenerix_storages/forms.py:288
+#: codenerix_storages/forms.py:301 codenerix_storages/forms_stockcontrol.py:340
+#: codenerix_storages/forms_stockcontrol.py:354
+#: codenerix_storages/forms_stockcontrol.py:374
+#: codenerix_storages/forms_stockcontrol.py:385
 msgid "Details"
 msgstr "Detalles"
 
-#: codenerix_storages/models.py:32 codenerix_storages/models.py:98
-#: codenerix_storages/models.py:119 codenerix_storages/models.py:125
-#: codenerix_storages/views.py:51 codenerix_storages/views.py:118
+#: codenerix_storages/forms.py:50 codenerix_storages/forms.py:71
+msgid "Address"
+msgstr ""
+
+#: codenerix_storages/forms.py:268 codenerix_storages/models.py:183
+#: codenerix_storages/models.py:198 codenerix_storages/views.py:83
+msgid "Zones"
+msgstr "Zonas"
+
+#: codenerix_storages/forms.py:275
+msgid "Pin for storage software"
+msgstr ""
+
+#: codenerix_storages/forms.py:276
+msgid "Confirm pin"
+msgstr ""
+
+#: codenerix_storages/forms.py:314 codenerix_storages/views.py:406
+#: codenerix_storages/views.py:472
+msgid "Passwords do not match"
+msgstr ""
+
+#: codenerix_storages/forms_stockcontrol.py:62
+#: codenerix_storages/forms_stockcontrol.py:98
+#: codenerix_storages/forms_stockcontrol.py:182
+#: codenerix_storages/forms_stockcontrol.py:235
+#: codenerix_storages/forms_stockcontrol.py:284
+#: codenerix_storages/forms_stockcontrol.py:320
+#: codenerix_storages/models_stockcontrol.py:38
+#: codenerix_storages/models_stockcontrol.py:64
+#: codenerix_storages/models_stockcontrol.py:98
+#: codenerix_storages/models_stockcontrol.py:123
+#: codenerix_storages/models_stockcontrol.py:154
+#: codenerix_storages/models_stockcontrol.py:179
+#: codenerix_storages/models_stockcontrol.py:198
+#: codenerix_storages/models_stockcontrol.py:217
+#: codenerix_storages/views_stockcontrol.py:361
+#: codenerix_storages/views_stockcontrol.py:1366
+#: codenerix_storages/views_stockcontrol.py:1967
+msgid "Notes"
+msgstr ""
+
+#: codenerix_storages/forms_stockcontrol.py:224
+msgid ""
+"This product must be unique, you can not add several products with the same "
+"unique code"
+msgstr ""
+
+#: codenerix_storages/forms_stockcontrol.py:259
+msgid "InventoryOut"
+msgstr ""
+
+#: codenerix_storages/models.py:33 codenerix_storages/models.py:37
+#: codenerix_storages/models.py:49 codenerix_storages/models.py:56
+#: codenerix_storages/models_stockcontrol.py:89
+#: codenerix_storages/models_stockcontrol.py:94
+#: codenerix_storages/models_stockcontrol.py:140 codenerix_storages/views.py:53
+#: codenerix_storages/views.py:91 codenerix_storages/views.py:109
+#: codenerix_storages/views.py:187 codenerix_storages/views.py:252
+#: codenerix_storages/views.py:280 codenerix_storages/views.py:306
+#: codenerix_storages/views.py:356 codenerix_storages/views.py:491
+#: codenerix_storages/views_stockcontrol.py:58
+#: codenerix_storages/views_stockcontrol.py:806
+#: codenerix_storages/views_stockcontrol.py:868
+#: codenerix_storages/views_stockcontrol.py:1148
+#: codenerix_storages/views_stockcontrol.py:1338
+#: codenerix_storages/views_stockcontrol.py:1750
+#: codenerix_storages/views_stockcontrol.py:1942
+#: codenerix_storages/views_stockcontrol.py:2267
 msgid "Storage"
 msgstr "Almacén"
 
-#: codenerix_storages/models.py:39 codenerix_storages/models.py:52
-#: codenerix_storages/models.py:63
-msgid "---"
-msgstr "---"
-
-#: codenerix_storages/models.py:45
-msgid "Contact persons of storage"
-msgstr "Persona de contacto del almacén"
-
-#: codenerix_storages/models.py:66 codenerix_storages/models.py:70
-#: codenerix_storages/models.py:174 codenerix_storages/models.py:185
-#: codenerix_storages/models.py:192 codenerix_storages/models.py:203
-#: codenerix_storages/models.py:210 codenerix_storages/models.py:221
-#: codenerix_storages/models.py:231 codenerix_storages/models.py:246
-msgid "Alias"
-msgstr "Alias"
-
-#: codenerix_storages/models.py:86
-msgid ""
-"Cannot delete storage model, relationship between storage model and contacts"
-msgstr "No se puede eliminar el almacén, hay contactos relacionados con él"
-
-#: codenerix_storages/models.py:88
-msgid ""
-"Cannot delete storage model, relationship between storage model and zones"
-msgstr "No se puede eliminar el almacén, hay zonas relacionadas con él"
-
-#: codenerix_storages/models.py:112
-msgid "Storages"
-msgstr "Almacenes"
-
-#: codenerix_storages/models.py:120 codenerix_storages/models.py:124
-#: codenerix_storages/models.py:173 codenerix_storages/models.py:184
+#: codenerix_storages/models.py:50 codenerix_storages/models.py:55
+#: codenerix_storages/models.py:76 codenerix_storages/models.py:94
+#: codenerix_storages/models_stockcontrol.py:90
+#: codenerix_storages/models_stockcontrol.py:95
 msgid "Zone"
 msgstr "Zona"
 
-#: codenerix_storages/models.py:136
+#: codenerix_storages/models.py:51 codenerix_storages/models.py:57
+msgid "Salable"
+msgstr ""
+
+#: codenerix_storages/models.py:68
+#, fuzzy
+#| msgid ""
+#| "Cannot delete storage zone model, relationship between storage zone model "
+#| "and bacth"
 msgid ""
 "Cannot delete storage zone model, relationship between storage zone model "
-"and bacth"
+"and storage operator"
 msgstr "No se puede eliminar la zona, hay lotes relacionados con ella"
 
-#: codenerix_storages/models.py:191 codenerix_storages/models.py:202
-msgid "Hall"
-msgstr "Pasillo"
+#: codenerix_storages/models.py:70
+#, fuzzy
+#| msgid ""
+#| "Cannot delete storage zone model, relationship between storage zone model "
+#| "and bacth"
+msgid ""
+"Cannot delete storage zone model, relationship between storage zone model "
+"and storage box structure"
+msgstr "No se puede eliminar la zona, hay lotes relacionados con ella"
 
-#: codenerix_storages/models.py:209 codenerix_storages/models.py:220
-msgid "Rack"
-msgstr "Rack"
+#: codenerix_storages/models.py:77
+msgid "Structure box"
+msgstr ""
 
-#: codenerix_storages/models.py:226 codenerix_storages/models.py:241
-msgid "Shelf"
-msgstr "Estantería"
-
-#: codenerix_storages/models.py:227 codenerix_storages/models.py:242
+#: codenerix_storages/models.py:78 codenerix_storages/models.py:113
+#: codenerix_storages/models.py:130
 msgid "Length"
 msgstr "Longitud"
 
-#: codenerix_storages/models.py:228 codenerix_storages/models.py:243
+#: codenerix_storages/models.py:79 codenerix_storages/models.py:97
+#: codenerix_storages/models.py:114 codenerix_storages/models.py:131
 msgid "Width"
 msgstr "Ancho"
 
-#: codenerix_storages/models.py:229 codenerix_storages/models.py:244
+#: codenerix_storages/models.py:80 codenerix_storages/models.py:98
+#: codenerix_storages/models.py:115 codenerix_storages/models.py:132
 msgid "Heigth"
 msgstr "Altura"
 
-#: codenerix_storages/models.py:230 codenerix_storages/models.py:245
+#: codenerix_storages/models.py:82 codenerix_storages/models.py:99
+#: codenerix_storages/models.py:117 codenerix_storages/models.py:133
+#: codenerix_storages/models.py:148 codenerix_storages/models.py:161
 msgid "Weight"
 msgstr "Peso"
 
-#: codenerix_storages/views.py:51 codenerix_storages/views.py:118
-#: codenerix_storages/views.py:136 codenerix_storages/views.py:382
-#: codenerix_storages/views.py:443 codenerix_storages/views.py:504
-#: codenerix_storages/views.py:565
+#: codenerix_storages/models.py:83 codenerix_storages/models.py:100
+#: codenerix_storages/models.py:118
+#, fuzzy
+#| msgid "Weight"
+msgid "Max weight"
+msgstr "Peso"
+
+#: codenerix_storages/models.py:84 codenerix_storages/models.py:96
+#: codenerix_storages/models.py:119 codenerix_storages/models.py:129
+#: codenerix_storages/models.py:146 codenerix_storages/models.py:158
+msgid "Name"
+msgstr ""
+
+#: codenerix_storages/models.py:95
+msgid "Box structure"
+msgstr ""
+
+#: codenerix_storages/models.py:105
+#, fuzzy
+#| msgid ""
+#| "Cannot delete storage zone model, relationship between storage zone model "
+#| "and bacth"
+msgid "Cannot delete storage zone model, related to himself"
+msgstr "No se puede eliminar la zona, hay lotes relacionados con ella"
+
+#: codenerix_storages/models.py:107
+#, fuzzy
+#| msgid ""
+#| "Cannot delete storage zone model, relationship between storage zone model "
+#| "and bacth"
+msgid ""
+"Cannot delete storage zone model, relationship between storage structure "
+"model and storage box"
+msgstr "No se puede eliminar la zona, hay lotes relacionados con ella"
+
+#: codenerix_storages/models.py:138
+#, fuzzy
+#| msgid ""
+#| "Cannot delete storage zone model, relationship between storage zone model "
+#| "and bacth"
+msgid ""
+"Cannot delete storage zone model, relationship between storage box kind "
+"model and storage box"
+msgstr "No se puede eliminar la zona, hay lotes relacionados con ella"
+
+#: codenerix_storages/models.py:144 codenerix_storages/models.py:159
+msgid "Box Structure"
+msgstr ""
+
+#: codenerix_storages/models.py:145 codenerix_storages/models.py:160
+msgid "Box Kind"
+msgstr ""
+
+#: codenerix_storages/models.py:180 codenerix_storages/models.py:213
+msgid "---"
+msgstr "---"
+
+#: codenerix_storages/models.py:184 codenerix_storages/models.py:199
+msgid "Enable"
+msgstr ""
+
+#: codenerix_storages/models.py:206
+#, fuzzy
+#| msgid "StorageZone"
+msgid "Storage operator"
+msgstr "Zona"
+
+#: codenerix_storages/models_stockcontrol.py:37
+#: codenerix_storages/models_stockcontrol.py:97
+#: codenerix_storages/models_stockcontrol.py:153
+#: codenerix_storages/models_stockcontrol.py:197
+msgid "Ends"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:39
+msgid "Processed"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:43
+#: codenerix_storages/models_stockcontrol.py:72
+msgid "This Inventory has been already processed, can not be updated"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:49
+#: codenerix_storages/models_stockcontrol.py:79
+msgid "This Inventory has been already processed, can not be deleted"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:58
+#: codenerix_storages/models_stockcontrol.py:116
+#: codenerix_storages/models_stockcontrol.py:172
+#: codenerix_storages/models_stockcontrol.py:211
+#: codenerix_storages/models_stockcontrol.py:359
+#: codenerix_storages/models_stockcontrol.py:367
+#: codenerix_storages/views_stockcontrol.py:350
+#: codenerix_storages/views_stockcontrol.py:355
+#: codenerix_storages/views_stockcontrol.py:490
+#: codenerix_storages/views_stockcontrol.py:492
+#: codenerix_storages/views_stockcontrol.py:889
+#: codenerix_storages/views_stockcontrol.py:1359
+#: codenerix_storages/views_stockcontrol.py:1961
+msgid "Box"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:59
+msgid "Product Final"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:60
+#: codenerix_storages/models_stockcontrol.py:313
+#: codenerix_storages/models_stockcontrol.py:321
+msgid "Product Unique"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:61
+msgid "Product Unique Value"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:62
+#, fuzzy
+#| msgid "Storage's Batch"
+msgid "Storage Operator"
+msgstr "Lote de almacén"
+
+#: codenerix_storages/models_stockcontrol.py:63
+#: codenerix_storages/models_stockcontrol.py:121
+#: codenerix_storages/models_stockcontrol.py:141
+#: codenerix_storages/models_stockcontrol.py:177
+#: codenerix_storages/models_stockcontrol.py:216
+#: codenerix_storages/models_stockcontrol.py:266
+#: codenerix_storages/models_stockcontrol.py:271
+#: codenerix_storages/models_stockcontrol.py:361
+#: codenerix_storages/models_stockcontrol.py:369
+#: codenerix_storages/views_stockcontrol.py:351
+#: codenerix_storages/views_stockcontrol.py:356
+#: codenerix_storages/views_stockcontrol.py:490
+#: codenerix_storages/views_stockcontrol.py:492
+#: codenerix_storages/views_stockcontrol.py:890
+#: codenerix_storages/views_stockcontrol.py:1360
+#: codenerix_storages/views_stockcontrol.py:1962
+msgid "Quantity"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:96
+#: codenerix_storages/models_stockcontrol.py:152
+#: codenerix_storages/models_stockcontrol.py:196
+msgid "Starts"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:100
+#: codenerix_storages/models_stockcontrol.py:155
+#: codenerix_storages/models_stockcontrol.py:199
+msgid "Actions"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:111
+#: codenerix_storages/models_stockcontrol.py:165
+#: codenerix_storages/models_stockcontrol.py:279
+#: codenerix_storages/templates/codenerix_storages/inventory.html:4
+#: codenerix_storages/views_stockcontrol.py:58
+msgid "Inventory"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:112
+#: codenerix_storages/models_stockcontrol.py:122
+#: codenerix_storages/models_stockcontrol.py:166
+#: codenerix_storages/models_stockcontrol.py:178
+#: codenerix_storages/views_stockcontrol.py:360
+#: codenerix_storages/views_stockcontrol.py:490
+#: codenerix_storages/views_stockcontrol.py:492
+#: codenerix_storages/views_stockcontrol.py:894
+#: codenerix_storages/views_stockcontrol.py:1365
+msgid "Caducity"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:117
+#: codenerix_storages/models_stockcontrol.py:173
+#: codenerix_storages/models_stockcontrol.py:212
+#: codenerix_storages/models_stockcontrol.py:265
+#: codenerix_storages/models_stockcontrol.py:270
+#: codenerix_storages/models_stockcontrol.py:360
+#: codenerix_storages/models_stockcontrol.py:368
+#: codenerix_storages/views_stockcontrol.py:352
+#: codenerix_storages/views_stockcontrol.py:357
+#: codenerix_storages/views_stockcontrol.py:891
+#: codenerix_storages/views_stockcontrol.py:1361
+#: codenerix_storages/views_stockcontrol.py:1963
+msgid "Product"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:118
+#: codenerix_storages/models_stockcontrol.py:174
+#: codenerix_storages/models_stockcontrol.py:213
+#: codenerix_storages/views_stockcontrol.py:353
+#: codenerix_storages/views_stockcontrol.py:358
+#: codenerix_storages/views_stockcontrol.py:893
+#: codenerix_storages/views_stockcontrol.py:1363
+#: codenerix_storages/views_stockcontrol.py:1965
+msgid "Unique"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:119
+#: codenerix_storages/models_stockcontrol.py:175
+#: codenerix_storages/models_stockcontrol.py:214
+msgid "Unique Value"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:120
+#: codenerix_storages/models_stockcontrol.py:176
+#: codenerix_storages/models_stockcontrol.py:215
+msgid "Operator"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:135
+#: codenerix_storages/models_stockcontrol.py:163
+msgid "Order"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:142
+#: codenerix_storages/models_stockcontrol.py:233
+#: codenerix_storages/models_stockcontrol.py:244
+msgid "Desired Date"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:147
+#: codenerix_storages/models_stockcontrol.py:151
+msgid "Provider"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:164
+msgid "Line Albaran"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:170
+msgid "Purchases Order"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:171
+msgid "Purchases Line Albaran"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:191
+#: codenerix_storages/models_stockcontrol.py:195
+msgid "Albaran"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:207
+msgid "Inventory line"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:229
+#: codenerix_storages/models_stockcontrol.py:240
+#, fuzzy
+#| msgid "Storages"
+msgid "Storage source"
+msgstr "Almacenes"
+
+#: codenerix_storages/models_stockcontrol.py:230
+#: codenerix_storages/models_stockcontrol.py:241
+msgid "Storage destionation"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:232
+#: codenerix_storages/models_stockcontrol.py:243
+msgid "Request Date"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:237
+#, fuzzy
+#| msgid "Batches"
+msgid "Batch source"
+msgstr "Lotes"
+
+#: codenerix_storages/models_stockcontrol.py:238
+msgid "Batch destination"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:239
+msgid "Products"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:242
+msgid "Request user"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:252
+#, fuzzy
+#| msgid ""
+#| "Cannot delete storage model, relationship between storage model and zones"
+msgid ""
+"Cannot delete request stock model, relationship between request stock model "
+"and lines"
+msgstr "No se puede eliminar el almacén, hay zonas relacionadas con él"
+
+#: codenerix_storages/models_stockcontrol.py:254
+#, fuzzy
+#| msgid ""
+#| "Cannot delete storage model, relationship between storage model and zones"
+msgid ""
+"Cannot delete request stock model, relationship between request stock model "
+"and outgoing albaran"
+msgstr "No se puede eliminar el almacén, hay zonas relacionadas con él"
+
+#: codenerix_storages/models_stockcontrol.py:264
+#: codenerix_storages/models_stockcontrol.py:280
+#: codenerix_storages/models_stockcontrol.py:288
+msgid "Request stock"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:282
+#: codenerix_storages/models_stockcontrol.py:290
+msgid "Prepare Date"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:283
+#: codenerix_storages/models_stockcontrol.py:291
+msgid "Outgoing Date"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:284
+#: codenerix_storages/models_stockcontrol.py:292
+msgid "Estimated Date"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:289
+#: codenerix_storages/models_stockcontrol.py:322
+msgid "Prepare user"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:300
+#, fuzzy
+#| msgid ""
+#| "Cannot delete storage model, relationship between storage model and zones"
+msgid ""
+"Cannot delete outgoing albaran model, relationship between outgoing albaran "
+"model and lines"
+msgstr "No se puede eliminar el almacén, hay zonas relacionadas con él"
+
+#: codenerix_storages/models_stockcontrol.py:302
+#, fuzzy
+#| msgid ""
+#| "Cannot delete storage model, relationship between storage model and "
+#| "contacts"
+msgid ""
+"Cannot delete outgoing albaran model, relationship between outgoing albaran "
+"model and incoming albaran"
+msgstr "No se puede eliminar el almacén, hay contactos relacionados con él"
+
+#: codenerix_storages/models_stockcontrol.py:312
+#: codenerix_storages/models_stockcontrol.py:320
+#: codenerix_storages/models_stockcontrol.py:332
+#: codenerix_storages/models_stockcontrol.py:338
+#: codenerix_storages/views_stockcontrol.py:2267
+msgid "Outgoing Albaran"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:315
+#: codenerix_storages/models_stockcontrol.py:323
+#: codenerix_storages/models_stockcontrol.py:362
+#: codenerix_storages/models_stockcontrol.py:370
+msgid "Validator user"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:333
+#: codenerix_storages/models_stockcontrol.py:339
+msgid "Reception user"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:334
+#: codenerix_storages/models_stockcontrol.py:340
+msgid "Reception Date"
+msgstr ""
+
+#: codenerix_storages/models_stockcontrol.py:348
+#, fuzzy
+#| msgid ""
+#| "Cannot delete storage model, relationship between storage model and zones"
+msgid ""
+"Cannot delete incoming albaran model, relationship between incoming albaran "
+"model and lines"
+msgstr "No se puede eliminar el almacén, hay zonas relacionadas con él"
+
+#: codenerix_storages/models_stockcontrol.py:358
+#: codenerix_storages/models_stockcontrol.py:366
+msgid "Incoming Albaran"
+msgstr ""
+
+#: codenerix_storages/templates/codenerix_storages/inventory.html:32
+msgid "All is OK!"
+msgstr ""
+
+#: codenerix_storages/templates/codenerix_storages/inventory.html:38
+msgid "There are locked products that are LOST!"
+msgstr ""
+
+#: codenerix_storages/templates/codenerix_storages/inventory.html:40
+msgid "Do you confirm to set this inventory in the storage/zone?"
+msgstr ""
+
+#: codenerix_storages/views.py:109
+msgid "StorageZone"
+msgstr "Zona"
+
+#: codenerix_storages/views.py:187
+msgid "StorageBox"
+msgstr "Caja"
+
+#: codenerix_storages/views.py:252 codenerix_storages/views.py:280
+#, fuzzy
+#| msgid "StorageBox"
+msgid "StorageBoxStructure"
+msgstr "Caja"
+
+#: codenerix_storages/views.py:306 codenerix_storages/views.py:334
+#, fuzzy
+#| msgid "StorageBox"
+msgid "StorageBoxKind"
+msgstr "Caja"
+
+#: codenerix_storages/views.py:334
 msgid "People"
 msgstr "Gente"
 
-#: codenerix_storages/views.py:63
-msgid "The selected entry is already a storage, select another entry!"
+#: codenerix_storages/views.py:356 codenerix_storages/views.py:491
+#, fuzzy
+#| msgid "StorageBox"
+msgid "StorageOperator"
+msgstr "Caja"
+
+#: codenerix_storages/views.py:368
+#, fuzzy
+#| msgid "The selected entry is already a storage, select another entry!"
+msgid "The selected entry is already a operator, select another entry!"
 msgstr "La entrada seleccionada ya es un almacén, seleccione otra entrada!"
 
-#: codenerix_storages/views.py:64 codenerix_storages/views.py:89
+#: codenerix_storages/views.py:369 codenerix_storages/views.py:439
 msgid "The selected entry is not available anymore, please, try again!"
 msgstr ""
 "La entrada seleccionada ya no está disponible, por favor, ¡inténtelo de "
 "nuevo!"
 
-#: codenerix_storages/views.py:107
-msgid "Zones"
-msgstr "Zonas"
+#: codenerix_storages/views.py:377 codenerix_storages/views.py:447
+msgid "Not related to a user (E1)"
+msgstr ""
 
-#: codenerix_storages/views.py:109
-msgid "Contacts"
-msgstr "Contactos"
+#: codenerix_storages/views.py:393 codenerix_storages/views.py:463
+msgid "Not related to a user (E2)"
+msgstr ""
 
-#: codenerix_storages/views.py:136
-msgid "StorageZone"
-msgstr "Zona"
+#: codenerix_storages/views.py:397 codenerix_storages/views.py:467
+msgid "Not related to a user (E3)"
+msgstr ""
 
-#: codenerix_storages/views.py:341
-msgid "Storage not seleted!"
-msgstr "Almacén no seleccionado"
+#: codenerix_storages/views.py:402
+msgid "Passwords required"
+msgstr ""
 
-#: codenerix_storages/views.py:382
-#| msgid "Storage"
-msgid "StorageHall"
-msgstr "Pasillo"
+#: codenerix_storages/views_stockcontrol.py:61
+#: codenerix_storages/views_stockcontrol.py:809
+#: codenerix_storages/views_stockcontrol.py:1151
+#: codenerix_storages/views_stockcontrol.py:1753
+#: codenerix_storages/views_stockcontrol.py:2270
+msgid "Get report"
+msgstr ""
 
-#: codenerix_storages/views.py:443
-#| msgid "StorageBatch"
-msgid "StorageRack"
-msgstr "Rack"
+#: codenerix_storages/views_stockcontrol.py:62
+#: codenerix_storages/views_stockcontrol.py:810
+#: codenerix_storages/views_stockcontrol.py:1152
+#: codenerix_storages/views_stockcontrol.py:1754
+msgid "Do inventory"
+msgstr ""
 
-#: codenerix_storages/views.py:504
-#| msgid "Storage"
-msgid "StorageShelf"
-msgstr "Estantería"
+#: codenerix_storages/views_stockcontrol.py:299
+msgid "Inventory not found!"
+msgstr ""
 
-#: codenerix_storages/views.py:565
-#| msgid "Storage"
-msgid "StorageBox"
-msgstr "Caja"
+#: codenerix_storages/views_stockcontrol.py:313
+#: codenerix_storages/views_stockcontrol.py:330
+msgid "InventoryLine"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:339
+#: codenerix_storages/views_stockcontrol.py:879
+#: codenerix_storages/views_stockcontrol.py:1349
+#: codenerix_storages/views_stockcontrol.py:1953
+msgid "Unique product is new!"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:340
+#: codenerix_storages/views_stockcontrol.py:880
+#: codenerix_storages/views_stockcontrol.py:1350
+#: codenerix_storages/views_stockcontrol.py:1954
+msgid "Product not found!"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:341
+#: codenerix_storages/views_stockcontrol.py:881
+#: codenerix_storages/views_stockcontrol.py:1351
+#: codenerix_storages/views_stockcontrol.py:1955
+msgid "Are you sure you want to remove \"<name>\"?"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:342
+msgid "Inventariar"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:343
+msgid "Compact"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:344
+msgid "Extended"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:490
+#: codenerix_storages/views_stockcontrol.py:492
+msgid "Product final"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:490
+#: codenerix_storages/views_stockcontrol.py:492
+msgid "Product unique"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:490
+#: codenerix_storages/views_stockcontrol.py:492
+#: codenerix_storages/views_stockcontrol.py:664
+msgid "Locked"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:647
+#: codenerix_storages/views_stockcontrol.py:662
+msgid "Lost"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:649
+#: codenerix_storages/views_stockcontrol.py:666
+msgid "New"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:806
+#: codenerix_storages/views_stockcontrol.py:868
+#: codenerix_storages/views_stockcontrol.py:1148
+#: codenerix_storages/views_stockcontrol.py:1338
+msgid "Incoming Stock"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:851
+msgid "DistributionLine"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:882
+#: codenerix_storages/views_stockcontrol.py:1352
+#: codenerix_storages/views_stockcontrol.py:1956
+msgid "Albaranar"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:887
+#: codenerix_storages/views_stockcontrol.py:1357
+msgid "Purchase Order"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:918
+#: codenerix_storages/views_stockcontrol.py:919
+#: codenerix_storages/views_stockcontrol.py:1392
+#: codenerix_storages/views_stockcontrol.py:1393
+msgid "Press * or start typing"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1305
+msgid "Incoming Inventory not found!"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1319
+msgid "InventoryInLine"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1583
+msgid "This product is already registered"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1691
+msgid "Unique product already exists in our database!"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1695
+msgid "Unique product already registered here!"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1729
+msgid "Purchase order not found!"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1732
+msgid "Inventory IN Line not found!"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1750
+msgid "Outgoing stock (Orders)"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1914
+msgid "Outgoing Inventory not found!"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1928
+msgid "InventoryOutLine"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:1942
+msgid "Outgoing Stock"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:2137
+msgid "Product uniques not found"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:2144
+msgid "Quantity invalid"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:2271
+msgid "Do outgoingalbaran"
+msgstr ""
+
+#: codenerix_storages/views_stockcontrol.py:2314
+msgid "Albaran saliente"
+msgstr ""
+
+#~ msgid "Contact persons of storage"
+#~ msgstr "Persona de contacto del almacén"
+
+#~ msgid "Alias"
+#~ msgstr "Alias"
+
+#~ msgid "Hall"
+#~ msgstr "Pasillo"
+
+#~ msgid "Rack"
+#~ msgstr "Rack"
+
+#~ msgid "Shelf"
+#~ msgstr "Estantería"
+
+#~ msgid "Contacts"
+#~ msgstr "Contactos"
+
+#~ msgid "Storage not seleted!"
+#~ msgstr "Almacén no seleccionado"
+
+#~| msgid "Storage"
+#~ msgid "StorageHall"
+#~ msgstr "Pasillo"
+
+#~| msgid "StorageBatch"
+#~ msgid "StorageRack"
+#~ msgstr "Rack"
+
+#~| msgid "Storage"
+#~ msgid "StorageShelf"
+#~ msgstr "Estantería"
 
 #~ msgid "Reference"
 #~ msgstr "Referencia"
 
-#~ msgid "Storage's Batch"
-#~ msgstr "Lote de almacén"
-
 #~ msgid "Storage's Batchs"
 #~ msgstr "Lotes de almacén"
-
-#~ msgid "Batches"
-#~ msgstr "Lotes"
 
 #~ msgid "Bacthes"
 #~ msgstr "Lotes"
